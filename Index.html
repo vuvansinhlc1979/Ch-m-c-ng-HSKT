@@ -1,0 +1,3348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ Thống Chấm Công – Trường TH Số 2 Gia Phú</title>
+<script src="xlsx.full.min.js"></script>
+<script src="exceljs.min.js"></script>
+<style>
+@import url('');
+:root{
+  --navy:#0d1b3e;--navy2:#172447;--navy3:#1e2f5c;
+  --gold:#c8973a;--gold2:#e0b84e;--gold3:#f5e4b0;
+  --green:#1a6b3c;--green2:#e6f4ec;--green3:#b7dfc8;
+  --red:#b52a2a;--red2:#fceaea;
+  --amber:#b86a00;--amber2:#fff4d6;
+  --sky:#1565a8;--sky2:#e3f2fd;
+  --w:#fff;--g0:#f4f5f8;--g1:#eaedf3;--g2:#d4d9e6;
+  --g3:#9ba5bc;--g4:#5c6880;--g5:#2a3550;
+  --r:8px;--r2:12px;
+  --sh:0 2px 8px rgba(13,27,62,.08),0 8px 24px rgba(13,27,62,.06);
+  --sb-w:205px;--tb-h:60px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g0);color:var(--g5);min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sb-w);background:var(--navy);display:flex;flex-direction:column;z-index:300;box-shadow:3px 0 16px rgba(13,27,62,.18)}
+.sb-brand{padding:0 14px;height:var(--tb-h);display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-brand-icon{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sb-brand-title{font-family:'Newsreader',serif;font-size:13px;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-brand-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.5px;text-transform:uppercase;margin-top:1px}
+.sb-nav{flex:1;padding:8px 7px;overflow-y:auto}
+.sb-sec{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1.4px;text-transform:uppercase;padding:10px 10px 5px;margin-top:4px}
+.sb-btn{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:var(--r);cursor:pointer;color:rgba(255,255,255,.6);font-size:12px;font-weight:500;transition:.13s;border:none;background:none;width:100%;text-align:left;font-family:inherit;margin-bottom:1px}
+.sb-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-btn.active{background:var(--gold);color:var(--navy);font-weight:700}
+.sb-btn .ic{font-size:13px;flex-shrink:0;opacity:.75}
+.sb-btn.active .ic{opacity:1}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sb-badge.ok{background:var(--gold2);color:var(--navy)}
+.sb-badge.warn{background:var(--amber);color:#fff}
+.sb-dot{width:7px;height:7px;background:var(--amber);border-radius:50%;margin-left:auto;flex-shrink:0;display:none}
+.sb-dot.show{display:block;animation:blink .9s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.sb-foot{padding:10px 14px;border-top:1px solid rgba(255,255,255,.06);font-size:10px;color:rgba(255,255,255,.25);line-height:1.8}
+.sb-ver{display:inline-block;background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;margin-bottom:3px}
+
+/* TOPBAR */
+.topbar{position:fixed;left:var(--sb-w);right:0;top:0;height:var(--tb-h);background:var(--navy);display:flex;align-items:center;padding:0 20px;gap:12px;z-index:200;box-shadow:0 2px 8px rgba(13,27,62,.2)}
+.tb-school{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.tb-school-icon{width:34px;height:34px;background:rgba(255,255,255,.1);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tb-school-name{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-school-title{font-family:'Newsreader',serif;font-size:15px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-badge{background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px}
+.tb-meta{text-align:right;font-size:10px;color:rgba(255,255,255,.45);line-height:1.6}
+.tb-meta b{color:rgba(255,255,255,.75)}
+.tb-save-time{font-size:9px;color:rgba(255,255,255,.28);margin-top:1px}
+
+/* MAIN */
+.main{margin-left:var(--sb-w);margin-top:var(--tb-h);padding:18px;min-height:calc(100vh - var(--tb-h))}
+
+/* CARDS */
+.card{background:var(--w);border-radius:var(--r2);box-shadow:var(--sh);border:1px solid var(--g1);margin-bottom:16px;overflow:hidden}
+.card-hd{padding:12px 18px;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-hd h2{font-size:12.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:7px}
+.card-hd h2::before{content:'';display:inline-block;width:3px;height:13px;background:var(--gold);border-radius:2px}
+.card-bd{padding:14px 18px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.13s;white-space:nowrap}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy2)}
+.btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover{background:var(--gold2)}
+.btn-success{background:var(--green);color:#f0d908}.btn-success:hover{background:#145830}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#8e1f1f}
+.btn-outline{background:transparent;border:1.5px solid var(--g2);color:var(--g4)}.btn-outline:hover{border-color:var(--navy);color:var(--navy);background:var(--g0)}
+.btn-ghost{background:transparent;color:var(--g4)}.btn-ghost:hover{background:var(--g1);color:var(--navy)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* FORMS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row3{grid-template-columns:1fr 1fr 1fr}
+.form-group{margin-bottom:11px}
+.form-group label{display:block;font-size:11px;font-weight:700;color:var(--g5);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:7px 10px;border:1.5px solid var(--g2);border-radius:var(--r);font-family:inherit;font-size:12px;color:var(--navy);outline:none;transition:.13s;background:var(--w)}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,151,58,.1)}
+.form-hint{font-size:10px;color:var(--g3);margin-top:3px;line-height:1.5}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--g1)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-lbl h4{font-size:12px;font-weight:600;color:var(--navy)}
+.toggle-lbl p{font-size:10px;color:var(--g3);margin-top:2px}
+.toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.tslider{position:absolute;cursor:pointer;inset:0;background:var(--g2);border-radius:20px;transition:.2s}
+.tslider::before{content:'';position:absolute;width:14px;height:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.tslider{background:var(--gold)}
+.toggle input:checked+.tslider::before{transform:translateX(18px)}
+
+/* NOTICES */
+.notice{display:none;align-items:flex-start;gap:8px;padding:10px 13px;border-radius:var(--r);font-size:12px;font-weight:500;margin-bottom:10px}
+.notice.show{display:flex}
+.n-ok{background:var(--green2);color:var(--green);border:1px solid var(--green3)}
+.n-err{background:var(--red2);color:var(--red);border:1px solid #f5c6cb}
+.n-warn{background:var(--amber2);color:var(--amber);border:1px solid #ffe082}
+.n-info{background:var(--sky2);color:var(--sky);border:1px solid #b3d7f2}
+
+/* DROPZONE */
+.dropzone{border:2px dashed var(--g2);border-radius:var(--r2);padding:22px 18px;text-align:center;cursor:pointer;transition:.2s;position:relative;background:linear-gradient(135deg,rgba(200,151,58,.03),transparent)}
+.dropzone:hover,.dropzone.over{border-color:var(--gold);background:rgba(200,151,58,.05)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dz-ico{font-size:28px;margin-bottom:7px}
+.dz-ttl{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.dz-sub{font-size:11px;color:var(--g3)}
+.dz-sub b{color:var(--navy2)}
+
+/* PROGRESS BAR */
+.prog-wrap{display:none;margin-top:12px;padding:10px 14px;background:var(--sky2);border-radius:var(--r);border:1px solid #b3d7f2}
+.prog-lbl{font-size:11px;color:var(--sky);margin-bottom:6px}
+.prog-bar-bg{background:rgba(21,101,168,.15);border-radius:20px;height:6px;overflow:hidden}
+.prog-bar{height:6px;background:var(--sky);border-radius:20px;width:0%;transition:width .3s ease}
+
+/* VERIFY */
+.vfy-panel{display:none;margin-top:14px;border:1.5px solid var(--g2);border-radius:var(--r2);overflow:hidden}
+.vfy-panel.show{display:block}
+.vfy-hd{background:var(--navy);color:#fff;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.vfy-hd-left{display:flex;align-items:center;gap:8px}
+.vfy-hd-left h3{font-size:13px;font-weight:700}
+.vfy-hd-left span{font-size:10px;color:rgba(255,255,255,.4)}
+.vfy-hd-right{display:flex;gap:8px;flex-wrap:wrap}
+.vfy-bd{padding:14px 16px;background:var(--g0)}
+.vfy-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.vfy-sc{background:var(--w);border:1px solid var(--g1);border-radius:var(--r);padding:9px 10px;text-align:center}
+.vfy-sc .v{font-size:19px;font-weight:700;color:var(--navy)}
+.vfy-sc .l{font-size:9px;color:var(--g3);text-transform:uppercase;margin-top:2px;letter-spacing:.4px}
+.vfy-sc.ok{border-color:var(--green3);background:var(--green2)}.vfy-sc.ok .v{color:var(--green)}
+.vfy-sc.warn{border-color:#ffe082;background:#fffde7}.vfy-sc.warn .v{color:var(--amber)}
+.vfy-cols{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.vfy-box{background:var(--w);border:1px solid var(--g1);border-radius:var(--r);padding:11px 13px}
+.vfy-box h4{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--g3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--g1)}
+.vfy-tags{display:flex;flex-wrap:wrap;gap:4px;line-height:1.9}
+.vtag{display:inline-flex;align-items:center;gap:3px;background:var(--navy);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.vtag .vc{color:var(--gold2)}
+.vtag.gold{background:var(--gold);color:var(--navy)}.vtag.gold .vc{color:var(--navy2);font-weight:700}
+.vfy-warn-box{background:var(--amber2);border:1px solid #ffe082;border-radius:var(--r);padding:10px 13px;margin-bottom:9px}
+.vfy-warn-box h4{font-size:11px;font-weight:700;color:var(--amber);margin-bottom:6px}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:9px;margin-top:13px}
+.scard{background:var(--g0);border:1px solid var(--g1);border-radius:var(--r);padding:11px 13px;text-align:center}
+.scard .sv{font-size:22px;font-weight:700;color:var(--navy)}
+.scard .sl{font-size:9px;color:var(--g3);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.scard.acc{border-color:var(--gold);background:rgba(200,151,58,.05)}.scard.acc .sv{color:var(--gold)}
+
+/* MONTH BAR */
+.mbar{background:var(--w);border-radius:var(--r2);box-shadow:var(--sh);border:1px solid var(--g1);margin-bottom:14px;padding:9px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.mtabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.mtab{padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:500;border:1.5px solid var(--g2);background:var(--w);color:var(--g4);cursor:pointer;transition:.13s;white-space:nowrap;font-family:inherit}
+.mtab:hover{border-color:var(--gold);color:var(--navy)}
+.mtab.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.mtab.has-data{border-color:var(--gold)}
+.mtab .dot{width:5px;height:5px;background:var(--gold);border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle}
+.mtab.active .dot{background:var(--gold2)}
+.mbar-actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+
+/* ATTENDANCE */
+.att-wrap{background:var(--w);border-radius:var(--r2);box-shadow:var(--sh);border:1px solid var(--g1);overflow:hidden}
+.att-hd{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:14px 20px}
+.att-hd .school-row{display:flex;align-items:center;gap:10px;font-size:9px;color:rgba(255,255,255,.45);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.att-hd .school-row .sep{color:rgba(255,255,255,.18)}
+.att-hd h3{font-family:'Newsreader',serif;font-size:15px;margin-bottom:3px;line-height:1.3}
+.att-hd .sub{font-size:11px;color:rgba(255,255,255,.55)}
+.tbl-tb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;background:var(--g0);border-bottom:1px solid var(--g1)}
+.edit-tip{font-size:11px;color:var(--g3);font-style:italic;flex:1}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead tr:first-child th{background:var(--navy);color:#fff;padding:7px 3px;text-align:center;font-size:9.5px;font-weight:600;white-space:nowrap;border:1px solid rgba(255,255,255,.1)}
+thead tr:nth-child(2) th{background:var(--navy2);color:var(--gold2);padding:4px 2px;text-align:center;font-size:9px;font-weight:600;border:1px solid rgba(255,255,255,.07);min-width:22px}
+thead tr:nth-child(3) th{background:#1e3060;color:rgba(255,255,255,.6);padding:3px 2px;text-align:center;font-size:8.5px;border:1px solid rgba(255,255,255,.05)}
+.th-fix{min-width:30px}.th-name{min-width:100px;text-align:left!important;padding-left:9px!important}
+.th-cls{min-width:48px}.th-mon{min-width:55px}.th-tot{background:#253564!important;min-width:46px}
+tbody tr{border-bottom:1px solid var(--g1);transition:background .1s}
+tbody tr:hover{background:rgba(200,151,58,.03)}
+td{padding:6px 3px;text-align:center;border:1px solid var(--g1);vertical-align:middle;color:var(--g4)}
+td.td-stt{color:var(--g3);font-size:10px}
+td.td-name{text-align:left;padding-left:9px;font-weight:500;color:var(--navy);white-space:nowrap}
+td.td-cls{font-weight:700;color:var(--navy2);font-size:11px}
+td.td-mon{color:var(--g3);font-size:10px}
+td.td-day{min-width:22px;max-width:27px;font-size:10px;font-weight:500;cursor:pointer;user-select:none}
+td.td-day:hover{outline:2px solid var(--gold);z-index:2;position:relative}
+td.d-sun{background:#fffaed;color:#9a7200}
+td.d-sat{background:#f3f0ff;color:#6030aa}
+td.d-on{background:var(--green2);color:var(--green);font-weight:700;font-size:11px}
+td.d-on:hover{background:var(--green3)}
+td.d-edit{outline:1.5px solid var(--amber)!important;background:#fff9ea!important}
+td.td-tot{background:#fffbe6;color:var(--navy);font-weight:700;font-size:12px;border-left:2px solid var(--gold)}
+td.td-note{min-width:65px;cursor:pointer;font-size:10px;color:var(--g4)}
+td.td-note:hover{background:rgba(200,151,58,.05)}
+td.editing{background:#fff9e6!important;outline:2px solid var(--gold)!important;z-index:10}
+td input.ci{width:100%;border:none;background:transparent;text-align:center;font-family:inherit;font-size:12px;font-weight:700;color:var(--green);outline:none;padding:0}
+tr.tr-sum td{background:var(--navy);color:#fff;font-weight:600;font-size:11px;padding:7px 3px}
+tr.tr-sum td.sl{text-align:right;padding-right:9px;color:var(--gold2)}
+tr.tr-sum td.sv{color:var(--gold2);font-weight:700}
+tr.tr-sum td.st{background:#1e3060!important;color:var(--gold2);font-weight:700}
+tr.row-kt td.td-name{color:var(--red)}
+tr.row-kt td.td-cls{color:var(--red)}
+.att-leg{padding:8px 16px;background:var(--g0);border-top:1px solid var(--g1);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--g4)}
+.leg-box{width:17px;height:15px;border-radius:3px;border:1px solid rgba(0,0,0,.07);font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.att-foot{padding:18px 22px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid var(--g1)}
+.sign-col{text-align:center;min-width:130px}
+.sign-col .stitle{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:30px}
+.sign-col .sname{font-size:11.5px;font-weight:700;color:var(--navy);padding-top:4px}
+
+/* CHART */
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:110px;padding:5px 0;border-bottom:2px solid var(--g1);margin-bottom:7px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-fill{width:100%;background:var(--navy);border-radius:4px 4px 0 0;transition:height .5s ease;min-height:2px;position:relative;cursor:pointer}
+.bar-fill:hover{background:var(--gold)}
+.bar-tip{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:.13s}
+.bar-fill:hover .bar-tip{opacity:1}
+.bar-lbl{font-size:9px;color:var(--g3);white-space:nowrap}
+.mc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.mc{background:var(--g0);border:1.5px solid var(--g1);border-radius:var(--r);padding:12px 14px;cursor:pointer;transition:.13s}
+.mc:hover{border-color:var(--gold);box-shadow:var(--sh);transform:translateY(-1px)}
+.mc-title{font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:5px}
+.mc-val{font-size:24px;font-weight:700;color:var(--green)}
+.mc-lbl{font-size:10px;color:var(--g3);margin-top:2px}
+.mc.empty .mc-val{color:var(--g2)}
+.cls-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.cls-tbl th{background:var(--navy);color:#fff;padding:6px 9px;font-size:10px;text-align:center}
+.cls-tbl td{padding:6px 9px;border-bottom:1px solid var(--g1);text-align:center}
+.cls-tbl tr:hover td{background:rgba(200,151,58,.04)}
+.cls-tbl .ft{font-weight:700;color:var(--navy)}
+.cls-tbl tr.sum-row td{background:var(--navy);color:#fff;font-weight:700}
+.cls-tbl td.kt-cell{color:var(--red);font-weight:600}
+
+/* STUDENT LIST */
+.hs-toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.hs-input{padding:6px 11px;border:1.5px solid var(--g2);border-radius:var(--r);font-family:inherit;font-size:12px;outline:none;background:var(--w)}
+.hs-input:focus{border-color:var(--gold)}
+.hs-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.hs-table th{background:var(--navy);color:#fff;padding:7px 9px;font-size:10px;font-weight:700;text-align:left;white-space:nowrap}
+.hs-table th.tc{text-align:center}
+.hs-table td{padding:6px 8px;border-bottom:1px solid var(--g1);vertical-align:middle}
+.hs-table tr:hover td{background:rgba(200,151,58,.03)}
+.hs-table .td-stt{text-align:center;color:var(--g3);font-size:10.5px;width:32px}
+.hs-table .td-name{font-weight:600;color:var(--navy)}
+.hs-table .td-cls{font-weight:700;color:var(--navy2)}
+.hs-table .td-ktt{color:var(--red);font-size:11px}
+.hs-table .td-act{text-align:center;width:40px}
+.hs-table td input{border:1px solid var(--g2);border-radius:5px;padding:3px 6px;font-family:inherit;font-size:11.5px;background:var(--w);outline:none;width:100%}
+.hs-table td input:focus{border-color:var(--gold);background:#fffef5}
+.hs-table td select{border:1px solid var(--g2);border-radius:5px;padding:3px 5px;font-family:inherit;font-size:11.5px;background:var(--w);outline:none}
+.hs-summary{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+.hs-sc{background:var(--g0);border:1px solid var(--g1);border-radius:var(--r);padding:7px 13px;display:flex;align-items:center;gap:7px}
+.hs-sc .sv{font-size:17px;font-weight:700;color:var(--navy)}
+.hs-sc .sl{color:var(--g3);font-size:10px}
+.hs-sc.hl{border-color:var(--gold);background:rgba(200,151,58,.05)}.hs-sc.hl .sv{color:var(--gold)}
+.btn-icon{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;transition:.1s}
+.btn-icon:hover{background:var(--g1)}
+
+/* CHECK PAGE */
+.ck-section{margin-bottom:18px}
+.ck-hd{font-size:12px;font-weight:700;color:var(--navy);padding:7px 12px;background:var(--g0);border-left:3px solid var(--gold);border-radius:0 var(--r) var(--r) 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.ck-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-bottom:9px}
+.ck-card{background:var(--w);border:1.5px solid var(--g1);border-radius:var(--r);padding:11px 13px}
+.ck-card.ok{border-color:var(--green3);background:var(--green2)}.ck-card.ok .cv{color:var(--green)}
+.ck-card.warn{border-color:#ffe082;background:#fffde7}.ck-card.warn .cv{color:var(--amber)}
+.ck-card.err{border-color:#f5c6cb;background:var(--red2)}.ck-card.err .cv{color:var(--red)}
+.ck-card .cv{font-size:21px;font-weight:700}
+.ck-card .cl{font-size:9.5px;color:var(--g3);margin-top:2px;text-transform:uppercase}
+.ck-list{margin:0;padding:0;list-style:none;border:1px solid var(--g1);border-radius:var(--r);overflow:hidden}
+.ck-list li{padding:8px 12px;border-bottom:1px solid var(--g1);font-size:12px;display:flex;align-items:flex-start;gap:8px}
+.ck-list li:last-child{border-bottom:none}
+.ck-list li .ii{font-size:14px;flex-shrink:0;margin-top:1px}
+.ck-list li .it{flex:1;color:var(--g5);line-height:1.5}
+.ck-list li .if{font-size:10.5px;color:var(--sky);margin-top:3px;font-style:italic}
+.ck-list li.ok{background:var(--green2)}
+.ck-list li.warn{background:#fffde7}
+.ck-list li.err{background:var(--red2)}
+.ck-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.ck-tbl th{background:var(--navy);color:#fff;padding:7px 10px;font-size:10px;font-weight:700}
+.ck-tbl td{padding:6px 10px;border-bottom:1px solid var(--g1)}
+.ck-tbl tr.ok td{background:var(--green2)}
+.ck-tbl tr.warn td{background:#fffde7}
+.ck-tbl tr.err td{background:var(--red2)}
+.badge-ok{display:inline-block;background:var(--green);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
+.badge-warn{display:inline-block;background:var(--amber);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
+.badge-err{display:inline-block;background:var(--red);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
+.ck-empty{padding:20px;text-align:center;color:var(--g3);font-size:12px;font-style:italic}
+
+/* SETTINGS */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ss-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--g3);margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--g1)}
+.psz-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.psz-opt{border:1.5px solid var(--g2);border-radius:var(--r);padding:8px 10px;cursor:pointer;transition:.13s;text-align:center}
+.psz-opt:hover{border-color:var(--gold)}
+.psz-opt.active{border-color:var(--navy);background:rgba(13,27,62,.04)}
+.psz-opt .pn{font-size:12px;font-weight:700;color:var(--navy)}
+.psz-opt .pd{font-size:10px;color:var(--g3);margin-top:1px}
+.swatches{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.swatch{width:24px;height:24px;border-radius:5px;cursor:pointer;border:2px solid transparent;transition:.13s}
+.swatch:hover{transform:scale(1.15)}
+.swatch.active{border-color:var(--navy);box-shadow:0 0 0 2px rgba(13,27,62,.2)}
+.divider{height:1px;background:var(--g1);margin:12px 0}
+.dlbl{display:flex;align-items:center;gap:8px;margin:12px 0;color:var(--g3);font-size:11px}
+.dlbl::before,.dlbl::after{content:'';flex:1;height:1px;background:var(--g1)}
+
+/* CONFIRM DIALOG */
+.dlg-bg{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:600;display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:.18s}
+.dlg-bg.open{opacity:1;pointer-events:all}
+.dlg-box{background:var(--w);border-radius:13px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(12px);transition:.18s;overflow:hidden}
+.dlg-bg.open .dlg-box{transform:translateY(0)}
+.dlg-hd{padding:16px 18px 10px;display:flex;align-items:center;gap:10px}
+.dlg-ico{font-size:22px}
+.dlg-title{font-size:14px;font-weight:700;color:var(--navy)}
+.dlg-body{padding:0 18px 14px;font-size:12.5px;color:var(--g4);line-height:1.65}
+.dlg-ft{padding:0 18px 16px;display:flex;gap:7px;justify-content:flex-end}
+
+/* SAVE DIALOG */
+.save-dialog{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:600;display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:.18s}
+.save-dialog.open{opacity:1;pointer-events:all}
+.sd-box{background:var(--w);border-radius:13px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.3);transform:translateY(14px);transition:.18s;overflow:hidden}
+.save-dialog.open .sd-box{transform:translateY(0)}
+.sd-hd{background:var(--navy);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.sd-hd h3{font-size:13px;font-weight:700}
+.sd-hd button{background:none;border:none;color:#fff;font-size:19px;cursor:pointer;opacity:.6;line-height:1}.sd-hd button:hover{opacity:1}
+.sd-bd{padding:18px}
+.sd-ft{padding:0 18px 14px;display:flex;gap:7px;justify-content:flex-end}
+.sd-path{display:flex;align-items:center;gap:7px;background:var(--g0);border:1.5px solid var(--g2);border-radius:var(--r);padding:7px 11px;margin-bottom:11px;font-size:11px;color:var(--g4)}
+.sd-path span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sd-info{font-size:11px;color:var(--g3);margin-bottom:12px;line-height:1.6}
+.sd-note{background:var(--sky2);border:1px solid #b3d7f2;border-radius:var(--r);padding:9px 11px;font-size:11px;color:var(--sky);margin-bottom:11px;line-height:1.6}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:5px;z-index:999}
+.toast{padding:9px 15px;border-radius:var(--r);font-size:12px;font-weight:600;box-shadow:var(--sh);transform:translateX(110%);transition:.25s;max-width:280px;pointer-events:none}
+.toast.show{transform:translateX(0)}
+.t-ok{background:var(--green);color:#fff}
+.t-err{background:var(--red);color:#fff}
+.t-info{background:var(--navy);color:#fff}
+.t-warn{background:var(--amber);color:#fff}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 18px;color:var(--g3)}
+.empty .ico{font-size:35px;margin-bottom:9px}
+.empty h3{font-size:13px;font-weight:700;color:var(--g4);margin-bottom:4px}
+.empty p{font-size:11px}
+
+/* TAGS */
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--navy);color:#fff;margin:1px 2px}
+.tag-amber{background:var(--amber);color:#fff}
+.tag-green{background:var(--green);color:#fff}
+.tag-red{background:var(--red);color:#fff}
+.kt-badge{display:inline-block;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+
+/* STORAGE INFO */
+.storage-bar-bg{background:var(--g1);border-radius:4px;height:4px;flex:1}
+.storage-bar-fill{height:4px;background:var(--green);border-radius:4px;transition:width .3s}
+.storage-bar-fill.warn{background:var(--amber)}
+.storage-bar-fill.err{background:var(--red)}
+
+@media print{
+  .sidebar,.topbar,.mbar,.tbl-tb,.att-leg{display:none!important}
+  .main{margin:0;padding:0}
+  .att-wrap{box-shadow:none;border:none;border-radius:0}
+  body{background:#fff}
+}
+@media(max-width:900px){
+  :root{--sb-w:0px;--tb-h:54px}
+  .sidebar{transform:translateX(-210px);transition:transform .25s}
+  .sidebar.mob-open{transform:translateX(0)!important}
+  .topbar{left:0}.main{margin-left:0}
+  .sg{grid-template-columns:1fr}
+  .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:299}
+  .mob-overlay.show{display:block}
+  #mobMenuBtn{display:flex!important}
+}
+@media(max-width:600px){
+  .main{padding:10px 8px}
+  .form-row,.form-row3{grid-template-columns:1fr}
+  .vfy-cols{grid-template-columns:1fr}
+  .vfy-stats{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon">⚙️</div>
+    <div>
+      <div class="sb-brand-title">THIẾT LẬP HỆ THỐNG</div>
+      <div class="sb-brand-sub">Cài đặt chung</div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">Chính</div>
+    <button class="sb-btn active" onclick="showPage('upload',this)" id="navUpload">
+      <span class="ic">📂</span> Tải Dữ Liệu
+      <span class="sb-badge" id="navBadge">!</span>
+    </button>
+    <button class="sb-btn" onclick="showPage('chamcong',this)" id="navCC">
+      <span class="ic">📋</span> Bảng Chấm Công
+      <span class="sb-dot" id="unsavedDot" title="Có thay đổi chưa lưu"></span>
+    </button>
+    <button class="sb-btn" onclick="showPage('hocsinh',this)" id="navHS">
+      <span class="ic">👥</span> DS Học Sinh KT
+    </button>
+    <button class="sb-btn" onclick="showPage('kiemtra',this);runCheck()" id="navKT">
+      <span class="ic">🔍</span> Kiểm Tra Nhanh
+      <span class="sb-badge ok" id="ktBadge" style="display:none">✓</span>
+    </button>
+    <button class="sb-btn" onclick="showPage('tonghop',this)" id="navTH">
+      <span class="ic">📊</span> Tổng Hợp Năm
+    </button>
+    <button class="sb-btn" onclick="showPage('thongke',this)" id="navTK">
+      <span class="ic">📑</span> Thống Kê HK
+    </button>
+    <div class="sb-sec">Công cụ</div>
+    <button class="sb-btn" onclick="showPage('settings',this)" id="navCfg">
+      <span class="ic">⚙️</span> Cài Đặt
+    </button>
+    <button class="sb-btn" onclick="manualSave()">
+      <span class="ic">💾</span> Lưu Dữ Liệu
+    </button>
+    <button class="sb-btn" onclick="openExportDialog('all')">
+      <span class="ic">📦</span> Xuất Tất Cả
+    </button>
+    <button class="sb-btn" onclick="doPrint()">
+      <span class="ic">🖨️</span> In Bảng
+    </button>
+  </div>
+  <div class="sb-foot">
+    <span class="sb-ver">v4.0</span><br>
+    Năm học <span id="sbYear">2025–2026</span><br>
+    GV: <span id="sbTeacher">Vũ Văn Sinh</span>
+  </div>
+</nav>
+<div class="mob-overlay" id="mobOverlay" onclick="toggleMobMenu()"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tb-school">
+    <div class="tb-school-icon">📋</div>
+    <div style="min-width:0;flex:1">
+      <div class="tb-school-name" id="tbSchoolName">TRƯỜNG TH SỐ 2 GIA PHÚ · TỈNH LÀO CAI</div>
+      <div class="tb-school-title">HỆ THỐNG CHẤM CÔNG TỰ ĐỘNG</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <button id="mobMenuBtn" onclick="toggleMobMenu()" style="display:none;background:var(--gold);border:none;color:var(--navy);font-size:18px;width:36px;height:36px;border-radius:7px;cursor:pointer;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">☰</button>
+    <button class="btn btn-success btn-sm" onclick="manualSave()" id="topSaveBtn">💾 Lưu</button>
+    <span class="tb-badge">v4.0</span>
+    <div class="tb-meta">
+      <div><b id="tbDate">--</b></div>
+      <div class="tb-save-time" id="tbSaveTime">Chưa lưu</div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- PAGE: UPLOAD -->
+<div id="page-upload">
+  <div class="card" style="display:none">
+    <div class="card-hd"><h2 style="color:#fff;">Chi tiết từng tháng</h2></div>
+      <h2>Tải file kế hoạch dạy học (LBG)</h2>
+      <span id="lastFileLbl" style="font-size:11px;color:var(--g3)"></span>
+    </div>
+    <div class="card-bd">
+      <div class="dropzone" id="dz">
+        <input type="file" id="fileInput" accept=".xls,.xlsx">
+        <div class="dz-ico">📂</div>
+        <div class="dz-ttl">Kéo thả file vào đây hoặc nhấn để chọn</div>
+        <div class="dz-sub">Nhận file <b>lbg_ca_nam.xls</b> từ VnEdu (.xls hoặc .xlsx) — đọc tất cả sheet</div>
+      </div>
+      <div class="prog-wrap" id="progWrap">
+        <div class="prog-lbl" id="progLbl">Đang đọc...</div>
+        <div class="prog-bar-bg"><div class="prog-bar" id="progBar"></div></div>
+      </div>
+      <!-- VERIFY PANEL -->
+      <div class="vfy-panel" id="vfyPanel">
+        <div class="vfy-hd">
+          <div class="vfy-hd-left">
+            <span style="font-size:15px">🔍</span>
+            <div><h3>Xác nhận dữ liệu đọc được</h3><span id="vfyFname"></span></div>
+          </div>
+          <div class="vfy-hd-right">
+            <button class="btn btn-success btn-sm" onclick="confirmData()">✅ Xác nhận &amp; sử dụng</button>
+            <button class="btn btn-outline btn-sm" onclick="resetUpload()">🔄 Tải file khác</button>
+          </div>
+        </div>
+        <div class="vfy-bd">
+          <div class="vfy-stats" id="vfyStats"></div>
+          <div class="vfy-cols" id="vfyCols"></div>
+          <div id="vfyWarn"></div>
+        </div>
+      </div>
+      <div class="notice n-ok" id="nOk"></div>
+      <div class="notice n-err" id="nErr"></div>
+      <div class="notice n-warn" id="nWarn"></div>
+      <div class="notice n-info show" id="nInfo">💡 Dữ liệu lưu tự động vào trình duyệt. Lần sau mở ứng dụng không cần tải lại.</div>
+      <div id="statsArea" style="display:none">
+        <div class="dlbl">Thống kê dữ liệu hiện tại</div>
+        <div class="stat-grid" id="statGrid"></div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--g3)" id="storageRow">
+          <span>💽 Bộ nhớ:</span>
+          <div class="storage-bar-bg"><div class="storage-bar-fill" id="storageBar" style="width:0%"></div></div>
+          <span id="storageText">0 KB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+<!-- PAGE: CHAMCONG -->
+<div id="page-chamcong" style="display:none">
+  <div class="mbar">
+    <div class="mtabs" id="monthTabs"></div>
+    <div class="mbar-actions">
+      <button class="btn btn-sm btn-outline" id="editBtn" onclick="toggleEdit()">✏️ Chỉnh sửa</button>
+<button class="btn btn-sm btn-success" onclick="addClassPrompt()">➕ Thêm lớp</button>
+<button class="btn btn-sm btn-danger" onclick="askDeleteClass()">🗑️ Xoá lớp</button>
+      <button class="btn btn-sm btn-danger" id="clearBtn" onclick="askClearEdits()" style="display:none">🗑️ Xoá sửa</button>
+      <button class="btn btn-sm btn-success" onclick="manualSave()">💾 Lưu</button>
+      <button class="btn btn-sm btn-primary" onclick="doPrint()">🖨️ In</button>
+      <button class="btn btn-sm btn-gold" onclick="openExportDialog('month')">📊 Xuất Excel</button>
+    </div>
+  </div>
+  <div class="att-wrap">
+    <div class="att-hd">
+      <div class="school-row">
+        <span id="attSchool">Đơn vị: Trường Tiểu học Số 2 Gia Phú</span>
+        <span class="sep">|</span>
+        <span id="attCode">Mã QHNS: 1027296</span>
+      </div>
+      <h3>Bảng chấm công giáo viên dạy học sinh khuyết tật học hòa nhập</h3>
+      <div class="sub" id="attSub">Năm học 2025–2026</div>
+    </div>
+    <div class="tbl-tb">
+      <span class="edit-tip" id="editTip">💡 Bật chế độ chỉnh sửa để sửa số tiết hoặc thêm ghi chú</span>
+      <div style="display:flex;gap:5px;align-items:center">
+  <button class="btn btn-sm btn-gold" id="ccBtnAll" onclick="setCCFilter('all')">📋 Tất cả lớp</button>
+<button class="btn btn-sm btn-outline" id="ccBtnKT" onclick="setCCFilter('kt')">🔴 Chỉ lớp KT</button>
+</div>
+<span id="ktFilterNote" style="font-size:11px;color:var(--amber);display:none">⚠️ Đang lọc: chỉ lớp có HS KT</span>
+    </div>
+    <div class="tbl-scroll"><div id="tblBody">
+      <div class="empty"><div class="ico">📁</div><h3>Chưa có dữ liệu</h3><p>Vào "Tải Dữ Liệu" để bắt đầu.</p></div>
+    </div></div>
+    <div class="att-leg" id="attLeg" style="display:none">
+      <b style="font-size:10.5px">Chú thích:</b>
+      <div class="leg-item"><div class="leg-box" style="background:#e6f4ec;color:#1a6b3c">1</div> Tiết dạy</div>
+      <div class="leg-item"><div class="leg-box" style="background:#fffaed;color:#9a7200;width:20px">CN</div> Chủ nhật</div>
+      <div class="leg-item"><div class="leg-box" style="background:#f3f0ff;color:#6030aa;width:20px">T7</div> Thứ 7</div>
+      <div class="leg-item"><div class="leg-box" style="background:#fff9ea;outline:1.5px solid #b86a00;width:20px;font-size:7.5px">SỬA</div> Chỉnh tay</div>
+    </div>
+    <div class="att-foot" id="attFoot" style="display:none">
+      <div class="sign-col"><div class="stitle">Người chấm công</div><div class="sname" id="sigT">Vũ Văn Sinh</div></div>
+      <div class="sign-col"><div class="stitle">PHT, Phụ trách chuyên môn</div><div class="sname" id="sigP">Đinh Thị Ngân</div></div>
+      <div class="sign-col"><div class="stitle">Hiệu trưởng</div><div class="sname" id="sigHT">Nguyễn Thị Thuý</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: HỌC SINH KT -->
+<div id="page-hocsinh" style="display:none">
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);">
+      <h2 style="color:#fff;">Danh sách học sinh khuyết tật học hoà nhập</h2>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" onclick="addStudent()">➕ Thêm</button>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('hsImport').click()">📥 Nhập Excel</button>
+        <input type="file" id="hsImport" accept=".xls,.xlsx" style="display:none" onchange="importStudents(event)">
+        <button class="btn btn-gold btn-sm" onclick="exportStudents()">📊 Xuất DS</button>
+<button class="btn btn-danger btn-sm" onclick="askClearAllStudents()">🗑️ Xoá tất cả</button>
+        <button class="btn btn-outline btn-sm" onclick="downloadStudentTemplate()">📄 File mẫu</button>
+      </div>
+    </div>
+    <div class="card-bd">
+      <div class="hs-summary" id="hsSummary"></div>
+      <div class="hs-toolbar">
+        <input class="hs-input" type="text" id="hsSearch" placeholder="🔍 Tìm tên, lớp, dạng KT..." oninput="renderStudents()" style="width:200px">
+        <select class="hs-input" id="hsClsFilter" onchange="renderStudents()">
+          <option value="">Tất cả lớp</option>
+        </select>
+        <select class="hs-input" id="hsKhoiFilter" onchange="renderStudents()">
+          <option value="">Tất cả khối</option>
+          <option value="1">Khối 1</option>
+          <option value="2">Khối 2</option>
+          <option value="3">Khối 3</option>
+          <option value="4">Khối 4</option>
+          <option value="5">Khối 5</option>
+        </select>
+        <button class="btn btn-sm btn-ghost" onclick="clearHsFilter()">✕</button>
+        <span id="hsCountLbl" style="font-size:11px;color:var(--g3)"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="hs-table">
+          <thead>
+            <tr>
+              <th class="tc">TT</th>
+              <th>Họ và tên học sinh</th>
+              <th class="tc">Lớp</th>
+              <th class="tc">Ngày sinh</th>
+              <th class="tc">Dân tộc</th>
+              <th class="tc">Giới tính</th>
+              <th>Dạng khuyết tật</th>
+              <th>Ghi chú</th>
+              <th class="tc">Xoá</th>
+            </tr>
+          </thead>
+          <tbody id="hsTbody">
+            <tr><td colspan="9"><div class="ck-empty">Chưa có dữ liệu. Nhấn "Thêm" để bắt đầu.</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="form-hint" style="margin-top:8px">💡 Nhấn vào ô bất kỳ để chỉnh sửa trực tiếp. Nhấn Tab để sang ô kế tiếp. Dữ liệu tự lưu.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: KIỂM TRA -->
+<div id="page-kiemtra" style="display:none">
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);">
+      <h2 style="color:#fff;">Kiểm tra nhanh dữ liệu</h2>
+      <div style="display:flex;gap:5px">
+        <button class="btn btn-sm btn-primary" onclick="runCheck()">🔄 Kiểm tra lại</button>
+        <button class="btn btn-sm btn-gold" onclick="exportCheckReport()">📄 Xuất báo cáo</button>
+      </div>
+    </div>
+    <div class="card-bd" id="checkContent">
+      <div class="ck-empty">Nhấn "Kiểm tra lại" để bắt đầu phân tích.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: TỔNG HỢP -->
+<div id="page-tonghop" style="display:none">
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Biểu đồ tiết dạy theo tháng</h2>
+      <button class="btn btn-sm btn-gold" onclick="openExportDialog('all')">📦 Xuất tất cả tháng</button>
+    </div>
+    <div class="card-bd" id="chartArea"><div class="empty"><div class="ico">📊</div><h3>Chưa có dữ liệu</h3></div></div>
+  </div>
+  
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Tổng tiết theo lớp × tháng</h2>
+  <div style="display:flex;gap:6px;align-items:center">
+    <button class="btn btn-sm btn-outline" id="btnShowAll" onclick="setClsFilter('all')" style="border-color:var(--navy);color:var(--navy);font-weight:700">📋 Tất cả lớp</button>
+    <button class="btn btn-sm btn-outline" id="btnShowKT" onclick="setClsFilter('kt')">🔴 Chỉ lớp có HS KT</button>
+  </div>
+</div>
+    <div class="card-bd" id="clsArea"><div class="empty"><p>Chưa có dữ liệu</p></div></div>
+  </div>
+</div>
+
+<!-- PAGE: THỐNG KÊ HỌC KỲ -->
+<div id="page-thongke" style="display:none">
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);">
+      <h2 style="color:#fff;">Thống kê số lớp và số tiết dạy HSKT học hoà nhập</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-outline" id="tkBtnHK1" onclick="setTKFilter('hk1')">📘 Học kỳ I</button>
+        <button class="btn btn-sm btn-outline" id="tkBtnHK2" onclick="setTKFilter('hk2')">📗 Học kỳ II</button>
+        <button class="btn btn-sm btn-outline" id="tkBtnAll" onclick="setTKFilter('all')">📙 Cả năm</button>
+        <button class="btn btn-sm btn-outline" id="tkBtnAllCls" onclick="setTKClsFilter('all')">📋 Tất cả các lớp</button>
+        <button class="btn btn-sm btn-outline" id="tkBtnKTCls" onclick="setTKClsFilter('kt')">🔴 Lớp có HS KT</button>
+        <button class="btn btn-sm btn-gold" onclick="document.getElementById('tkExportDlg').classList.add('open')">📊 Xuất Excel</button>
+      </div>
+    </div>
+    <div class="card-bd" id="tkContent">
+      <div class="empty"><p>Chưa có dữ liệu</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: CÀI ĐẶT -->
+<div id="page-settings" style="display:none">
+  <div class="sg">
+    <div class="card">
+      <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Thông tin giáo viên &amp; trường</h2></div>
+      <div class="card-bd">
+        <div class="ss-title">Thông tin cơ bản</div>
+        <div class="form-group"><label>Họ và tên giáo viên</label><input type="text" id="cfg-teacher"></div>
+        <div class="form-group"><label>Môn dạy</label><input type="text" id="cfg-subject"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Tên trường</label><input type="text" id="cfg-school"></div>
+          <div class="form-group"><label>Mã QHNS</label><input type="text" id="cfg-code"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>PHT / Phụ trách CM</label><input type="text" id="cfg-pht"></div>
+          <div class="form-group"><label>Hiệu trưởng</label><input type="text" id="cfg-principal"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Năm học</label><input type="text" id="cfg-schoolyear"></div>
+          <div class="form-group"><label>Địa điểm ký tên</label><input type="text" id="cfg-location"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveConfig()">💾 Lưu thông tin</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Thiết lập trang in</h2></div>
+      <div class="card-bd">
+        <div class="ss-title">Khổ giấy</div>
+        <div class="psz-grid">
+          <div class="psz-opt active" onclick="selPS(this,'A4')" data-ps="A4"><div class="pn">A4</div><div class="pd">210×297 mm</div></div>
+          <div class="psz-opt" onclick="selPS(this,'A3')" data-ps="A3"><div class="pn">A3</div><div class="pd">297×420 mm</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="ss-title">Hướng trang</div>
+        <div class="psz-grid">
+          <div class="psz-opt active" onclick="selOrientation(this,'landscape')" data-ori="landscape"><div class="pn">⬛ Ngang</div><div class="pd">Landscape</div></div>
+          <div class="psz-opt" onclick="selOrientation(this,'portrait')" data-ori="portrait"><div class="pn">▬ Dọc</div><div class="pd">Portrait</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="ss-title">Lề trang (cm)</div>
+        <div class="form-row form-row3">
+          <div class="form-group"><label>Trên</label><input type="number" id="mg-t" step="0.1" min="0"></div>
+          <div class="form-group"><label>Dưới</label><input type="number" id="mg-b" step="0.1" min="0"></div>
+          <div class="form-group"><label>Trái</label><input type="number" id="mg-l" step="0.1" min="0"></div>
+          <div class="form-group"><label>Phải</label><input type="number" id="mg-r" step="0.1" min="0"></div>
+          <div class="form-group"><label>Header</label><input type="number" id="mg-h" step="0.1" min="0"></div>
+          <div class="form-group"><label>Footer</label><input type="number" id="mg-f" step="0.1" min="0"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Thu vừa 1 trang</h4><p>Fit to page khi in</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-fitpage"><span class="tslider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Lặp tiêu đề khi in</h4><p>Header ở đầu mỗi trang</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-repeatrow"><span class="tslider"></span></label>
+        </div>
+        <div style="margin-top:10px"><button class="btn btn-primary btn-sm" onclick="savePageCfg()">💾 Lưu thiết lập in</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Giao diện &amp; hiển thị</h2></div>
+      <div class="card-bd">
+        <div class="ss-title">Màu header Excel xuất ra</div>
+        <div class="swatches" id="swatches">
+          <div class="swatch active" style="background:#0d1b3e" data-c="navy" onclick="selColor(this,'#0d1b3e','#172447')"></div>
+          <div class="swatch" style="background:#1a4731" data-c="forest" onclick="selColor(this,'#1a4731','#256342')"></div>
+          <div class="swatch" style="background:#5c1a1a" data-c="crimson" onclick="selColor(this,'#5c1a1a','#7a2424')"></div>
+          <div class="swatch" style="background:#1a3a5c" data-c="ocean" onclick="selColor(this,'#1a3a5c','#234e78')"></div>
+          <div class="swatch" style="background:#3d2a6e" data-c="purple" onclick="selColor(this,'#3d2a6e','#523996')"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Hiển thị cột Ghi chú</h4><p>Ẩn/hiện cột ghi chú</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-shownote" onchange="renderCurrent()"><span class="tslider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Tô màu T7 &amp; Chủ nhật</h4><p>Nền vàng CN, tím T7</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-colorwk" onchange="renderCurrent()"><span class="tslider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Đánh dấu lớp có HS KT</h4><p>Tên đỏ cho lớp có HS khuyết tật</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-showkt" onchange="renderCurrent()"><span class="tslider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Tự động chuyển tháng hiện tại</h4><p>Mặc định chọn tháng hiện tại</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-autonav"><span class="tslider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Lưu tự động khi chỉnh sửa</h4><p>Auto-save sau 3 giây</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-autosave"><span class="tslider"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Xuất file &amp; kiểm soát</h2></div>
+      <div class="card-bd">
+        <div class="ss-title">Định dạng tên file</div>
+        <div class="form-group">
+          <label>File tháng đơn</label>
+          <input type="text" id="cfg-fn1">
+          <div class="form-hint">{M}=tháng · {Y}=năm</div>
+        </div>
+        <div class="form-group">
+          <label>File toàn năm học</label>
+          <input type="text" id="cfg-fn2">
+          <div class="form-hint">{Y1} {Y2}=năm đầu/cuối</div>
+        </div>
+        <div class="divider"></div>
+        <div class="ss-title">Tuỳ chọn xuất Excel</div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Chỉ xuất lớp có HS KT</h4><p>Lọc lớp theo danh sách khuyết tật</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-onlykt"><span class="tslider"></span></label>
+        </div>
+        <div class="divider"></div>
+        <div class="ss-title">Kiểm soát dữ liệu</div>
+        <div class="form-group">
+          <label>Số tiết tối đa/ngày (cảnh báo nếu vượt)</label>
+          <input type="number" id="cfg-maxday" min="1" max="20">
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl"><h4>Nhắc lưu trước khi đóng</h4><p>Cảnh báo nếu có chỉnh sửa chưa lưu</p></div>
+          <label class="toggle"><input type="checkbox" id="cfg-promptsave"><span class="tslider"></span></label>
+        </div>
+        <div style="margin-top:10px"><button class="btn btn-primary btn-sm" onclick="saveExportCfg()">💾 Lưu cài đặt</button></div>
+        <div class="divider"></div>
+        <button class="btn btn-gold btn-sm" onclick="exportTemplate()">📄 Tải file mẫu LBG (.xlsx)</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">📅 Thiết lập thời gian học kỳ</h2></div>
+    <div class="card-bd">
+      <div class="ss-title">Học kỳ I</div>
+      <div class="form-row">
+        <div class="form-group"><label>Từ ngày (dd/mm/yyyy)</label><input type="text" id="cfg-hk1start" placeholder="05/09/2025"></div>
+        <div class="form-group"><label>Đến ngày (dd/mm/yyyy)</label><input type="text" id="cfg-hk1end" placeholder="17/01/2026"></div>
+      </div>
+      <div class="ss-title">Học kỳ II</div>
+      <div class="form-row">
+        <div class="form-group"><label>Từ ngày (dd/mm/yyyy)</label><input type="text" id="cfg-hk2start" placeholder="20/01/2026"></div>
+        <div class="form-group"><label>Đến ngày (dd/mm/yyyy)</label><input type="text" id="cfg-hk2end" placeholder="31/05/2026"></div>
+      </div>
+      <div class="form-hint">💡 Thống kê HK sẽ chỉ tính tiết trong khoảng ngày này. Tháng bị chia đôi giữa 2 kỳ sẽ được tính chính xác theo ngày.</div>
+      <div style="margin-top:10px"><button class="btn btn-primary btn-sm" onclick="saveHKCfg()">💾 Lưu thiết lập học kỳ</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);"><h2 style="color:#fff;">Quản lý dữ liệu đã lưu</h2></div>
+    <div class="card-bd">
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="exportBackup()">💾 Sao lưu (.json)</button>
+        <button class="btn btn-outline btn-sm" onclick="triggerRestore()">📥 Khôi phục</button>
+        <input type="file" id="restoreInput" accept=".json" style="display:none">
+        <button class="btn btn-danger btn-sm" onclick="askClearAll()">🗑️ Xoá toàn bộ</button>
+      </div>
+      <p class="form-hint" style="margin-top:8px">Sao lưu định kỳ để bảo toàn các chỉnh sửa. File .json có thể khôi phục bất kỳ lúc nào.</p>
+    </div>
+  </div>
+  <div class="card" style="display:none">
+    <div class="card-hd"><h2 style="color:var(--red)">Vùng nguy hiểm</h2></div>
+    <div class="card-bd" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-danger btn-sm" onclick="askClearAll()">🗑️ Xoá toàn bộ dữ liệu</button>
+      <button class="btn btn-outline btn-sm" onclick="askResetCfg()">↺ Đặt lại mặc định</button>
+      <span style="font-size:11px;color:var(--g3)">⚠️ Không thể hoàn tác!</span>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- EXPORT DIALOG -->
+<div class="save-dialog" id="saveDialog">
+  <div class="sd-box">
+    <div class="sd-hd">
+      <h3 id="sdTitle">💾 Xuất file Excel</h3>
+      <button onclick="closeSaveDialog()">×</button>
+    </div>
+    <div class="sd-bd">
+      <div class="sd-note" id="sdNote"></div>
+      <div class="sd-path" id="sdPathRow" style="display:none">
+        <span>📁</span>
+        <span id="sdPathLbl">Chưa chọn thư mục</span>
+        <button class="btn btn-ghost btn-sm" onclick="pickSaveDir()">Đổi</button>
+      </div>
+      <div class="sd-info" id="sdInfo"></div>
+      <div class="form-group">
+        <label>Tên file</label>
+        <input type="text" id="sdFilename">
+        <div class="form-hint">Không cần gõ đuôi .xlsx</div>
+      </div>
+      <div class="toggle-row" id="sdOverwriteRow">
+        <div class="toggle-lbl"><h4>Ghi đè nếu trùng tên</h4><p>Ghi đè file cũ không hỏi lại</p></div>
+        <label class="toggle"><input type="checkbox" id="sdOverwrite" checked><span class="tslider"></span></label>
+      </div>
+    </div>
+    <div class="sd-ft">
+      <button class="btn btn-outline btn-sm" onclick="closeSaveDialog()">Huỷ</button>
+      <button class="btn btn-gold btn-sm" onclick="doExport()">📊 Xuất file</button>
+    </div>
+  </div>
+</div>
+<!-- TK EXPORT DIALOG -->
+<div class="dlg-bg" id="tkExportDlg">
+  <div class="dlg-box">
+    <div class="dlg-hd">
+      <span class="dlg-ico">📊</span>
+      <div class="dlg-title">Xuất Excel thống kê</div>
+    </div>
+    <div class="dlg-body">
+      <p style="margin-bottom:12px">Chọn phạm vi lớp cần xuất:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-primary" onclick="doExportThongKe('all')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
+          <span style="font-size:16px">📋</span>
+          <div style="text-align:left">
+            <div style="font-size:12px;font-weight:700">Tất cả các lớp</div>
+            <div style="font-size:10px;opacity:.7;font-weight:400">Xuất toàn bộ lớp có tiết dạy trong kỳ</div>
+          </div>
+        </button>
+        <button class="btn btn-danger" onclick="doExportThongKe('kt')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
+          <span style="font-size:16px">🔴</span>
+          <div style="text-align:left">
+            <div style="font-size:12px;font-weight:700">Chỉ lớp có HS khuyết tật</div>
+            <div style="font-size:10px;opacity:.7;font-weight:400">Xuất những lớp có HS KT trong danh sách</div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="dlg-ft">
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('tkExportDlg').classList.remove('open')">Huỷ</button>
+    </div>
+  </div>
+</div>
+<!-- CONFIRM DIALOG -->
+<div class="dlg-bg" id="confirmDlg">
+  <div class="dlg-box">
+    <div class="dlg-hd">
+      <span class="dlg-ico" id="dlgIco">⚠️</span>
+      <div class="dlg-title" id="dlgTitle">Xác nhận</div>
+    </div>
+    <div class="dlg-body" id="dlgBody">Bạn có chắc chắn?</div>
+    <div class="dlg-ft">
+      <button class="btn btn-outline btn-sm" onclick="closeConfirm()">Huỷ</button>
+      <button class="btn btn-danger btn-sm" id="dlgOkBtn" onclick="doConfirm()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+<script>
+// ═══════════════════════════════════════
+//  CHẤM CÔNG v4.0 — Clean JavaScript
+//  Fix: selOri name conflict, backup/restore
+// ═══════════════════════════════════════
+
+var APP_VER = '4.0';
+var SK = { l:'bcc_l', e:'bcc_e', n:'bcc_n', c:'bcc_c', s:'bcc_s', m:'bcc_m', cfg:'bcc_cfg', ts:'bcc_ts' };
+
+var MONTHS = [
+  {m:8,y:2025,lbl:'T8/2025'},{m:9,y:2025,lbl:'T9/2025'},
+  {m:10,y:2025,lbl:'T10/2025'},{m:11,y:2025,lbl:'T11/2025'},
+  {m:12,y:2025,lbl:'T12/2025'},{m:1,y:2026,lbl:'T1/2026'},
+  {m:2,y:2026,lbl:'T2/2026'},{m:3,y:2026,lbl:'T3/2026'},
+  {m:4,y:2026,lbl:'T4/2026'},{m:5,y:2026,lbl:'T5/2026'}
+];
+var WD = ['CN','T2','T3','T4','T5','T6','T7'];
+
+var DEFAULT_CFG = {
+  teacher:'Vũ Văn Sinh', subject:'Mĩ thuật',
+  school:'Trường TH Số 2 Gia Phú', code:'1027296',
+  pht:'Đinh Thị Ngân', principal:'Nguyễn Thị Thuý',
+  schoolYear:'2025 - 2026', location:'Gia Phú',
+  pageSize:'A4', orientation:'landscape',
+  mgTop:1.9, mgBot:1.9, mgLeft:1.3, mgRight:1.3, mgHd:0.8, mgFt:0.8,
+  fitPage:true, repeatRow:true,
+  colorPrimary:'#0d1b3e', colorPrimary2:'#172447', colorCol:'navy',
+  showNote:true, colorWk:true, showKT:true, autoNav:true, autoSave:true,
+  fn1:'bang_cham_cong_T{M}_{Y}', fn2:'bang_cham_cong_namhoc_{Y1}_{Y2}',
+  promptSave:false, maxDayLessons:5, onlyKTCls:false,
+hk1Start:'05/09/2025', hk1End:'17/01/2026',
+hk2Start:'20/01/2026', hk2End:'31/05/2026'
+};
+
+// ── STATE ──
+var CFG = JSON.parse(JSON.stringify(DEFAULT_CFG));
+var lessonData = {}, manualEdits = {}, noteData = {}, allClasses = [];
+var studentList = [];
+var activeMonth = null, editMode = false, pendingData = null;
+var weekCount = 0, sheetCount = 0;
+// FIX: renamed curPS/curOrientation to avoid conflict with function name selOri
+var curPS = 'A4', curOrientation = 'landscape';
+var savedDirHandle = null, exportMode = 'month';
+var confirmCb = null;
+var _exportClsFilter = 'all';
+var clsFilterMode = 'all';
+var ccFilterMode = 'all';
+var autoSaveTimer = null;
+var hasUnsaved = false;
+
+// ── HELPERS ──
+function G(id) { return document.getElementById(id); }
+function mk(m, y) { return y + '_' + m; }
+function mDays(m, y) { return new Date(y, m, 0).getDate(); }
+function mWd(d, m, y) { return WD[new Date(y, m-1, d).getDay()]; }
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function nowTime() {
+  var d = new Date();
+  return pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
+}
+function safeJSON(str, def) {
+  if (!str) return def;
+  try { return JSON.parse(str); } catch(e) { return def; }
+}
+
+// ── INIT ──
+window.addEventListener('load', function() {
+  loadCFG();
+  applyForm();
+  loadStorage();
+  buildTabs();
+  updateTopbar();
+
+  var now = new Date();
+  var curKey = mk(now.getMonth() + 1, now.getFullYear());
+  var found = MONTHS.filter(function(x) { return mk(x.m, x.y) === curKey; });
+  activeMonth = (CFG.autoNav && found.length) ? curKey : mk(9, 2025);
+  setActiveTab(activeMonth);
+
+  if (Object.keys(lessonData).length > 0) {
+    showPage('chamcong', G('navCC'));
+    renderTable(activeMonth);
+  }
+
+  // Clock
+  function tick() {
+    var d = new Date();
+    var days = ['CN','T2','T3','T4','T5','T6','T7'];
+    G('tbDate').textContent = days[d.getDay()] + ', ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+  }
+  tick();
+  setInterval(tick, 30000);
+
+  // Dropzone events
+  var dz = G('dz');
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', function() { dz.classList.remove('over'); });
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault(); dz.classList.remove('over');
+    var f = e.dataTransfer.files[0]; if (f) processFile(f);
+  });
+  G('fileInput').addEventListener('change', function(e) {
+    if (e.target.files[0]) processFile(e.target.files[0]);
+  });
+
+  // FIX: Attach restore handler via addEventListener, not inline onchange
+  // This prevents the input from being reset before the handler fires
+  G('restoreInput').addEventListener('change', function(e) {
+    importBackup(e);
+  });
+
+  window.addEventListener('beforeunload', function(e) {
+    if (CFG.promptSave && hasUnsaved) { e.preventDefault(); e.returnValue = ''; }
+  });
+});
+
+// FIX: Separate trigger function for restore so input is clean each time
+function triggerRestore() {
+  var inp = G('restoreInput');
+  inp.value = ''; // Reset trước để onchange luôn kích hoạt dù chọn cùng file
+  inp.click();
+}
+
+// ── NAVIGATION ──
+function showPage(id, btn) {
+  var pages = ['upload','chamcong','hocsinh','kiemtra','tonghop','thongke','settings'];
+  pages.forEach(function(k) {
+    var el = G('page-' + k);
+    if (el) el.style.display = k === id ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sb-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  if (id === 'tonghop') renderSummary();
+  if (id === 'thongke') { setTKFilter(tkFilterMode || 'hk1'); }
+  if (id === 'settings') applyForm();
+  if (id === 'hocsinh') renderStudents();
+}
+
+// ── STORAGE ──
+function saveStorage(silent) {
+  try {
+    localStorage.setItem(SK.l, JSON.stringify(lessonData));
+    localStorage.setItem(SK.e, JSON.stringify(manualEdits));
+    localStorage.setItem(SK.n, JSON.stringify(noteData));
+    localStorage.setItem(SK.c, JSON.stringify(allClasses));
+    localStorage.setItem(SK.s, JSON.stringify(studentList));
+    localStorage.setItem(SK.m, JSON.stringify({ weekCount: weekCount, sheetCount: sheetCount }));
+    var ts = new Date().toISOString();
+    localStorage.setItem(SK.ts, ts);
+    G('tbSaveTime').textContent = 'Lưu: ' + nowTime();
+    hasUnsaved = false;
+    G('unsavedDot').classList.remove('show');
+    updateStorageInfo();
+    if (!silent) toast('💾 Đã lưu', 't-ok');
+  } catch(e) {
+    toast('⚠️ Lỗi lưu: ' + e.message, 't-err');
+  }
+}
+
+function loadStorage() {
+  try {
+    var raw = localStorage.getItem(SK.l);
+    if (!raw) return;
+    lessonData  = safeJSON(localStorage.getItem(SK.l), {});
+    manualEdits = safeJSON(localStorage.getItem(SK.e), {});
+    noteData    = safeJSON(localStorage.getItem(SK.n), {});
+    allClasses  = safeJSON(localStorage.getItem(SK.c), []);
+    studentList = safeJSON(localStorage.getItem(SK.s), []);
+    var meta    = safeJSON(localStorage.getItem(SK.m), {});
+    weekCount   = meta.weekCount || 0;
+    sheetCount  = meta.sheetCount || 0;
+    var ts = localStorage.getItem(SK.ts);
+    if (ts) {
+      var d = new Date(ts);
+      G('tbSaveTime').textContent = 'Lưu: ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    }
+    updateStatCards();
+    updateTabDots();
+    G('navBadge').style.display = 'none';
+    showNotice('ok', '✅ Đã khôi phục dữ liệu từ phiên làm việc trước.');
+  } catch(e) {
+    showNotice('err', '❌ Lỗi đọc dữ liệu: ' + e.message);
+  }
+}
+
+function loadCFG() {
+  try {
+    var c = localStorage.getItem(SK.cfg);
+    if (c) {
+      var parsed = JSON.parse(c);
+      Object.keys(DEFAULT_CFG).forEach(function(k) {
+        if (parsed[k] !== undefined) CFG[k] = parsed[k];
+      });
+    }
+    curPS = CFG.pageSize;
+    curOrientation = CFG.orientation; // FIX: use curOrientation
+  } catch(e) { CFG = JSON.parse(JSON.stringify(DEFAULT_CFG)); }
+}
+
+function saveCFG() {
+  try { localStorage.setItem(SK.cfg, JSON.stringify(CFG)); } catch(e) {}
+}
+
+function updateStorageInfo() {
+  try {
+    var total = 0;
+    var skVals = [SK.l, SK.e, SK.n, SK.c, SK.s, SK.m, SK.cfg, SK.ts];
+    skVals.forEach(function(k) {
+      var v = localStorage.getItem(k); if (v) total += v.length;
+    });
+    var kb = (total / 1024).toFixed(1);
+    var pct = Math.min(100, total / (5 * 1024 * 1024) * 100);
+    var bar = G('storageBar');
+    var txt = G('storageText');
+    if (bar) {
+      bar.style.width = pct + '%';
+      bar.className = 'storage-bar-fill' + (pct > 80 ? ' err' : pct > 50 ? ' warn' : '');
+    }
+    if (txt) txt.textContent = kb + ' KB / ~5000 KB';
+  } catch(e) {}
+}
+
+// ── FILE PROCESSING ──
+function processFile(file) {
+  clearNotices();
+  G('progWrap').style.display = 'block';
+  G('progBar').style.width = '5%';
+  G('progLbl').textContent = 'Đang đọc: ' + file.name;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    G('progBar').style.width = '60%';
+    G('progLbl').textContent = 'Phân tích dữ liệu...';
+    try {
+      var wb = XLSX.read(e.target.result, { type: 'binary', cellDates: true, raw: false });
+      G('progBar').style.width = '90%';
+      parseSheets(wb, file.name);
+      G('progBar').style.width = '100%';
+      setTimeout(function() { G('progWrap').style.display = 'none'; }, 800);
+    } catch(err) {
+      G('progWrap').style.display = 'none';
+      showNotice('err', '❌ Lỗi đọc file: ' + err.message + ' — Kiểm tra định dạng .xls/.xlsx');
+    }
+  };
+  reader.onerror = function() {
+    G('progWrap').style.display = 'none';
+    showNotice('err', '❌ Không thể đọc file. Thử lại hoặc kiểm tra file.');
+  };
+  reader.readAsBinaryString(file);
+}
+
+function detectCol(hdr, keys) {
+  for (var i = 0; i < hdr.length; i++) {
+    var h = String(hdr[i] || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    for (var j = 0; j < keys.length; j++) {
+      if (h.indexOf(keys[j]) >= 0) return i;
+    }
+  }
+  return -1;
+}
+
+function parseDMY(s) {
+  var str = String(s || '').trim();
+  var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  var dd = parseInt(m[1]), mm = parseInt(m[2]), yyyy = parseInt(m[3]);
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return null;
+  return new Date(yyyy, mm - 1, dd);
+}
+
+function parseSheets(wb, fname) {
+  var tmpData = {}, classSet = {};
+  var tmpWeeks = 0, tmpSheets = 0;
+  var parseLog = [], warnings = [];
+  var maxDay = CFG.maxDayLessons || 5;
+  var WD_OFF = { '2':0, '3':1, '4':2, '5':3, '6':4, '7':5, 'cn':6 };
+
+  wb.SheetNames.forEach(function(sname) {
+    var ws = wb.Sheets[sname];
+    var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+    if (rows.length < 5) return;
+
+    rows.forEach(function(row) {
+      var anyTuan = row.some(function(c) { return String(c || '').trim().indexOf('Tuần') === 0; });
+      if (anyTuan) tmpWeeks++;
+    });
+
+    var hdr = rows[3] || [];
+    var colMon = detectCol(hdr, ['môn học','môn']);
+    var colLop = detectCol(hdr, ['lớp']);
+    var colStt = detectCol(hdr, ['trạng thái','trang thai']);
+    if (colMon < 0) colMon = 4;
+    if (colLop < 0) colLop = 5;
+    if (colStt < 0) colStt = 10;
+
+    var weekStart = null;
+    var headerRows = [rows[1], rows[2]];
+    for (var hi = 0; hi < headerRows.length; hi++) {
+      var hrow = headerRows[hi];
+      if (!hrow) continue;
+      var foundTuNgay = false;
+      for (var ci = 0; ci < hrow.length; ci++) {
+        var cell = String(hrow[ci] || '').trim();
+        if (cell.toLowerCase().indexOf('từ ngày') >= 0) { foundTuNgay = true; continue; }
+        var d = parseDMY(cell);
+        if (d && (foundTuNgay || !weekStart)) {
+          weekStart = d;
+          if (foundTuNgay) break;
+        }
+      }
+      if (weekStart) break;
+    }
+
+    var curDate = null, sheetL = 0;
+
+    rows.forEach(function(row, ri) {
+      if (ri < 4) return;
+      var c0 = String(row[0] || '').trim();
+
+      var d1 = parseDMY(c0);
+      if (d1) { curDate = d1; }
+      else if (row[0] instanceof Date && !isNaN(row[0])) { curDate = row[0]; }
+      else if (typeof row[0] === 'number' && !isNaN(row[0])) {
+    try {
+        var p = XLSX.SSF.parse_date_code(row[0]);
+        if (p) {
+            curDate = new Date(p.y, p.m, p.d); // p.m đã là 0-based
+        } else {
+            // Fallback: tính từ epoch Excel (ngày 1/1/1900)
+            var excelEpoch = new Date(1900, 0, 1);
+            var daysOffset = row[0] - 1;
+            curDate = new Date(excelEpoch.getTime() + daysOffset * 86400000);
+        }
+    } catch(e) {
+        // Fallback nếu parse lỗi
+        var excelEpoch = new Date(1900, 0, 1);
+        var daysOffset = row[0] - 1;
+        curDate = new Date(excelEpoch.getTime() + daysOffset * 86400000);
+    }
+}
+      else {
+        var c0lo = c0.toLowerCase();
+        if (WD_OFF.hasOwnProperty(c0lo) && weekStart) {
+          curDate = new Date(weekStart.getTime() + WD_OFF[c0lo] * 86400000);
+        }
+      }
+
+      if (!curDate || isNaN(curDate.getTime())) return;
+
+      var subject = String(row[colMon] || '').trim();
+      var cls     = String(row[colLop] || '').trim();
+      var status  = String(row[colStt] || '').trim().toLowerCase();
+      var skip    = (status === 'bỏ học' || status === 'vắng' || status === 'nghỉ');
+
+      if (cls && subject === CFG.subject && !skip) {
+        var mo = curDate.getMonth() + 1;
+        var yr = curDate.getFullYear();
+        var dy = curDate.getDate();
+        if (dy < 1 || dy > 31) return;
+        var key = mk(mo, yr);
+        if (!tmpData[key]) tmpData[key] = {};
+        if (!tmpData[key][cls]) tmpData[key][cls] = {};
+        tmpData[key][cls][dy] = (tmpData[key][cls][dy] || 0) + 1;
+        if (tmpData[key][cls][dy] > maxDay) {
+          var wMsg = cls + ': ' + dy + '/' + mo + '/' + yr + ' — ' + tmpData[key][cls][dy] + ' tiết';
+          var exists = warnings.some(function(w) { return w === wMsg; });
+          if (!exists) warnings.push(wMsg);
+        }
+        classSet[cls] = true;
+        sheetL++;
+      }
+    });
+
+    if (sheetL > 0) {
+      tmpSheets++;
+      parseLog.push({ name: sname, cnt: sheetL });
+    }
+  });
+
+  pendingData = {
+    tmpData: tmpData,
+    classSet: classSet,
+    tmpWeeks: tmpWeeks,
+    tmpSheets: tmpSheets,
+    parseLog: parseLog,
+    warnings: warnings,
+    fname: fname
+  };
+  showVerify(pendingData);
+}
+
+function showVerify(pd) {
+  var tmpData = pd.tmpData, classSet = pd.classSet;
+  var clsKeys = Object.keys(classSet);
+  var totL = 0;
+  Object.keys(tmpData).forEach(function(key) {
+    Object.keys(tmpData[key]).forEach(function(cls) {
+      Object.keys(tmpData[key][cls]).forEach(function(d) {
+        totL += tmpData[key][cls][d];
+      });
+    });
+  });
+  var totM = Object.keys(tmpData).length;
+
+  G('vfyFname').textContent = 'File: ' + pd.fname;
+
+  function sc(l, v, cls) {
+    return '<div class="vfy-sc ' + cls + '"><div class="v">' + v + '</div><div class="l">' + l + '</div></div>';
+  }
+  G('vfyStats').innerHTML =
+    sc('Sheet đọc', pd.tmpSheets, pd.tmpSheets > 0 ? 'ok' : 'warn') +
+    sc('Tuần học', pd.tmpWeeks, pd.tmpWeeks > 0 ? 'ok' : 'warn') +
+    sc('Lớp', clsKeys.length, clsKeys.length > 0 ? 'ok' : 'warn') +
+    sc('Tổng tiết', totL, totL > 0 ? 'ok' : 'warn') +
+    sc('Tháng', totM, totM > 0 ? 'ok' : 'warn');
+
+  var shTags = '';
+  if (!pd.parseLog.length) {
+    shTags = '<span style="color:var(--red);font-size:11px">Không đọc được tiết nào! Kiểm tra tên môn trong Cài Đặt.</span>';
+  } else {
+    pd.parseLog.forEach(function(s) {
+      shTags += '<span class="vtag">' + esc(s.name) + ' <span class="vc">' + s.cnt + '</span></span>';
+    });
+  }
+
+  var mKeys = Object.keys(tmpData).sort(function(a, b) {
+    var pa = a.split('_').map(Number), pb = b.split('_').map(Number);
+    return pa[0] !== pb[0] ? pa[0] - pb[0] : pa[1] - pb[1];
+  });
+  var mTags = '';
+  if (!mKeys.length) {
+    mTags = '<span style="color:var(--g3);font-size:11px">Không có tháng nào</span>';
+  } else {
+    mKeys.forEach(function(key) {
+      var parts = key.split('_');
+      var cnt = 0;
+      Object.keys(tmpData[key]).forEach(function(cls) {
+        Object.keys(tmpData[key][cls]).forEach(function(d) { cnt += tmpData[key][cls][d]; });
+      });
+      mTags += '<span class="vtag gold">T' + parts[1] + '/' + parts[0] + ' <span class="vc">' + cnt + '</span></span>';
+    });
+  }
+
+  G('vfyCols').innerHTML =
+    '<div class="vfy-box"><h4>Sheet đọc (' + pd.parseLog.length + ')</h4><div class="vfy-tags">' + shTags + '</div></div>' +
+    '<div class="vfy-box"><h4>Tháng có dữ liệu (' + mKeys.length + ')</h4><div class="vfy-tags">' + mTags + '</div></div>';
+
+  if (pd.warnings.length) {
+    var wHtml = '<div class="vfy-warn-box"><h4>⚠️ ' + pd.warnings.length + ' cảnh báo — kiểm tra trước khi xác nhận</h4><div>';
+    pd.warnings.slice(0, 10).forEach(function(w) {
+      wHtml += '<span class="tag tag-amber">' + esc(w) + '</span>';
+    });
+    if (pd.warnings.length > 10) wHtml += '<span class="tag tag-amber">+' + (pd.warnings.length - 10) + ' nữa</span>';
+    wHtml += '</div></div>';
+    G('vfyWarn').innerHTML = wHtml;
+  } else {
+    G('vfyWarn').innerHTML = '';
+  }
+
+  G('vfyPanel').classList.add('show');
+  G('lastFileLbl').textContent = 'File: ' + pd.fname;
+}
+
+function confirmData() {
+  if (!pendingData) return;
+  var pd = pendingData;
+  var clsArr = Object.keys(pd.classSet).sort(function(a, b) {
+    var ga = parseInt(a[0]) || 0, gb = parseInt(b[0]) || 0;
+    return ga !== gb ? ga - gb : a.localeCompare(b, 'vi');
+  });
+  lessonData = pd.tmpData;
+  allClasses = clsArr;
+  weekCount = pd.tmpWeeks;
+  sheetCount = pd.tmpSheets;
+  updateTabDots();
+  updateStatCards();
+  saveStorage(true);
+  renderTable(activeMonth);
+  G('vfyPanel').classList.remove('show');
+  G('navBadge').style.display = 'none';
+  showNotice('ok', '✅ <b>' + esc(pd.fname) + '</b> — ' + sheetCount + ' sheet, ' + allClasses.length + ' lớp, ' + getTotalL() + ' tiết.');
+  toast('✅ Tải dữ liệu thành công!', 't-ok');
+  pendingData = null;
+  showPage('chamcong', G('navCC'));
+}
+
+function resetUpload() {
+  G('vfyPanel').classList.remove('show');
+  G('fileInput').value = '';
+  pendingData = null;
+  clearNotices();
+}
+
+function getTotalL() {
+  var t = 0;
+  Object.keys(lessonData).forEach(function(key) {
+    Object.keys(lessonData[key]).forEach(function(cls) {
+      Object.keys(lessonData[key][cls]).forEach(function(d) { t += lessonData[key][cls][d]; });
+    });
+  });
+  return t;
+}
+
+function updateStatCards() {
+  var ktCls = {};
+  studentList.forEach(function(s) { if (s.cls) ktCls[s.cls] = true; });
+  var items = [
+    ['Tổng tiết', getTotalL(), 'acc'],
+    ['Số lớp', allClasses.length, ''],
+    ['Số tuần', weekCount || '?', ''],
+    ['Tháng có data', Object.keys(lessonData).length, ''],
+    ['HS khuyết tật', studentList.length, ''],
+    ['Lớp có HS KT', Object.keys(ktCls).length, '']
+  ];
+  var html = '';
+  items.forEach(function(it) {
+    html += '<div class="scard ' + it[2] + '"><div class="sv">' + it[1] + '</div><div class="sl">' + it[0] + '</div></div>';
+  });
+  G('statGrid').innerHTML = html;
+  G('statsArea').style.display = 'block';
+  updateStorageInfo();
+}
+
+// ── MONTH TABS ──
+function buildTabs() {
+  var w = G('monthTabs');
+  w.innerHTML = '';
+  MONTHS.forEach(function(mo) {
+    var key = mk(mo.m, mo.y);
+    var btn = document.createElement('button');
+    btn.className = 'mtab';
+    btn.dataset.key = key;
+    btn.onclick = (function(k) {
+      return function() { activeMonth = k; setActiveTab(k); renderTable(k); };
+    })(key);
+    w.appendChild(btn);
+  });
+  updateTabDots();
+}
+
+function updateTabDots() {
+  document.querySelectorAll('.mtab').forEach(function(btn) {
+    var key = btn.dataset.key;
+    var mo = MONTHS.filter(function(x) { return mk(x.m, x.y) === key; })[0];
+    if (!mo) return;
+    var has = lessonData[key] && Object.keys(lessonData[key]).length > 0;
+    btn.innerHTML = mo.lbl + (has ? '<span class="dot"></span>' : '');
+    btn.classList.toggle('has-data', has);
+    btn.classList.toggle('active', key === activeMonth);
+  });
+}
+function setActiveTab(key) { updateTabDots(); }
+
+// ── RENDER TABLE ──
+function getEff(key, cls, d) {
+  var e = manualEdits[key] && manualEdits[key][cls] && manualEdits[key][cls][d];
+  if (e !== undefined) return e;
+  var l = lessonData[key] && lessonData[key][cls] && lessonData[key][cls][d];
+  return l || 0;
+}
+
+function renderTable(key) {
+  var parts = key.split('_');
+  var y = parseInt(parts[0]), m = parseInt(parts[1]);
+  var days = mDays(m, y);
+  var mData = lessonData[key] || {}, mEdit = manualEdits[key] || {};
+  var allInMonth = {};
+  Object.keys(mData).forEach(function(c) { allInMonth[c] = true; });
+  Object.keys(mEdit).forEach(function(c) { allInMonth[c] = true; });
+
+  var ktMap = {};
+  studentList.forEach(function(s) { if (s.cls) ktMap[s.cls] = true; });
+
+  var dispCls;
+  if (ccFilterMode === 'kt') {
+    dispCls = allClasses.filter(function(c) { return !!ktMap[c]; });
+    G('ktFilterNote').style.display = 'inline';
+  } else {
+    dispCls = allClasses.length > 0 ? allClasses : Object.keys(allInMonth).sort(function(a,b){return a.localeCompare(b,'vi');});
+    G('ktFilterNote').style.display = 'none';
+  }
+
+  G('attSub').textContent = 'Tháng ' + pad2(m) + ' năm ' + y + ' — Giáo viên: ' + CFG.teacher + ' — Năm học ' + CFG.schoolYear;
+  G('attSchool').textContent = 'Đơn vị: ' + CFG.school;
+  G('attCode').textContent = 'Mã QHNS: ' + CFG.code;
+
+  var cont = G('tblBody');
+
+  if (dispCls.length === 0 && Object.keys(allInMonth).length === 0) {
+    cont.innerHTML = '<div class="empty"><div class="ico">📅</div><h3>Tháng ' + m + '/' + y + ' không có dữ liệu</h3><p>Tháng này chưa có tiết trong file đã tải.</p></div>';
+    G('attLeg').style.display = 'none';
+    G('attFoot').style.display = 'none';
+    return;
+  }
+
+  var dn = [], dw = [];
+  for (var d = 1; d <= days; d++) { dn.push(d); dw.push(mWd(d, m, y)); }
+
+  var showNote = CFG.showNote;
+  var colorWk  = CFG.colorWk;
+  var showKT   = CFG.showKT;
+
+  var thDays = '', thWds = '';
+  for (var i = 0; i < dn.length; i++) {
+    thDays += '<th>' + dn[i] + '</th>';
+    var wdColor = dw[i] === 'CN' ? '#d4a800' : (dw[i] === 'T7' ? '#9966dd' : 'rgba(255,255,255,.65)');
+    thWds += '<th style="color:' + wdColor + '">' + dw[i] + '</th>';
+  }
+
+  var noteHdr = showNote ? '<th rowspan="3" style="min-width:65px">Ghi chú</th>' : '';
+
+  var html = '<table><thead>';
+  html += '<tr>';
+  html += '<th class="th-fix" rowspan="3">STT</th>';
+  html += '<th class="th-name" rowspan="3">Họ và tên</th>';
+  html += '<th class="th-cls" rowspan="3">Lớp</th>';
+  html += '<th class="th-mon" rowspan="3">Môn</th>';
+  html += '<th colspan="' + days + '">Ngày trong tháng</th>';
+  html += '<th class="th-tot" rowspan="3">Tổng<br>tiết</th>';
+  html += noteHdr;
+  html += '</tr>';
+  html += '<tr>' + thDays + '</tr>';
+  html += '<tr>' + thWds  + '</tr>';
+  html += '</thead><tbody>';
+
+  var dt = [];
+  for (var i = 0; i < days; i++) dt.push(0);
+  var stt = 1;
+
+  dispCls.forEach(function(cls) {
+    var isKT = !!ktMap[cls];
+    var rT = 0;
+    var cells = '';
+    for (var i = 0; i < dn.length; i++) {
+      var di = dn[i], wd = dw[i];
+      var cnt = getEff(key, cls, di);
+      if (cnt > 0) { rT += cnt; dt[i] += cnt; }
+      var tc = 'td-day';
+      if (colorWk) {
+        if (wd === 'CN') tc += ' d-sun';
+        else if (wd === 'T7') tc += ' d-sat';
+      }
+      if (cnt > 0) tc += ' d-on';
+      if (manualEdits[key] && manualEdits[key][cls] && manualEdits[key][cls][di] !== undefined) tc += ' d-edit';
+      cells += '<td class="' + tc + '" data-key="' + key + '" data-cls="' + esc(cls) + '" data-day="' + di + '" onclick="handleCell(this)">' + (cnt || '') + '</td>';
+    }
+    var note = (noteData[key] && noteData[key][cls]) ? noteData[key][cls] : '';
+    var rowCls = (showKT && isKT) ? ' class="row-kt"' : '';
+    var ktBadge = (showKT && isKT) ? '<span style="color:var(--red);font-weight:700;font-size:10px;margin-right:4px">KT</span>' : '';
+var noteCell = showNote ? '<td class="td-note" data-key="' + key + '" data-cls="' + esc(cls) + '" onclick="handleNote(this)">' + ktBadge + esc(note) + '</td>' : '';
+    html += '<tr' + rowCls + '>';
+    html += '<td class="td-stt">' + stt++ + '</td>';
+    html += '<td class="td-name">' + esc(CFG.teacher) + '</td>';
+    html += '<td class="td-cls">' + esc(cls) + '</td>';
+    html += '<td class="td-mon">' + esc(CFG.subject) + '</td>';
+    html += cells;
+    html += '<td class="td-tot">' + (rT || '') + '</td>';
+    html += noteCell;
+    html += '</tr>';
+  });
+
+  var grand = 0;
+  dt.forEach(function(v) { grand += v; });
+
+  var sumCells = '';
+  dt.forEach(function(v) { sumCells += '<td class="sv">' + (v || '') + '</td>'; });
+  html += '<tr class="tr-sum"><td colspan="4" class="sl">Cộng</td>' + sumCells + '<td class="st">' + grand + '</td>';
+  if (showNote) html += '<td></td>';
+  html += '</tr></tbody></table>';
+
+  cont.innerHTML = html;
+  G('attLeg').style.display = 'flex';
+  G('attFoot').style.display = 'flex';
+  G('clearBtn').style.display = (manualEdits[key] && Object.keys(manualEdits[key]).length) ? 'inline-flex' : 'none';
+}
+
+function renderCurrent() { if (activeMonth) renderTable(activeMonth); }
+
+function addClassPrompt() {
+  var cls = prompt('Nhập tên lớp cần thêm (vd: 1A1):');
+  if (!cls || !cls.trim()) return;
+  cls = cls.trim();
+  if (allClasses.indexOf(cls) >= 0) { toast('⚠️ Lớp ' + cls + ' đã tồn tại!', 't-warn'); return; }
+  allClasses.push(cls);
+  allClasses.sort(function(a,b){ var ga=parseInt(a[0])||0,gb=parseInt(b[0])||0; return ga!==gb?ga-gb:a.localeCompare(b,'vi'); });
+  saveStorage(true);
+  renderTable(activeMonth);
+  toast('✅ Đã thêm lớp ' + cls, 't-ok');
+}
+
+function askDeleteClass() {
+  var opts = allClasses.map(function(c,i){ return (i+1)+'. '+c; }).join('\n');
+  var inp = prompt('Nhập tên lớp cần xoá:\n' + opts + '\n\nHoặc gõ "TẤT CẢ" để xoá toàn bộ:');
+  if (!inp || !inp.trim()) return;
+  inp = inp.trim();
+  if (inp.toUpperCase() === 'TẤT CẢ') {
+    openConfirm('🗑️','Xoá tất cả lớp','Xoá toàn bộ danh sách lớp? Dữ liệu tiết dạy vẫn giữ nguyên.','🗑️ Xoá','btn-danger',function(){
+      allClasses = [];
+      saveStorage(true); renderTable(activeMonth);
+      toast('🗑️ Đã xoá tất cả lớp', 't-warn');
+    });
+  } else {
+    if (allClasses.indexOf(inp) < 0) { toast('⚠️ Không tìm thấy lớp ' + inp, 't-warn'); return; }
+    openConfirm('🗑️','Xoá lớp','Xoá lớp <b>'+inp+'</b> khỏi danh sách?','🗑️ Xoá','btn-danger',function(){
+      allClasses = allClasses.filter(function(c){ return c !== inp; });
+      saveStorage(true); renderTable(activeMonth);
+      toast('🗑️ Đã xoá lớp ' + inp, 't-warn');
+    });
+  }
+}
+
+// ── EDIT ──
+function toggleEdit() {
+  editMode = !editMode;
+  var btn = G('editBtn');
+  btn.textContent = editMode ? '🔒 Tắt sửa' : '✏️ Chỉnh sửa';
+  btn.className = editMode ? 'btn btn-sm btn-gold' : 'btn btn-sm btn-outline';
+  G('editTip').textContent = editMode ? '✏️ Chỉnh sửa BẬT — nhấn ô để sửa, Enter để xác nhận' : '💡 Bật chỉnh sửa để sửa số tiết hoặc thêm ghi chú';
+  toast(editMode ? '✏️ Chỉnh sửa BẬT' : '🔒 Đã tắt chỉnh sửa', 't-info');
+}
+
+function handleCell(td) {
+  if (!editMode) return;
+  var key = td.dataset.key, cls = td.dataset.cls, day = parseInt(td.dataset.day);
+  var cur = getEff(key, cls, day);
+  td.classList.add('editing');
+  var inp = document.createElement('input');
+  inp.className = 'ci'; inp.type = 'number'; inp.min = '0'; inp.max = '10'; inp.value = cur || '';
+  td.innerHTML = ''; td.appendChild(inp); inp.focus(); inp.select();
+  var committed = false;
+  function commit() {
+    if (committed) return; committed = true;
+    var raw = inp.value.trim();
+    var val = raw === '' ? 0 : Math.max(0, Math.min(10, parseInt(raw) || 0));
+    if (!manualEdits[key]) manualEdits[key] = {};
+    if (!manualEdits[key][cls]) manualEdits[key][cls] = {};
+    manualEdits[key][cls][day] = val;
+    markUnsaved();
+    renderTable(key);
+    if (val !== cur) toast('✅ ' + cls + ' ngày ' + day + ': ' + val + ' tiết', 't-ok');
+  }
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') { committed = true; renderTable(key); }
+  });
+  inp.addEventListener('blur', commit);
+}
+
+function handleNote(td) {
+  if (!editMode) return;
+  var key = td.dataset.key, cls = td.dataset.cls;
+  var cur = (noteData[key] && noteData[key][cls]) || '';
+  td.classList.add('editing');
+  var inp = document.createElement('input');
+  inp.className = 'ci'; inp.type = 'text'; inp.maxLength = 100; inp.value = cur;
+  inp.style.cssText = 'text-align:left;font-size:11px;color:var(--g5)';
+  td.innerHTML = ''; td.appendChild(inp); inp.focus();
+  var committed = false;
+  function commit() {
+    if (committed) return; committed = true;
+    if (!noteData[key]) noteData[key] = {};
+    noteData[key][cls] = inp.value.trim();
+    markUnsaved();
+    renderTable(key);
+  }
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === 'Escape') commit();
+  });
+  inp.addEventListener('blur', commit);
+}
+
+function markUnsaved() {
+  hasUnsaved = true;
+  G('unsavedDot').classList.add('show');
+  if (CFG.autoSave) {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(function() { saveStorage(true); }, 3000);
+  }
+}
+
+function askClearEdits() {
+  openConfirm('🗑️', 'Xoá chỉnh sửa tháng này',
+    'Xoá toàn bộ chỉnh sửa thủ công tháng này? Dữ liệu gốc từ LBG sẽ được phục hồi.',
+    '🗑️ Xoá', 'btn-danger',
+    function() {
+      delete manualEdits[activeMonth];
+      saveStorage(true); renderTable(activeMonth);
+      toast('🗑️ Đã xoá chỉnh sửa', 't-info');
+    }
+  );
+}
+
+// ── PRINT ──
+function doPrint() {
+  var parts = activeMonth.split('_');
+  var old = document.title;
+  document.title = 'Bảng chấm công T' + parts[1] + '-' + parts[0] + ' — ' + CFG.teacher;
+  window.print();
+  document.title = old;
+}
+
+// ── MANUAL SAVE ──
+function manualSave() {
+  saveStorage(false);
+  saveCFG();
+  var btns = [G('topSaveBtn')];
+  btns.forEach(function(b) {
+    if (!b) return;
+    var orig = b.innerHTML;
+    b.innerHTML = '✅ Đã lưu!';
+    b.style.background = 'var(--green)';
+    b.style.color = '#fff';
+    setTimeout(function() { b.innerHTML = orig; b.style.background = ''; b.style.color = ''; }, 1800);
+  });
+}
+
+// ══ STUDENT LIST ══════════════════════
+function renderStudents() {
+  var q     = (G('hsSearch')    || {value:''}).value.toLowerCase();
+  var fCls  = (G('hsClsFilter') || {value:''}).value;
+  var fKhoi = (G('hsKhoiFilter')|| {value:''}).value;
+
+  var clsSel = G('hsClsFilter');
+  if (clsSel) {
+    var curVal = clsSel.value;
+    var clsOpts = [];
+    studentList.forEach(function(s) { if (s.cls && clsOpts.indexOf(s.cls) < 0) clsOpts.push(s.cls); });
+    clsOpts.sort(function(a,b){return a.localeCompare(b,'vi');});
+    var html = '<option value="">Tất cả lớp</option>';
+    clsOpts.forEach(function(c) { html += '<option value="' + esc(c) + '"' + (c === curVal ? ' selected' : '') + '>' + esc(c) + '</option>'; });
+    clsSel.innerHTML = html;
+  }
+
+  var filtered = studentList.filter(function(s) {
+    var mQ = !q || (s.name||'').toLowerCase().indexOf(q) >= 0 || (s.cls||'').toLowerCase().indexOf(q) >= 0 || (s.ktt||'').toLowerCase().indexOf(q) >= 0;
+    var mC = !fCls  || s.cls === fCls;
+    var mK = !fKhoi || String((s.cls||'')[0]) === fKhoi;
+    return mQ && mC && mK;
+  });
+
+  if (G('hsCountLbl')) G('hsCountLbl').textContent = 'Hiển thị: ' + filtered.length + '/' + studentList.length;
+
+  var ktClsMap = {};
+  var kttMap   = {};
+  studentList.forEach(function(s) {
+    if (s.cls) ktClsMap[s.cls] = true;
+    if (s.ktt) kttMap[s.ktt]   = true;
+  });
+  G('hsSummary').innerHTML =
+    '<div class="hs-sc hl"><div class="sv">' + studentList.length + '</div><div class="sl">Tổng HS KT</div></div>' +
+    '<div class="hs-sc"><div class="sv">' + Object.keys(ktClsMap).length + '</div><div class="sl">Lớp có HS KT</div></div>' +
+    '<div class="hs-sc"><div class="sv">' + Object.keys(kttMap).length  + '</div><div class="sl">Dạng KT</div></div>';
+
+  var tbody = G('hsTbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="ck-empty">Chưa có học sinh nào. Nhấn "Thêm" để bắt đầu.</div></td></tr>';
+    return;
+  }
+
+  var html = '';
+  filtered.forEach(function(s, i) {
+    html += '<tr>';
+    html += '<td class="td-stt">' + (i+1) + '</td>';
+    html += '<td class="td-name"><input value="' + esc(s.name||'') + '" placeholder="Họ tên" onchange="updStudent(\'' + s.id + '\',\'name\',this.value)"></td>';
+    html += '<td class="td-cls"><input value="' + esc(s.cls||'') + '" placeholder="Lớp" style="width:60px;text-align:center" onchange="updStudent(\'' + s.id + '\',\'cls\',this.value)"></td>';
+    html += '<td><input type="text" value="' + esc(s.dob||'') + '" placeholder="dd/mm/yyyy" style="width:90px;text-align:center" onchange="updStudent(\'' + s.id + '\',\'dob\',this.value)"></td>';
+    html += '<td><input value="' + esc(s.danToc||'') + '" placeholder="Dân tộc" style="width:65px" onchange="updStudent(\'' + s.id + '\',\'danToc\',this.value)"></td>';
+    html += '<td><select onchange="updStudent(\'' + s.id + '\',\'gioiTinh\',this.value)"><option' + (s.gioiTinh==='Nam'?' selected':'') + '>Nam</option><option' + (s.gioiTinh==='Nữ'?' selected':'') + '>Nữ</option></select></td>';
+    html += '<td class="td-ktt"><input value="' + esc(s.ktt||'') + '" placeholder="Dạng KT" onchange="updStudent(\'' + s.id + '\',\'ktt\',this.value)"></td>';
+    html += '<td><input value="' + esc(s.ghiChu||'') + '" placeholder="Ghi chú" onchange="updStudent(\'' + s.id + '\',\'ghiChu\',this.value)"></td>';
+    html += '<td class="td-act"><button class="btn-icon" onclick="deleteStudent(\'' + s.id + '\')" title="Xoá">🗑️</button></td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function updStudent(id, field, val) {
+  var s = studentList.filter(function(x) { return x.id === id; })[0];
+  if (!s) return;
+  s[field] = val.trim();
+  saveStorage(true);
+  if (field === 'cls') renderStudents();
+}
+
+function addStudent() {
+  var id = 'hs_' + Date.now();
+  studentList.push({ id: id, name: '', cls: '', dob: '', danToc: 'Kinh', gioiTinh: 'Nam', ktt: '', ghiChu: '' });
+  saveStorage(true);
+  renderStudents();
+  setTimeout(function() {
+    var rows = G('hsTbody').querySelectorAll('tr');
+    if (rows.length) {
+      var inp = rows[rows.length-1].querySelector('input');
+      if (inp) inp.focus();
+    }
+  }, 50);
+}
+
+function deleteStudent(id) {
+  openConfirm('🗑️', 'Xoá học sinh', 'Xoá học sinh này khỏi danh sách?', 'Xoá', 'btn-danger', function() {
+    studentList = studentList.filter(function(s) { return s.id !== id; });
+    saveStorage(true); renderStudents();
+    toast('🗑️ Đã xoá', 't-info');
+  });
+}
+
+function askClearAllStudents() {
+  openConfirm('🗑️','Xoá toàn bộ HS KT',
+    'Xoá toàn bộ danh sách học sinh khuyết tật? <b>Không thể hoàn tác!</b>',
+    '🗑️ Xoá tất cả','btn-danger',function(){
+      studentList = [];
+      saveStorage(true);
+      renderStudents();
+      toast('🗑️ Đã xoá toàn bộ HS KT','t-warn');
+    }
+  );
+}
+
+function clearHsFilter() {
+  G('hsSearch').value = '';
+  G('hsClsFilter').value = '';
+  G('hsKhoiFilter').value = '';
+  renderStudents();
+}
+
+function importStudents(event) {
+  var file = event.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var wb = XLSX.read(e.target.result, { type: 'binary' });
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      var imported = 0, skipped = 0;
+      rows.forEach(function(row, ri) {
+        if (ri < 6) return;
+var name = String(row[1] || '').trim();
+if (!name || name === 'Họ và tên học sinh' || name === 'Họ và tên' || name === 'Họ tên') return;
+        var name = String(row[1] || '').trim();
+        var cls  = String(row[2] || '').trim();
+        if (!name && !cls) { skipped++; return; }
+        var dup = studentList.some(function(s) {
+          return s.name.toLowerCase() === name.toLowerCase() && s.cls.toLowerCase() === cls.toLowerCase();
+        });
+        if (dup) { skipped++; return; }
+        studentList.push({
+          id: 'hs_' + Date.now() + '_' + ri,
+          name: name, cls: cls,
+          dob:      String(row[3] || '').trim(),
+          danToc:   String(row[4] || 'Kinh').trim(),
+          gioiTinh: String(row[5] || 'Nam').trim(),
+          ktt:      String(row[6] || '').trim(),
+          ghiChu:   String(row[7] || '').trim()
+        });
+        imported++;
+      });
+      saveStorage(true); renderStudents();
+      toast('✅ Nhập ' + imported + ' HS' + (skipped ? ', bỏ qua ' + skipped : ''), 't-ok');
+    } catch(err) { toast('❌ Lỗi: ' + err.message, 't-err'); }
+  };
+  reader.readAsBinaryString(file);
+  event.target.value = '';
+}
+
+async function exportStudents() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('DS_HS_KT');
+  var hF = { name:'Times New Roman', size:10, bold:true, color:{argb:'FFFFFFFF'} };
+  var nF = { name:'Times New Roman', size:10 };
+  var fHd= { type:'pattern', pattern:'solid', fgColor:{argb:'FF0D1B3E'} };
+  var bT = { top:{style:'thin'}, left:{style:'thin'}, bottom:{style:'thin'}, right:{style:'thin'} };
+  [5,25,7,14,10,8,22,16].forEach(function(w,i){ws.getColumn(i+1).width=w;});
+  ws.getRow(1).getCell(1).value='UỶ BAN NHÂN DÂN XÃ GIA PHÚ';
+  ws.getRow(1).getCell(1).font={name:'Times New Roman',size:12,bold:true};
+  ws.mergeCells(1,1,1,8); ws.getRow(1).getCell(1).alignment={horizontal:'center'};
+  ws.getRow(2).getCell(1).value='TRƯỜNG ' + CFG.school.toUpperCase();
+  ws.getRow(2).getCell(1).font={name:'Times New Roman',size:12,bold:true};
+  ws.mergeCells(2,1,2,8); ws.getRow(2).getCell(1).alignment={horizontal:'center'};
+  ws.getRow(3).height=22;
+  ws.getRow(3).getCell(1).value='DANH SÁCH HỌC SINH HỌC HOÀ NHẬP NĂM ' + new Date().getFullYear();
+  ws.getRow(3).getCell(1).font={name:'Times New Roman',size:14,bold:true};
+  ws.mergeCells(3,1,3,8); ws.getRow(3).getCell(1).alignment={horizontal:'center'};
+  ws.getRow(4).getCell(1).value='Môn: ' + CFG.subject + '. Năm học: ' + CFG.schoolYear;
+  ws.getRow(4).getCell(1).font={name:'Times New Roman',size:11,italic:true};
+  ws.mergeCells(4,1,4,8); ws.getRow(4).getCell(1).alignment={horizontal:'center'};
+  ws.getRow(5).height=5;
+  ws.getRow(6).height=22;
+  ['TT','Họ và tên học sinh','Lớp','Ngày tháng\nnăm sinh','Dân tộc','Giới\ntính','Dạng khuyết tật','Ghi chú'].forEach(function(v,i){
+    var c=ws.getRow(6).getCell(i+1);c.value=v;c.font=hF;c.fill=fHd;c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=bT;
+  });
+  studentList.forEach(function(s,i){
+    var row=ws.getRow(7+i);row.height=16;
+    [i+1,s.name,s.cls,s.dob,s.danToc,s.gioiTinh,s.ktt,s.ghiChu].forEach(function(v,ci){
+      var c=row.getCell(ci+1);c.value=v||'';c.font=nF;c.alignment={horizontal:ci===1?'left':'center',vertical:'middle'};c.border=bT;
+    });
+  });
+  var buf=await wb.xlsx.writeBuffer();
+  var fname='ds_hs_khuyet_tat_' + CFG.schoolYear.replace(/ /g,'_').replace(/-/g,'_') + '.xlsx';
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), fname);
+  toast('📊 Đã xuất danh sách HS KT', 't-ok');
+}
+
+async function downloadStudentTemplate() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('MAU_DS_HS');
+  var hF = {name:'Times New Roman',size:10,bold:true,color:{argb:'FFFFFFFF'}};
+  var nF = {name:'Times New Roman',size:10};
+  var fHd= {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}};
+  var bT = {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  [5,25,7,14,10,8,22,16].forEach(function(w,i){ws.getColumn(i+1).width=w;});
+  ws.getRow(1).getCell(1).value='MẪU DANH SÁCH HS KT — Điền từ dòng 3 trở xuống';
+  ws.getRow(1).getCell(1).font={name:'Times New Roman',size:11,bold:true,color:{argb:'FFB52A2A'}};
+  ws.mergeCells(1,1,1,8);
+  ws.getRow(2).height=20;
+  ['TT','Họ và tên','Lớp','Ngày sinh (dd/mm/yyyy)','Dân tộc','Giới tính','Dạng khuyết tật','Ghi chú'].forEach(function(v,i){
+    var c=ws.getRow(2).getCell(i+1);c.value=v;c.font=hF;c.fill=fHd;c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=bT;
+  });
+  [['','Nguyễn Văn A','1A1','10/09/2019','Kinh','Nam','Thần kinh, vận động',''],
+   ['','Trần Thị B','2A3','05/03/2018','Kinh','Nữ','Trí tuệ','']].forEach(function(r,i){
+    var row=ws.getRow(3+i);
+    r.forEach(function(v,ci){var c=row.getCell(ci+1);c.value=v;c.font=nF;c.alignment={horizontal:ci===1?'left':'center',vertical:'middle'};c.border=bT;});
+  });
+  var buf=await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'mau_ds_hs_khuyet_tat.xlsx');
+  toast('📄 Đã tải file mẫu HS KT','t-ok');
+}
+
+// ══ KIỂM TRA NHANH ══════════════════════
+function runCheck() {
+  var cont = G('checkContent');
+  if (!Object.keys(lessonData).length) {
+    cont.innerHTML = '<div class="ck-empty">⚠️ Chưa có dữ liệu LBG. Tải file tại tab "Tải Dữ Liệu".</div>';
+    return;
+  }
+
+  var html = '';
+  var issueTotal = 0, errTotal = 0;
+
+  var ktMap = {};
+  studentList.forEach(function(s) { if (s.cls) ktMap[s.cls] = true; });
+  var ktKeys = Object.keys(ktMap);
+
+  var totL = getTotalL();
+  var totM = MONTHS.filter(function(x) { return lessonData[mk(x.m,x.y)] && Object.keys(lessonData[mk(x.m,x.y)]).length > 0; }).length;
+  html += '<div class="ck-section">';
+  html += '<div class="ck-hd">📊 Tổng quan dữ liệu</div>';
+  html += '<div class="ck-grid">';
+  html += ckCard(totL, 'Tổng tiết dạy', totL > 0 ? 'ok' : 'err');
+  html += ckCard(totM + '/10', 'Tháng có dữ liệu', totM >= 8 ? 'ok' : totM >= 4 ? 'warn' : 'err');
+  html += ckCard(allClasses.length, 'Lớp trong LBG', allClasses.length > 0 ? 'ok' : 'warn');
+  html += ckCard(studentList.length, 'HS khuyết tật', studentList.length > 0 ? 'ok' : 'warn');
+  html += ckCard(ktKeys.length, 'Lớp có HS KT', ktKeys.length > 0 ? 'ok' : 'warn');
+  html += '</div></div>';
+
+  var clsIssues = [];
+  allClasses.filter(function(c){return !ktMap[c];}).forEach(function(c) {
+    issueTotal++;
+    clsIssues.push({ type:'warn', ico:'⚠️', txt:'Lớp <b>' + esc(c) + '</b> có tiết trong LBG nhưng không có HS KT trong danh sách', fix:'Vào tab DS Học Sinh KT để kiểm tra. Tên lớp phải khớp chính xác.' });
+  });
+  ktKeys.filter(function(c){return allClasses.indexOf(c) < 0;}).forEach(function(c) {
+    issueTotal++; errTotal++;
+    clsIssues.push({ type:'err', ico:'❌', txt:'Lớp <b>' + esc(c) + '</b> có HS KT nhưng <b>không tìm thấy tiết</b> trong LBG', fix:'Kiểm tra tên lớp trong DS HS KT và file LBG. Phải khớp 100% (vd: "1A1" khác "1a1").' });
+  });
+  var clsBadge = clsIssues.length ? '<span class="badge-' + (errTotal > 0 ? 'err' : 'warn') + '">' + clsIssues.length + ' vấn đề</span>' : '<span class="badge-ok">✓ OK</span>';
+  html += '<div class="ck-section">';
+  html += '<div class="ck-hd">🏫 Đối chiếu lớp ' + clsBadge + '</div>';
+  html += '<ul class="ck-list">';
+  if (clsIssues.length) {
+    clsIssues.forEach(function(iss) {
+      html += '<li class="' + iss.type + '"><span class="ii">' + iss.ico + '</span><div><div class="it">' + iss.txt + '</div><div class="if">💡 ' + esc(iss.fix) + '</div></div></li>';
+    });
+  } else {
+    html += '<li class="ok"><span class="ii">✅</span><div class="it">Tất cả lớp có HS KT đều có tiết dạy trong LBG.</div></li>';
+  }
+  html += '</ul></div>';
+
+  var moIssues = [];
+  MONTHS.filter(function(x){return !lessonData[mk(x.m,x.y)]||!Object.keys(lessonData[mk(x.m,x.y)]).length;}).forEach(function(x) {
+    issueTotal++;
+    moIssues.push({ type:'warn', ico:'📅', txt:'Tháng <b>' + x.lbl + '</b> chưa có dữ liệu', fix:'Kiểm tra file LBG có đủ tuần cho tháng này chưa.' });
+  });
+  MONTHS.forEach(function(x) {
+    var key = mk(x.m, x.y);
+    var mD = lessonData[key] || {};
+    Object.keys(mD).forEach(function(cls) {
+      Object.keys(mD[cls]).forEach(function(d) {
+        var cnt = mD[cls][d];
+        if (cnt > (CFG.maxDayLessons || 5)) {
+          issueTotal++;
+          moIssues.push({ type:'warn', ico:'⚠️', txt:'Lớp <b>' + esc(cls) + '</b> ngày ' + d + '/' + x.m + '/' + x.y + ': <b>' + cnt + ' tiết</b> (vượt giới hạn ' + (CFG.maxDayLessons||5) + ')', fix:'Kiểm tra file LBG hoặc sửa thủ công tại Bảng Chấm Công.' });
+        }
+      });
+    });
+  });
+  var moBadge = moIssues.length ? '<span class="badge-warn">' + moIssues.length + ' vấn đề</span>' : '<span class="badge-ok">✓ OK</span>';
+  html += '<div class="ck-section">';
+  html += '<div class="ck-hd">📅 Kiểm tra tháng ' + moBadge + '</div>';
+  html += '<ul class="ck-list">';
+  if (moIssues.length) {
+    moIssues.forEach(function(iss) {
+      html += '<li class="' + iss.type + '"><span class="ii">' + iss.ico + '</span><div><div class="it">' + iss.txt + '</div><div class="if">💡 ' + esc(iss.fix) + '</div></div></li>';
+    });
+  } else {
+    html += '<li class="ok"><span class="ii">✅</span><div class="it">Tất cả tháng đều có dữ liệu trong giới hạn bình thường.</div></li>';
+  }
+  html += '</ul></div>';
+
+  if (studentList.length > 0) {
+    html += '<div class="ck-section">';
+    html += '<div class="ck-hd">🔗 Đối chiếu DS HS KT ↔ LBG</div>';
+    html += '<table class="ck-tbl"><thead><tr><th>Lớp</th><th>Số HS KT</th><th>Trong LBG?</th><th>Tổng tiết năm</th><th>Trạng thái</th></tr></thead><tbody>';
+    ktKeys.sort(function(a,b){return a.localeCompare(b,'vi');}).forEach(function(cls) {
+      var hsCount = studentList.filter(function(s){return s.cls===cls;}).length;
+      var totInLBG = 0;
+      MONTHS.forEach(function(x) {
+        var mo = (lessonData[mk(x.m,x.y)] || {})[cls] || {};
+        Object.keys(mo).forEach(function(d){ totInLBG += mo[d]; });
+      });
+      var inLBG = allClasses.indexOf(cls) >= 0;
+      var st = !inLBG ? 'err' : totInLBG === 0 ? 'warn' : 'ok';
+      html += '<tr class="' + st + '">';
+      html += '<td><b>' + esc(cls) + '</b></td>';
+      html += '<td style="text-align:center">' + hsCount + '</td>';
+      html += '<td style="text-align:center">' + (inLBG ? '<span class="badge-ok">✓ Có</span>' : '<span class="badge-err">✗ Không</span>') + '</td>';
+      html += '<td style="text-align:center;font-weight:700;color:' + (totInLBG > 0 ? 'var(--green)' : 'var(--red)') + '">' + totInLBG + '</td>';
+      html += '<td>' + (st==='ok'?'<span class="badge-ok">✅ Khớp</span>':st==='warn'?'<span class="badge-warn">⚠️ Cần xem</span>':'<span class="badge-err">❌ Không tìm thấy</span>') + '</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div class="ck-section"><div class="ck-hd">🔗 Đối chiếu DS HS KT ↔ LBG</div><div class="ck-empty">Chưa có danh sách HS KT. Thêm tại tab "DS Học Sinh KT".</div></div>';
+  }
+
+  var editList = [];
+  Object.keys(manualEdits).forEach(function(key) {
+    var parts = key.split('_');
+    Object.keys(manualEdits[key]).forEach(function(cls) {
+      Object.keys(manualEdits[key][cls]).forEach(function(d) {
+        var v = manualEdits[key][cls][d];
+        var orig = (lessonData[key] && lessonData[key][cls] && lessonData[key][cls][d]) || 0;
+        if (v !== orig) editList.push({ lbl:'T'+parts[1]+'/'+parts[0], cls:cls, d:d, orig:orig, v:v });
+      });
+    });
+  });
+  var editBadge = editList.length ? '<span class="badge-warn">' + editList.length + ' ô</span>' : '<span class="badge-ok">Không có</span>';
+  html += '<div class="ck-section"><div class="ck-hd">✏️ Chỉnh sửa thủ công ' + editBadge + '</div>';
+  if (editList.length) {
+    html += '<table class="ck-tbl"><thead><tr><th>Tháng</th><th>Lớp</th><th>Ngày</th><th>Gốc LBG</th><th>Đã sửa</th><th>Chênh lệch</th></tr></thead><tbody>';
+    editList.slice(0, 30).forEach(function(ed) {
+      var diff = ed.v - ed.orig;
+      html += '<tr class="warn"><td>' + esc(ed.lbl) + '</td><td><b>' + esc(ed.cls) + '</b></td><td>' + ed.d + '</td><td style="text-align:center">' + ed.orig + '</td><td style="text-align:center;font-weight:700;color:var(--amber)">' + ed.v + '</td><td style="text-align:center;color:' + (diff > 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:700">' + (diff > 0 ? '+' : '') + diff + '</td></tr>';
+    });
+    if (editList.length > 30) html += '<tr><td colspan="6" style="text-align:center;color:var(--g3);font-size:10.5px">... và ' + (editList.length-30) + ' chỉnh sửa khác</td></tr>';
+    html += '</tbody></table>';
+  } else {
+    html += '<ul class="ck-list"><li class="ok"><span class="ii">✅</span><div class="it">Không có chỉnh sửa thủ công. Dữ liệu khớp 100% LBG.</div></li></ul>';
+  }
+  html += '</div>';
+
+  if (studentList.length > 0) {
+    var hsIss = [];
+    studentList.forEach(function(s) {
+      if (!s.name.trim()) { issueTotal++; hsIss.push({type:'err', ico:'❌', txt:'Có học sinh chưa điền tên', fix:'Vào DS Học Sinh KT để bổ sung.'}); }
+      else if (!s.cls.trim()) { issueTotal++; hsIss.push({type:'err', ico:'❌', txt:'HS <b>'+esc(s.name)+'</b>: chưa điền lớp', fix:'Điền lớp để đối chiếu LBG.'}); }
+      else if (!s.ktt.trim()) { issueTotal++; hsIss.push({type:'warn', ico:'⚠️', txt:'HS <b>'+esc(s.name)+'</b> — '+esc(s.cls)+': chưa điền dạng khuyết tật', fix:'Bổ sung để hồ sơ đầy đủ.'}); }
+    });
+    var hsBadge = hsIss.length ? '<span class="badge-' + (hsIss.some(function(x){return x.type==='err';}) ? 'err' : 'warn') + '">' + hsIss.length + ' vấn đề</span>' : '<span class="badge-ok">✓ Đầy đủ</span>';
+    html += '<div class="ck-section"><div class="ck-hd">👥 Hồ sơ HS KT ' + hsBadge + '</div>';
+    html += '<ul class="ck-list">';
+    if (hsIss.length) {
+      hsIss.slice(0,15).forEach(function(iss){ html += '<li class="'+iss.type+'"><span class="ii">'+iss.ico+'</span><div><div class="it">'+iss.txt+'</div><div class="if">💡 '+esc(iss.fix)+'</div></div></li>'; });
+      if (hsIss.length > 15) html += '<li class="warn"><span class="ii">⚠️</span><div class="it">... và '+(hsIss.length-15)+' vấn đề khác</div></li>';
+    } else {
+      html += '<li class="ok"><span class="ii">✅</span><div class="it">Tất cả học sinh đều có đầy đủ tên, lớp, dạng khuyết tật.</div></li>';
+    }
+    html += '</ul></div>';
+  }
+
+  cont.innerHTML = html;
+
+  var badge = G('ktBadge');
+  if (issueTotal === 0) { badge.style.display='inline-block'; badge.textContent='✓'; badge.className='sb-badge ok'; }
+  else if (errTotal > 0) { badge.style.display='inline-block'; badge.textContent=errTotal; badge.className='sb-badge'; badge.style.background='var(--red)'; }
+  else { badge.style.display='inline-block'; badge.textContent=issueTotal; badge.className='sb-badge warn'; }
+}
+
+function ckCard(val, lbl, cls) {
+  return '<div class="ck-card ' + cls + '"><div class="cv">' + val + '</div><div class="cl">' + lbl + '</div></div>';
+}
+
+async function exportCheckReport() {
+  var now = new Date();
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Kiem_tra');
+  var hF={name:'Times New Roman',size:10,bold:true,color:{argb:'FFFFFFFF'}};
+  var nF={name:'Times New Roman',size:10};
+  var fHd={type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}};
+  var bT={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  [22,12,16,18,14].forEach(function(w,i){ws.getColumn(i+1).width=w;});
+  ws.getRow(1).getCell(1).value='BÁO CÁO KIỂM TRA — ' + CFG.school.toUpperCase();
+  ws.getRow(1).getCell(1).font={name:'Times New Roman',size:13,bold:true};
+  ws.mergeCells(1,1,1,5); ws.getRow(1).getCell(1).alignment={horizontal:'center'};
+  ws.getRow(2).getCell(1).value='Xuất: ' + now.toLocaleString('vi-VN') + ' — GV: ' + CFG.teacher;
+  ws.getRow(2).getCell(1).font=nF; ws.mergeCells(2,1,2,5);
+  ws.getRow(4).height=16;
+  ['Chỉ tiêu','Giá trị','Đánh giá','Ghi chú'].forEach(function(v,i){
+    var c=ws.getRow(4).getCell(i+1);c.value=v;c.font=hF;c.fill=fHd;c.alignment={horizontal:'center',vertical:'middle'};c.border=bT;
+  });
+  var ktMap={};studentList.forEach(function(s){if(s.cls)ktMap[s.cls]=true;});
+  var noLBG=Object.keys(ktMap).filter(function(c){return allClasses.indexOf(c)<0;}).length;
+  var editCount=Object.keys(manualEdits).reduce(function(s,mk2){return s+Object.keys(manualEdits[mk2]).reduce(function(s2,cls){return s2+Object.keys(manualEdits[mk2][cls]).length;},0);},0);
+  [
+    ['Tổng tiết dạy',getTotalL(),getTotalL()>0?'✅ OK':'❌ Chưa có',''],
+    ['Tháng có dữ liệu',MONTHS.filter(function(x){return lessonData[mk(x.m,x.y)]&&Object.keys(lessonData[mk(x.m,x.y)]).length>0;}).length+'/10','',''],
+    ['Lớp trong LBG',allClasses.length,'',''],
+    ['Lớp có HS KT',Object.keys(ktMap).length,'',''],
+    ['Tổng HS KT',studentList.length,'',''],
+    ['Lớp KT không có trong LBG',noLBG,noLBG>0?'❌ Cần kiểm tra':'✅ OK','Tên lớp phải khớp chính xác'],
+    ['Số ô chỉnh sửa thủ công',editCount,'','']
+  ].forEach(function(r,i){
+    var row=ws.getRow(5+i);
+    r.forEach(function(v,ci){var c=row.getCell(ci+1);c.value=v;c.font=nF;c.border=bT;c.alignment={horizontal:ci===0?'left':'center',vertical:'middle'};});
+  });
+  var buf=await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'bao_cao_kiem_tra_'+now.toISOString().slice(0,10)+'.xlsx');
+  toast('📄 Đã xuất báo cáo kiểm tra','t-ok');
+}
+
+// ══ TỔNG HỢP ══════════════════════════
+function renderSummary() {
+  var mt = MONTHS.map(function(x) {
+    var key = mk(x.m, x.y);
+    var cnt = 0;
+    var mD = lessonData[key] || {};
+    Object.keys(mD).forEach(function(cls){ Object.keys(mD[cls]).forEach(function(d){ cnt += mD[cls][d]; }); });
+    return { lbl:x.lbl, cnt:cnt, key:key };
+  });
+  var maxV = Math.max.apply(null, mt.map(function(x){return x.cnt;}));
+  if (maxV === 0) maxV = 1;
+
+  var totAll = mt.reduce(function(a,x){return a+x.cnt;}, 0);
+  var colors = ['#2196F3','#4CAF50','#FF9800','#E91E63','#9C27B0','#00BCD4','#FF5722','#8BC34A','#3F51B5','#F44336'];
+  var bars = '';
+  mt.forEach(function(x, i) {
+    var h = x.cnt ? Math.max(Math.round(x.cnt / maxV * 160), 40) : 18;
+    var color = colors[i % colors.length];
+    var pct = maxV > 0 ? Math.round(x.cnt/totAll*100) : 0;
+    bars += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer" onclick="gotoMonth(\'' + x.key + '\')">';
+    bars += '<div style="width:100%;height:' + h + 'px;background:' + color + ';border-radius:6px 6px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:0 3px 8px rgba(0,0,0,.18);transition:.2s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'">';
+    if (x.cnt > 0) {
+      bars += '<span style="color:#fff;font-size:18px;font-weight:900;text-shadow:0 2px 6px rgba(0,0,0,.5)">' + x.cnt + '</span>';
+      bars += '<span style="color:rgba(255,255,255,.95);font-size:12px;font-weight:700">tiết</span>';
+      bars += '<span style="color:rgba(255,255,255,.9);font-size:11px;font-weight:600">' + pct + '%</span>';
+    }
+    bars += '</div>';
+    bars += '<div style="font-size:13px;color:var(--g5);font-weight:700;text-align:center">' + x.lbl + '</div>';
+    bars += '</div>';
+  });
+  G('chartArea').innerHTML =
+    '<div style="display:flex;align-items:flex-end;gap:6px;height:200px;padding:10px 4px 0;border-bottom:2px solid var(--g1)">' + bars + '</div>' +
+    '';
+
+  if (!allClasses.length) { G('clsArea').innerHTML='<div class="empty"><p>Chưa có dữ liệu</p></div>'; return; }
+
+  var ktMap = {};
+  studentList.forEach(function(s){if(s.cls)ktMap[s.cls]=true;});
+
+  var displayClasses = clsFilterMode === 'kt'
+    ? allClasses.filter(function(c){ return !!ktMap[c]; })
+    : allClasses;
+
+  if (!displayClasses.length) {
+    G('clsArea').innerHTML='<div class="empty"><p>Không có lớp nào có HS khuyết tật</p></div>';
+    return;
+  }
+
+  var thead = '<tr><th>Lớp</th><th>Khối</th>';
+  MONTHS.forEach(function(x){ thead += '<th>T'+x.m+'/'+String(x.y).slice(2)+'</th>'; });
+  thead += '<th>Tổng</th><th>KT</th></tr>';
+
+  var tbody = '';
+  displayClasses.forEach(function(cls) {
+    var isKT = !!ktMap[cls];
+    var tot = 0;
+    var cells = '';
+    MONTHS.forEach(function(x) {
+      var v = 0;
+      var mD = (lessonData[mk(x.m,x.y)] || {})[cls] || {};
+      Object.keys(mD).forEach(function(d){ v += mD[d]; });
+      tot += v;
+      cells += '<td' + (v>0&&isKT?' class="kt-cell"':'') + '>' + (v||'') + '</td>';
+    });
+    tbody += '<tr>';
+    tbody += '<td class="ft"' + (isKT?' style="color:var(--red)"':'') + '>' + esc(cls) + '</td>';
+    tbody += '<td>' + (cls[0]||'?') + '</td>' + cells;
+    tbody += '<td class="ft">' + (tot||'') + '</td>';
+    tbody += '<td>' + (isKT ? '<span style="color:var(--red);font-weight:700;font-size:10px">KT</span>' : '') + '</td>';
+    tbody += '</tr>';
+  });
+
+  var gByM = [];
+  MONTHS.forEach(function(x) {
+    var v = 0;
+    var mD = lessonData[mk(x.m,x.y)] || {};
+    Object.keys(mD).forEach(function(cls){ Object.keys(mD[cls]).forEach(function(d){ v += mD[cls][d]; }); });
+    gByM.push(v);
+  });
+  var gTotal = gByM.reduce(function(a,b){return a+b;}, 0);
+  var sumRow = '<tr class="sum-row"><td colspan="2">Tổng cộng</td>' + gByM.map(function(v){return '<td>'+(v||'')+'</td>';}).join('') + '<td>' + gTotal + '</td><td></td></tr>';
+
+  G('clsArea').innerHTML = '<table class="cls-tbl"><thead>' + thead + '</thead><tbody>' + tbody + sumRow + '</tbody></table>';
+}
+
+function gotoMonth(key) {
+  showPage('chamcong', G('navCC'));
+  activeMonth = key;
+  setActiveTab(key);
+  renderTable(key);
+}
+
+// ══ EXPORT ════════════════════════════
+function openExportDialog(mode) {
+  if (mode === 'all') {
+    openConfirm('📦','Chọn phạm vi xuất',
+      'Bạn muốn xuất tháng này như thế nào?<br><br>' +
+      '<button class="btn btn-primary" style="width:100%;margin-bottom:8px;justify-content:flex-start;gap:10px;padding:10px 14px" onclick="closeConfirm();_doOpenExport(\'all\',\'all\')">' +
+      '<span style="font-size:16px">📋</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Tất cả các lớp</div><div style="font-size:10px;opacity:.7">Xuất toàn bộ lớp có tiết dạy</div></div></button>' +
+      '<button class="btn btn-danger" style="width:100%;justify-content:flex-start;gap:10px;padding:10px 14px" onclick="closeConfirm();_doOpenExport(\'all\',\'kt\')">' +
+      '<span style="font-size:16px">🔴</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Chỉ lớp có HS khuyết tật</div><div style="font-size:10px;opacity:.7">Xuất những lớp có HS KT</div></div></button>',
+      'Huỷ','btn-outline', null
+    );
+    G('dlgOkBtn').style.display='none';
+    return;
+  }
+  _doOpenExport(mode, 'all');
+}
+
+function _doOpenExport(mode, clsFilter) {
+  exportMode = mode;
+  _exportClsFilter = clsFilter || 'all';
+  var parts = activeMonth.split('_'), y = parts[0], m = parts[1];
+  var hasFSA = 'showSaveFilePicker' in window;
+  G('sdTitle').textContent = mode === 'all' ? '📦 Xuất tất cả tháng' : '📊 Xuất Excel tháng T' + m + '/' + y;
+  var defName = mode === 'all'
+    ? (CFG.fn2 || 'bang_cham_cong_namhoc_{Y1}_{Y2}').replace('{Y1}','2025').replace('{Y2}','2026')
+    : (CFG.fn1 || 'bang_cham_cong_T{M}_{Y}').replace('{M}', m).replace('{Y}', y);
+  G('sdFilename').value = defName;
+
+  var keys = mode === 'all'
+    ? MONTHS.filter(function(x){return lessonData[mk(x.m,x.y)]&&Object.keys(lessonData[mk(x.m,x.y)]).length>0;}).map(function(x){return mk(x.m,x.y);})
+    : [activeMonth];
+  var totL = 0;
+  keys.forEach(function(k) {
+    var mD = lessonData[k] || {};
+    Object.keys(mD).forEach(function(cls){ Object.keys(mD[cls]).forEach(function(d){ totL += mD[cls][d]; }); });
+  });
+  var ktNote = CFG.onlyKTCls && studentList.length > 0 ? ' <b style="color:var(--amber)">(chỉ lớp KT)</b>' : '';
+  G('sdInfo').innerHTML = mode === 'all'
+    ? 'Xuất <b>' + keys.length + ' sheet</b> — tổng <b>' + totL + ' tiết</b>' + ktNote
+    : '<b>T' + m + '/' + y + '</b> — <b>' + allClasses.length + ' lớp</b> — <b>' + totL + ' tiết</b>' + ktNote;
+
+  if (hasFSA) {
+    G('sdNote').textContent = '📂 Trình duyệt hỗ trợ lưu trực tiếp vào thư mục. Nhấn "Đổi" để chọn thư mục.';
+    G('sdPathRow').style.display = 'flex';
+    G('sdPathLbl').textContent = savedDirHandle ? '📁 ' + savedDirHandle.name : 'Chưa chọn (sẽ mở hộp thoại khi xuất)';
+    G('sdOverwriteRow').style.display = 'flex';
+  } else {
+    G('sdNote').textContent = 'ℹ️ File sẽ lưu vào thư mục Downloads.';
+    G('sdPathRow').style.display = 'none';
+    G('sdOverwriteRow').style.display = 'none';
+  }
+  G('saveDialog').classList.add('open');
+}
+function closeSaveDialog() { G('saveDialog').classList.remove('open'); }
+
+async function pickSaveDir() {
+  try {
+    savedDirHandle = await window.showDirectoryPicker({ mode:'readwrite' });
+    G('sdPathLbl').textContent = '📁 ' + savedDirHandle.name;
+    toast('📂 Chọn thư mục: ' + savedDirHandle.name, 't-info');
+  } catch(e) { if (e.name !== 'AbortError') toast('❌ Lỗi: ' + e.message, 't-err'); }
+}
+
+async function doExport() {
+  var fname = (G('sdFilename').value.trim() || 'bang_cham_cong');
+  var fullName = fname.endsWith('.xlsx') ? fname : fname + '.xlsx';
+  var wb = new ExcelJS.Workbook(); wb.creator = 'HT Cham Cong v' + APP_VER;
+  var keys = exportMode === 'all'
+    ? MONTHS.filter(function(x){return lessonData[mk(x.m,x.y)]&&Object.keys(lessonData[mk(x.m,x.y)]).length>0;}).map(function(x){return mk(x.m,x.y);})
+    : [activeMonth];
+  if (!keys.length) { toast('⚠️ Không có dữ liệu để xuất','t-warn'); return; }
+  var ktMap = {};
+  studentList.forEach(function(s){if(s.cls)ktMap[s.cls]=true;});
+  keys.forEach(function(k) { buildSheet(wb, k, _exportClsFilter === 'kt' ? ktMap : null); });
+  var buf = await wb.xlsx.writeBuffer();
+  var blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+
+  var hasFSA = 'showSaveFilePicker' in window;
+  if (hasFSA) {
+    try {
+      var fh;
+      if (savedDirHandle) {
+        try {
+          fh = await savedDirHandle.getFileHandle(fullName, { create:true });
+          var wr = await fh.createWritable(); await wr.write(buf); await wr.close();
+          toast('✅ Đã lưu: ' + fullName + ' → ' + savedDirHandle.name, 't-ok');
+          closeSaveDialog(); return;
+        } catch(e) { /* fallback */ }
+      }
+      fh = await window.showSaveFilePicker({
+        suggestedName: fullName,
+        types: [{ description:'Excel', accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx']} }]
+      });
+      var wr2 = await fh.createWritable(); await wr2.write(buf); await wr2.close();
+      toast('✅ Đã lưu: ' + fh.name, 't-ok');
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+      dlBlob(blob, fullName);
+    }
+  } else {
+    dlBlob(blob, fullName);
+  }
+  closeSaveDialog();
+}
+
+function dlBlob(blob, fname) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 200);
+  toast('💾 Đã tải: ' + fname, 't-ok');
+}
+
+// ══ BUILD EXCEL SHEET ══════════════════
+function buildSheet(wb, key, ktFilter) {
+  var parts = key.split('_');
+  var y = parseInt(parts[0]), m = parseInt(parts[1]);
+  var days = mDays(m, y);
+  var dn = [], dw = [];
+  for (var d = 1; d <= days; d++) { dn.push(d); dw.push(mWd(d, m, y)); }
+
+  var CS=1,CN=2,CC=3,CM=4,CD1=5,CDN=4+days,CT=5+days,CNT=6+days;
+  var showNote = CFG.showNote;
+  var NC = showNote ? CNT : CT;
+
+  var mData = lessonData[key] || {}, mEdit = manualEdits[key] || {};
+  var clsSet = {};
+  Object.keys(mData).forEach(function(c){clsSet[c]=true;});
+  Object.keys(mEdit).forEach(function(c){clsSet[c]=true;});
+  var ktMap = {};
+  studentList.forEach(function(s){if(s.cls)ktMap[s.cls]=true;});
+
+  var dispCls;
+  if (ktFilter && Object.keys(ktFilter).length > 0) {
+    dispCls = allClasses.filter(function(c){return ktFilter[c];});
+  } else if (CFG.onlyKTCls && Object.keys(ktMap).length > 0) {
+    dispCls = allClasses.filter(function(c){return ktMap[c];});
+  } else {
+    dispCls = allClasses.length > 0 ? allClasses : Object.keys(clsSet).sort(function(a,b){return a.localeCompare(b,'vi');});
+  }
+
+  var mgL=CFG.mgLeft/2.54, mgR=CFG.mgRight/2.54, mgT=CFG.mgTop/2.54;
+  var mgB=CFG.mgBot/2.54, mgH=CFG.mgHd/2.54, mgF=CFG.mgFt/2.54;
+
+  var ws = wb.addWorksheet('T' + m + '-' + y, {
+    pageSetup: {
+      paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+      orientation: CFG.orientation || 'landscape',
+      fitToPage: CFG.fitPage !== false, fitToWidth: 1, fitToHeight: 0,
+      margins: { left:mgL, right:mgR, top:mgT, bottom:mgB, header:mgH, footer:mgF },
+      printTitlesRow: CFG.repeatRow !== false ? '6:8' : undefined
+    },
+    properties: { defaultRowHeight: 14 }
+  });
+
+  ws.getColumn(CS).width=4; ws.getColumn(CN).width=13; ws.getColumn(CC).width=5.5; ws.getColumn(CM).width=7;
+  for (var ci = CD1; ci <= CDN; ci++) ws.getColumn(ci).width = 2.9;
+  ws.getColumn(CT).width = 6.5;
+  if (NC === CNT) ws.getColumn(CNT).width = 9;
+
+  var fM = {name:'Times New Roman',size:10};
+  var fB = {name:'Times New Roman',size:10,bold:true};
+  var fT = {name:'Times New Roman',size:12,bold:true};
+  var hF = {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}};
+  var bT = {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  var bML = {top:{style:'thin'},left:{style:'medium'},bottom:{style:'thin'},right:{style:'thin'}};
+  var bMB = {top:{style:'thin'},left:{style:'medium'},bottom:{style:'medium'},right:{style:'thin'}};
+
+  function fPat(argb) { return {type:'pattern',pattern:'solid',fgColor:{argb:argb}}; }
+  var fHD = fPat('FF2E4A7A'), fH2 = fPat('FF3D5C94');
+  var fSU = fPat('FFFFF8E6'), fSA = fPat('FFF3F0FF');
+  var fON = fPat('FFE8F5E9'), fED = fPat('FFFFD180');
+  var fKT = fPat('FFFFF0F0');
+  var fSM = fPat('FFE8EDF5'), fTL = fPat('FFFFFCE6');
+  var aCC = {horizontal:'center',vertical:'middle',wrapText:true};
+  var aLC = {horizontal:'left',vertical:'middle',wrapText:true};
+
+  function S(cell, v, fo, fi, al, bo) {
+    if (v !== undefined) cell.value = v;
+    if (fo) cell.font = fo;
+    if (fi) cell.fill = fi;
+    if (al) cell.alignment = al;
+    if (bo) cell.border = bo;
+  }
+
+  ws.getRow(1).height = 15;
+  S(ws.getRow(1).getCell(1), 'ĐƠN VỊ: ' + CFG.school.toUpperCase(), fB, null, {horizontal:'left',vertical:'middle'});
+  ws.mergeCells(1,1,1,8);
+  S(ws.getRow(2).getCell(1),'MÃ QHNS:',fM);
+  S(ws.getRow(2).getCell(4),CFG.code,fM);
+  ws.getRow(3).height = 21;
+  S(ws.getRow(3).getCell(1),'BẢNG CHẤM CÔNG GIÁO VIÊN DẠY HỌC SINH KHUYẾT TẬT HỌC HÒA NHẬP NĂM HỌC ' + CFG.schoolYear, fT, null, aCC);
+  ws.mergeCells(3,1,3,NC);
+  ws.getRow(4).height = 17;
+  S(ws.getRow(4).getCell(1),'Tháng ' + pad2(m) + ' năm ' + y, {name:'Times New Roman',size:11,bold:true,italic:true}, null, aCC);
+  ws.mergeCells(4,1,4,NC);
+  ws.getRow(5).height = 4;
+
+  ws.getRow(6).height = 25;
+  var fixCols = [[CS,'STT'],[CN,'Họ và tên'],[CC,'Lớp'],[CM,'Môn'],[CT,'Tổng\nsố tiết']];
+  if (NC === CNT) fixCols.push([CNT,'Ghi chú']);
+  fixCols.forEach(function(fc) {
+    S(ws.getRow(6).getCell(fc[0]), fc[1], hF, fHD, aCC, bT);
+    ws.mergeCells(6, fc[0], 8, fc[0]);
+  });
+  S(ws.getRow(6).getCell(CD1),'Ngày trong tháng', hF, fHD, aCC, bT);
+  ws.mergeCells(6, CD1, 6, CDN);
+  ws.getRow(7).height = 12; ws.getRow(8).height = 11;
+  dn.forEach(function(dd, i) {
+    var c = CD1 + i, wd = dw[i];
+    var isSun = wd === 'CN', isSat = wd === 'T7';
+    var numColor = isSun ? 'FF7A5C00' : (isSat ? 'FF5A3F99' : 'FFFFFFFF');
+    var wdColor  = isSun ? 'FF7A5C00' : (isSat ? 'FF5A3F99' : 'FFD0DCF0');
+    var bg = isSun ? fSU : (isSat ? fSA : fHD);
+    var bg2= isSun ? fSU : (isSat ? fSA : fH2);
+    S(ws.getRow(7).getCell(c), dd, {name:'Times New Roman',size:8,bold:true,color:{argb:numColor}}, bg, aCC, bT);
+    S(ws.getRow(8).getCell(c), wd, {name:'Times New Roman',size:8,bold:true,color:{argb:wdColor}}, bg2, aCC, bT);
+  });
+
+  var stt = 1, exR = 9;
+  var dTot = [];
+  for (var i = 0; i < days; i++) dTot.push(0);
+
+  dispCls.forEach(function(cls) {
+    var isKT = !!ktMap[cls];
+    var row = ws.getRow(exR); row.height = 14;
+    var clsFill = isKT ? fKT : null;
+    S(row.getCell(CS), stt++, fM, clsFill, aCC, bT);
+    S(row.getCell(CN), CFG.teacher, fM, clsFill, aLC, bT);
+    S(row.getCell(CC), cls, {name:'Times New Roman',size:10,bold:true,color:{argb:isKT?'FFAA2020':'FF1A2744'}}, clsFill, aCC, bT);
+    S(row.getCell(CM), CFG.subject, fM, clsFill, aCC, bT);
+    var rTot = 0;
+    dn.forEach(function(dd, i) {
+      var c = CD1 + i, wd = dw[i];
+      var cnt = getEff(key, cls, dd);
+      if (cnt > 0) { rTot += cnt; dTot[i] += cnt; }
+      var isSun = wd === 'CN', isSat = wd === 'T7';
+      var isManual = mEdit[cls] && mEdit[cls][dd] !== undefined;
+      var fi;
+      if (cnt > 0) fi = isManual ? fED : fON;
+      else if (isSun) fi = fSU;
+      else if (isSat) fi = fSA;
+      else fi = clsFill || {type:'pattern',pattern:'none'};
+      var fo;
+      if (cnt > 0) fo = {name:'Times New Roman',size:9,bold:true,color:{argb:'FF1A6B34'}};
+      else fo = {name:'Times New Roman',size:8,color:{argb:isSun?'FFB8860B':(isSat?'FF7B5EAA':'FF999999')}};
+      S(row.getCell(c), cnt || null, fo, fi, aCC, bT);
+    });
+    S(row.getCell(CT), rTot||null, rTot?{name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A2744'}}:fM, fTL, aCC, bML);
+    if (NC === CNT) S(row.getCell(CNT), (noteData[key]&&noteData[key][cls])||null, fM, clsFill||null, aLC, bT);
+    exR++;
+  });
+
+  var sRow = ws.getRow(exR); sRow.height = 15;
+  S(sRow.getCell(CS),'Cộng',fB,fSM,{horizontal:'right',vertical:'middle'});
+  ws.mergeCells(exR,CS,exR,CM);
+  [CS,CN,CC,CM].forEach(function(c){sRow.getCell(c).fill=fSM;sRow.getCell(c).border=bT;});
+  var grand = 0;
+  dTot.forEach(function(v){grand+=v;});
+  dn.forEach(function(dd,i) {
+    var c = CD1+i, v = dTot[i];
+    S(sRow.getCell(c),v||null,{name:'Times New Roman',size:9,bold:!!v,color:{argb:'FF1A2744'}},fSM,aCC,bT);
+  });
+  S(sRow.getCell(CT),grand,{name:'Times New Roman',size:10,bold:true},fTL,aCC,bMB);
+  if (NC===CNT) { sRow.getCell(CNT).fill=fSM; sRow.getCell(CNT).border=bT; }
+  exR += 2;
+
+  var dateStr = (CFG.location||'Gia Phú') + ', ngày ' + days + ' tháng ' + pad2(m) + ' năm ' + y;
+  var midC = Math.round(CD1 + days * 0.55);
+  S(ws.getRow(exR).getCell(midC), dateStr, {name:'Times New Roman',size:10,italic:true}, null, aCC);
+  ws.mergeCells(exR, midC, exR, NC); exR++;
+  var s1=1, s2=Math.round(NC*0.38), s3=Math.round(NC*0.76);
+  [[s1,s1+4,'Người chấm công'],[s2,s2+5,'PHT, Phụ trách chuyên môn'],[s3,NC,'Hiệu trưởng']].forEach(function(fc){
+    S(ws.getRow(exR).getCell(fc[0]),fc[2],fB,null,aCC); ws.mergeCells(exR,fc[0],exR,Math.min(fc[1],NC));
+  });
+  exR++; ws.getRow(exR).height=30; exR++;
+  [[s1,s1+4,CFG.teacher],[s2,s2+5,CFG.pht],[s3,NC,CFG.principal]].forEach(function(fc){
+    S(ws.getRow(exR).getCell(fc[0]),fc[2],fB,null,aCC); ws.mergeCells(exR,fc[0],exR,Math.min(fc[1],NC));
+  });
+}
+
+// ══ EXPORT TEMPLATE ═══════════════════
+async function exportTemplate() {
+  var wb = new ExcelJS.Workbook(); wb.creator = 'HT Cham Cong v' + APP_VER;
+  var fHd={type:'pattern',pattern:'solid',fgColor:{argb:'FF1A2744'}};
+  var bT={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  var hF={name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}};
+  var nF={name:'Times New Roman',size:9};
+  var aCC={horizontal:'center',vertical:'middle',wrapText:true};
+  var ws = wb.addWorksheet('Tuan_1');
+  [10,8,5,10,6,6,10,35,12,12].forEach(function(w,i){ws.getColumn(i+1).width=w;});
+  ws.getRow(1).getCell(1).value='KẾ HOẠCH DẠY HỌC';
+  ws.getRow(1).getCell(1).font={name:'Times New Roman',size:12,bold:true};
+  ws.mergeCells(1,1,1,11);
+  ws.getRow(2).getCell(1).value='Giáo viên:'; ws.getRow(2).getCell(4).value=CFG.teacher;
+  ws.getRow(2).getCell(5).value='Từ ngày:'; ws.getRow(2).getCell(6).value='08/09/2025';
+  ws.getRow(3).getCell(1).value='Tuần:'; ws.getRow(3).getCell(4).value='Tuần 1';
+  ws.getRow(3).getCell(5).value='Đến ngày:'; ws.getRow(3).getCell(6).value='14/09/2025';
+  ws.getRow(4).height=26;
+  ['Thứ, ngày','Buổi','Tiết TKB','Môn học','Lớp','Tiết PPCT','Phân môn','Tên bài dạy','Ghi chú','Trạng thái'].forEach(function(v,i){
+    var c=ws.getRow(4).getCell(i+1);c.value=v;c.font=hF;c.fill=fHd;c.alignment=aCC;c.border=bT;
+  });
+  [['','Sáng',2,CFG.subject,'3A3',1,'','Bài 1 (Tiết 1)','','Bình thường'],
+   ['08/09/2025','Chiều',1,CFG.subject,'1A4',1,'','Mở đầu (Tiết 1)','','Bình thường'],
+   ['09/09/2025','Sáng',1,CFG.subject,'2A3',1,'','Bài 1 (Tiết 1)','','Bình thường']
+  ].forEach(function(l,i){
+    var row=ws.getRow(5+i);row.height=14;
+    l.forEach(function(v,ci){
+      var c=row.getCell(ci+1);c.value=v||'';
+      c.font=(ci===3||ci===4)?{name:'Times New Roman',size:9,bold:true}:nF;
+      c.alignment=ci===7?{horizontal:'left',vertical:'middle'}:aCC;c.border=bT;
+    });
+  });
+  var wg=wb.addWorksheet('HUONG_DAN');
+  wg.getColumn(1).width=4; wg.getColumn(2).width=26; wg.getColumn(3).width=55;
+  [
+    ['HƯỚNG DẪN SỬ DỤNG FILE LBG','',''],
+    ['','',''],
+    ['STT','Cột','Yêu cầu'],
+    ['1','Cột D: Môn học','Phải khớp chính xác môn đã cài trong Cài Đặt (mặc định: ' + CFG.subject + ')'],
+    ['2','Cột E: Lớp','Mã lớp: 1A1, 3A2, 5B4... (phân biệt hoa thường)'],
+    ['3','Cột J: Trạng thái','Để trống = có dạy. "Bỏ học"/"Vắng"/"Nghỉ" = bỏ qua'],
+    ['4','Cột A: Thứ ngày','Định dạng DD/MM/YYYY hoặc số thứ: 2,3,4,5,6,7,CN'],
+    ['5','Tên Sheet','Mỗi sheet = 1 tuần. Đặt tên Tuan_1, Tuan_2...']
+  ].forEach(function(row,ri){
+    var wr=wg.getRow(ri+1); wr.height=20;
+    row.forEach(function(v,ci){
+      var c=wr.getCell(ci+1); c.value=v;
+      if(ri===0) c.font={name:'Times New Roman',size:13,bold:true,color:{argb:'FF1A2744'}};
+      else if(ri===2){c.font=hF;c.fill=fHd;c.alignment={horizontal:'center',vertical:'middle'};c.border=bT;}
+      else c.font=nF;
+      c.alignment={horizontal:'left',vertical:'middle',wrapText:true};
+    });
+  });
+  wg.mergeCells(1,1,1,3);
+  var buf=await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'mau_ke_hoach_day_hoc_LBG.xlsx');
+  toast('📄 Đã tải file mẫu LBG!','t-ok');
+}
+
+// ══ SETTINGS ══════════════════════════
+function applyForm() {
+  function fv(id, v) { var el=G(id); if(el&&v!==undefined) el.value=v; }
+  function fc(id, v) { var el=G(id); if(el) el.checked=!!v; }
+  fv('cfg-teacher',CFG.teacher); fv('cfg-subject',CFG.subject);
+  fv('cfg-school',CFG.school); fv('cfg-code',CFG.code);
+  fv('cfg-pht',CFG.pht); fv('cfg-principal',CFG.principal);
+  fv('cfg-schoolyear',CFG.schoolYear); fv('cfg-location',CFG.location);
+  fv('cfg-fn1',CFG.fn1); fv('cfg-fn2',CFG.fn2); fv('cfg-maxday',CFG.maxDayLessons);
+  fv('mg-t',CFG.mgTop); fv('mg-b',CFG.mgBot); fv('mg-l',CFG.mgLeft);
+  fv('mg-r',CFG.mgRight); fv('mg-h',CFG.mgHd); fv('mg-f',CFG.mgFt);
+  fc('cfg-fitpage',CFG.fitPage); fc('cfg-repeatrow',CFG.repeatRow);
+  fc('cfg-shownote',CFG.showNote); fc('cfg-colorwk',CFG.colorWk);
+  fc('cfg-showkt',CFG.showKT); fc('cfg-autonav',CFG.autoNav);
+  fc('cfg-autosave',CFG.autoSave); fc('cfg-promptsave',CFG.promptSave);
+  fc('cfg-onlykt',CFG.onlyKTCls);
+fv('cfg-hk1start',CFG.hk1Start); fv('cfg-hk1end',CFG.hk1End);
+fv('cfg-hk2start',CFG.hk2Start); fv('cfg-hk2end',CFG.hk2End);
+  document.querySelectorAll('.psz-opt[data-ps]').forEach(function(el){el.classList.toggle('active',el.dataset.ps===CFG.pageSize);});
+  document.querySelectorAll('.psz-opt[data-ori]').forEach(function(el){el.classList.toggle('active',el.dataset.ori===CFG.orientation);});
+  document.querySelectorAll('.swatch').forEach(function(s){s.classList.toggle('active',s.dataset.c===CFG.colorCol);});
+}
+
+function gv(id) { var el=G(id); return el?el.value.trim():''; }
+function pf(id) { return parseFloat(G(id)&&G(id).value)||0; }
+function cb(id) { return !!(G(id)&&G(id).checked); }
+
+function saveConfig() {
+  CFG.teacher   = gv('cfg-teacher') || CFG.teacher;
+  CFG.subject   = gv('cfg-subject') || CFG.subject;
+  CFG.school    = gv('cfg-school')  || CFG.school;
+  CFG.code      = gv('cfg-code')    || CFG.code;
+  CFG.pht       = gv('cfg-pht')     || CFG.pht;
+  CFG.principal = gv('cfg-principal')|| CFG.principal;
+  CFG.schoolYear= gv('cfg-schoolyear')||CFG.schoolYear;
+  CFG.location  = gv('cfg-location') || CFG.location;
+  saveCFG(); updateTopbar(); renderCurrent();
+  toast('✅ Đã lưu thông tin GV & trường','t-ok');
+}
+function savePageCfg() {
+  CFG.pageSize    = curPS;
+  CFG.orientation = curOrientation; // FIX: use curOrientation
+  CFG.mgTop=pf('mg-t');CFG.mgBot=pf('mg-b');CFG.mgLeft=pf('mg-l');
+  CFG.mgRight=pf('mg-r');CFG.mgHd=pf('mg-h');CFG.mgFt=pf('mg-f');
+  CFG.fitPage=cb('cfg-fitpage'); CFG.repeatRow=cb('cfg-repeatrow');
+  saveCFG(); toast('✅ Đã lưu thiết lập in','t-ok');
+}
+function saveExportCfg() {
+  CFG.fn1=gv('cfg-fn1')||CFG.fn1; CFG.fn2=gv('cfg-fn2')||CFG.fn2;
+  CFG.maxDayLessons=parseInt(gv('cfg-maxday'))||5;
+  CFG.promptSave=cb('cfg-promptsave'); CFG.showNote=cb('cfg-shownote');
+  CFG.colorWk=cb('cfg-colorwk'); CFG.showKT=cb('cfg-showkt');
+  CFG.autoNav=cb('cfg-autonav'); CFG.autoSave=cb('cfg-autosave');
+  CFG.onlyKTCls=cb('cfg-onlykt');
+  saveCFG(); renderCurrent(); toast('✅ Đã lưu cài đặt','t-ok');
+}
+// FIX: renamed selOri → selOrientation to avoid conflict with curOrientation variable
+function saveHKCfg() {
+  CFG.hk1Start = gv('cfg-hk1start') || CFG.hk1Start;
+  CFG.hk1End   = gv('cfg-hk1end')   || CFG.hk1End;
+  CFG.hk2Start = gv('cfg-hk2start') || CFG.hk2Start;
+  CFG.hk2End   = gv('cfg-hk2end')   || CFG.hk2End;
+  saveCFG();
+  toast('✅ Đã lưu thiết lập học kỳ', 't-ok');
+}
+function selPS(el,ps){document.querySelectorAll('.psz-opt[data-ps]').forEach(function(e){e.classList.remove('active');});el.classList.add('active');curPS=ps;}
+function selOrientation(el,ori){document.querySelectorAll('.psz-opt[data-ori]').forEach(function(e){e.classList.remove('active');});el.classList.add('active');curOrientation=ori;}
+function selColor(el,c1,c2){document.querySelectorAll('.swatch').forEach(function(s){s.classList.remove('active');});el.classList.add('active');CFG.colorPrimary=c1;CFG.colorPrimary2=c2;CFG.colorCol=el.dataset.c;saveCFG();toast('🎨 Màu đã cập nhật','t-info');}
+
+function updateTopbar() {
+  G('tbSchoolName').textContent = CFG.school.toUpperCase() + ' · MÃ QHNS: ' + CFG.code;
+  G('sigT').textContent = CFG.teacher;
+  G('sigP').textContent = CFG.pht;
+  G('sigHT').textContent = CFG.principal;
+  G('sbTeacher').textContent = CFG.teacher;
+  G('sbYear').textContent = CFG.schoolYear.replace(' - ','–');
+}
+// ══ THỐNG KÊ HỌC KỲ ══════════════════
+var tkFilterMode = 'hk1';
+var tkClsFilterMode = 'all';
+
+// HKI: T9->T12/2025, HKII: T1->T5/2026
+var HK1_MONTHS = [{m:9,y:2025},{m:10,y:2025},{m:11,y:2025},{m:12,y:2025}];
+var HK2_MONTHS = [{m:1,y:2026},{m:2,y:2026},{m:3,y:2026},{m:4,y:2026},{m:5,y:2026}];
+function setTKClsFilter(mode) {
+  tkClsFilterMode = mode;
+  var btnAll = document.getElementById('tkBtnAllCls');
+  var btnKT  = document.getElementById('tkBtnKTCls');
+  if (btnAll && btnKT) {
+    if (mode === 'all') {
+      btnAll.style.background = 'var(--navy)'; btnAll.style.color = '#fff';
+      btnKT.style.background  = '';            btnKT.style.color  = '';
+    } else {
+      btnKT.style.background  = 'var(--red)';  btnKT.style.color  = '#fff';
+      btnAll.style.background = '';            btnAll.style.color = '';
+    }
+  }
+  renderThongKe(tkFilterMode);
+}
+function setTKFilter(mode) {
+  tkFilterMode = mode;
+  ['hk1','hk2','all'].forEach(function(k) {
+    var btn = document.getElementById('tkBtn' + (k==='hk1'?'HK1':k==='hk2'?'HK2':'All'));
+    if (!btn) return;
+    btn.style.background = '';
+    btn.style.color = '';
+  });
+  var activeBtn = document.getElementById(mode==='hk1'?'tkBtnHK1':mode==='hk2'?'tkBtnHK2':'tkBtnAll');
+  if (activeBtn) { activeBtn.style.background='var(--navy)'; activeBtn.style.color='#fff'; }
+  renderThongKe(mode);
+}
+function getHKDateRange(mode) {
+  var s1 = parseDMY(CFG.hk1Start), e1 = parseDMY(CFG.hk1End);
+  var s2 = parseDMY(CFG.hk2Start), e2 = parseDMY(CFG.hk2End);
+  if (mode === 'hk1') return { start: s1, end: e1 };
+  if (mode === 'hk2') return { start: s2, end: e2 };
+  return { start: s1, end: e2 };
+}
+
+function getLessonsInRange(cls, startDate, endDate) {
+  if (!startDate || !endDate) return 0;
+  var total = 0;
+  MONTHS.forEach(function(x) {
+    var key = mk(x.m, x.y);
+    var mD = (lessonData[key] || {})[cls] || {};
+    var mE = (manualEdits[key] || {})[cls] || {};
+    for (var d = 1; d <= mDays(x.m, x.y); d++) {
+      var date = new Date(x.y, x.m-1, d);
+      if (date >= startDate && date <= endDate) {
+        total += mE[d] !== undefined ? mE[d] : (mD[d] || 0);
+      }
+    }
+  });
+  return total;
+}
+
+function getMonthLessonsInRange(cls, mo, yr, startDate, endDate) {
+  if (!startDate || !endDate) return getMonthLessons(cls, mo, yr);
+  var key = mk(mo, yr);
+  var mD = (lessonData[key] || {})[cls] || {};
+  var mE = (manualEdits[key] || {})[cls] || {};
+  var total = 0;
+  for (var d = 1; d <= mDays(mo, yr); d++) {
+    var date = new Date(yr, mo-1, d);
+    if (date >= startDate && date <= endDate) {
+      total += mE[d] !== undefined ? mE[d] : (mD[d] || 0);
+    }
+  }
+  return total;
+}
+function getTKMonths(mode) {
+  var range = getHKDateRange(mode);
+  if (!range.start || !range.end) {
+    if (mode === 'hk1') return HK1_MONTHS;
+    if (mode === 'hk2') return HK2_MONTHS;
+    return HK1_MONTHS.concat(HK2_MONTHS);
+  }
+  return MONTHS.filter(function(x) {
+    var monthStart = new Date(x.y, x.m-1, 1);
+    var monthEnd   = new Date(x.y, x.m, 0);
+    return monthStart <= range.end && monthEnd >= range.start;
+  });
+}
+
+function getTKLabel(mode) {
+  if (mode === 'hk1') return 'Học kỳ I, năm học ' + CFG.schoolYear + ' (từ ' + CFG.hk1Start + ' đến ' + CFG.hk1End + ')';
+  if (mode === 'hk2') return 'Học kỳ II, năm học ' + CFG.schoolYear + ' (từ ' + CFG.hk2Start + ' đến ' + CFG.hk2End + ')';
+  return 'Cả năm học ' + CFG.schoolYear;
+}
+
+function getLessonsForCls(cls, months) {
+  var total = 0;
+  months.forEach(function(x) {
+    var key = mk(x.m, x.y);
+    var mD = (lessonData[key] || {})[cls] || {};
+    var mE = (manualEdits[key] || {})[cls] || {};
+    var days = mDays(x.m, x.y);
+    for (var d = 1; d <= days; d++) {
+      var v = mE[d] !== undefined ? mE[d] : (mD[d] || 0);
+      total += v;
+    }
+  });
+  return total;
+}
+
+function getMonthLessons(cls, mo, yr) {
+  var key = mk(mo, yr);
+  var mD = (lessonData[key] || {})[cls] || {};
+  var mE = (manualEdits[key] || {})[cls] || {};
+  var total = 0;
+  var days = mDays(mo, yr);
+  for (var d = 1; d <= days; d++) {
+    var v = mE[d] !== undefined ? mE[d] : (mD[d] || 0);
+    total += v;
+  }
+  return total;
+}
+
+function renderThongKe(mode) {
+  var cont = document.getElementById('tkContent');
+  if (!allClasses.length) {
+    cont.innerHTML = '<div class="empty"><p>Chưa có dữ liệu. Vui lòng tải file LBG trước.</p></div>';
+    return;
+  }
+
+  var months  = getTKMonths(mode);
+  var label   = getTKLabel(mode);
+  var hkRange = getHKDateRange(mode);
+
+  var ktMap = {};
+  studentList.forEach(function(s) { if (s.cls) ktMap[s.cls] = true; });
+
+  // Chỉ lấy lớp có tiết dạy trong kỳ này
+  var dispCls = allClasses.filter(function(c) {
+    var hasLesson = getLessonsInRange(c, hkRange.start, hkRange.end) > 0;
+    if (tkClsFilterMode === 'kt') return hasLesson && !!ktMap[c];
+    return hasLesson;
+  });
+
+  if (!dispCls.length) {
+    cont.innerHTML = '<div class="empty"><p>Không có dữ liệu cho kỳ này.</p></div>';
+    return;
+  }
+
+  // Tính tổng tiết toàn kỳ
+  var totalAll = 0;
+  dispCls.forEach(function(c) { totalAll += getLessonsForCls(c, months); });
+
+  // Header tháng
+  var monthHeaders = '';
+  var monthSubHeaders = '';
+  months.forEach(function(x) {
+    monthHeaders += '<th colspan="4" style="background:var(--navy);color:#fff;text-align:center;padding:5px 3px;border:1px solid rgba(255,255,255,.15);font-size:10px">Tháng ' + x.m + '/' + String(x.y).slice(2) + '</th>';
+    monthSubHeaders += '<th style="background:var(--navy2);color:var(--gold2);font-size:9px;padding:4px 2px;text-align:center;border:1px solid rgba(255,255,255,.1)">Số lớp</th>';
+    monthSubHeaders += '<th style="background:var(--navy2);color:var(--gold2);font-size:9px;padding:4px 2px;text-align:center;border:1px solid rgba(255,255,255,.1)">Liết<br>dạy/lớp</th>';
+    monthSubHeaders += '<th style="background:var(--navy2);color:var(--gold2);font-size:9px;padding:4px 2px;text-align:center;border:1px solid rgba(255,255,255,.1)">Tên<br>môn day</th>';
+    monthSubHeaders += '<th style="background:var(--navy2);color:var(--gold2);font-size:9px;padding:4px 2px;text-align:center;border:1px solid rgba(255,255,255,.1)">Tổng<br>số tiết</th>';
+  });
+
+  var rows = '';
+  var colTotals = {};
+  months.forEach(function(x) { colTotals[mk(x.m,x.y)] = 0; });
+  var grandTotal = 0;
+  var totalLopThucDay = 0;
+
+  dispCls.forEach(function(cls, i) {
+    var lopThucDay = getLessonsInRange(cls, hkRange.start, hkRange.end);
+    totalLopThucDay += lopThucDay > 0 ? 1 : 0;
+    grandTotal += lopThucDay;
+    var hsCount = studentList.filter(function(s){return s.cls===cls;}).length;
+    var isKT = !!ktMap[cls];
+
+    var cells = '';
+    months.forEach(function(x) {
+      var v = getMonthLessonsInRange(cls, x.m, x.y, hkRange.start, hkRange.end);
+      colTotals[mk(x.m,x.y)] += v;
+      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">1</td>';
+      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (v > 0 ? v : '') + '</td>';
+      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (v > 0 ? esc(CFG.subject) : '') + '</td>';
+      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px;font-weight:' + (v>0?'700':'400') + ';color:' + (v>0?'var(--navy)':'var(--g2)') + '">' + (v > 0 ? v : '') + '</td>';
+    });
+
+    rows += '<tr style="border-bottom:1px solid var(--g1);color:' + (isKT?'#cc0000':'#1a2744') + '">';
+    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px;color:var(--g3)">' + (i+1) + '</td>';
+    rows += '<td style="border:1px solid var(--g1);font-size:10px;font-weight:500;color:var(--navy);padding:4px 6px">' + esc(CFG.teacher.split(' ').slice(-1)[0]) + ' ' + esc(CFG.teacher.split(' ').slice(0,-1).join(' ')) + '</td>';
+    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px;font-weight:700;color:' + (isKT?'var(--red)':'var(--navy)') + '">' + esc(cls) + '</td>';
+    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (lopThucDay > 0 ? lopThucDay : '') + '</td>';
+    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + hsCount + '</td>';
+    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">1</td>';
+    rows += cells;
+    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (isKT ? '<span style="color:#cc0000;font-weight:700;font-size:10px">KT</span>' : '') + '</td>';
+    rows += '</tr>';
+  });
+
+  // Dòng tổng số
+  var sumCells = '';
+  months.forEach(function(x) {
+    var v = colTotals[mk(x.m,x.y)];
+    sumCells += '<td style="text-align:center;border:1px solid rgba(255,255,255,.2);font-size:10px;color:var(--gold2)">' + dispCls.length + '</td>';
+    sumCells += '<td style="text-align:center;border:1px solid rgba(255,255,255,.2);font-size:10px"></td>';
+    sumCells += '<td style="text-align:center;border:1px solid rgba(255,255,255,.2);font-size:10px"></td>';
+    sumCells += '<td style="text-align:center;border:1px solid rgba(255,255,255,.2);font-size:10px;color:var(--gold2);font-weight:700">' + (v||'') + '</td>';
+  });
+
+  var totalLessons = 0;
+  dispCls.forEach(function(c){ totalLessons += getLessonsForCls(c, months); });
+
+  var html = '';
+  html += '<div style="background:var(--w);border:1px solid var(--g1);border-radius:var(--r2);overflow:hidden">';
+
+  // Tiêu đề
+  html += '<div style="padding:12px 16px;text-align:center;border-bottom:1px solid var(--g1)">';
+  html += '<div style="font-size:11px;font-weight:600;color:var(--navy)">UỶ BAN NHÂN DÂN XÃ GIA PHÚ</div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">TRƯỜNG ' + esc(CFG.school.toUpperCase()) + '</div>';
+  html += '<div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase">Thống kê</div>';
+  html += '<div style="font-size:12px;font-weight:700;color:var(--navy)">Số lớp và số tiết dạy học sinh khuyết tật học hoà nhập</div>';
+  html += '<div style="font-size:11px;font-style:italic;color:var(--g4);margin-top:3px">' + esc(label) + '</div>';
+  html += '</div>';
+
+  // Bảng
+  html += '<div style="overflow-x:auto;padding:10px 14px">';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:10.5px">';
+  html += '<thead>';
+  html += '<tr>';
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:24px">TT</th>';
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:90px">Họ và tên GV<br>dạy ở lớp có<br>HS học hoà nhập</th>';
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:35px">Lớp</th>';
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:38px">Số tiết<br>thực dạy/<br>tháng</th>';
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:32px">Số<br>sinh<br>KT</th>';
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:28px">Lớp<br>học</th>';
+  html += monthHeaders;
+  html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:50px">Ghi chú</th>';
+  html += '</tr>';
+  html += '<tr>' + monthSubHeaders + '</tr>';
+  html += '</thead>';
+  html += '<tbody>' + rows + '</tbody>';
+  html += '<tfoot>';
+  html += '<tr style="background:var(--navy)">';
+  html += '<td colspan="3" style="text-align:right;padding:6px 8px;color:#fff;font-weight:700;font-size:10px;border:1px solid rgba(255,255,255,.15)">Tổng số</td>';
+  html += '<td style="text-align:center;color:var(--gold2);font-weight:700;font-size:10px;border:1px solid rgba(255,255,255,.15)">' + totalLessons + '</td>';
+  html += '<td style="text-align:center;color:var(--gold2);font-size:10px;border:1px solid rgba(255,255,255,.15)"></td>';
+  html += '<td style="text-align:center;color:var(--gold2);font-size:10px;border:1px solid rgba(255,255,255,.15)"></td>';
+  html += sumCells;
+  html += '<td style="border:1px solid rgba(255,255,255,.15)"></td>';
+  html += '</tr>';
+  html += '</tfoot>';
+  html += '</table></div>';
+
+  // Ký tên
+  var now = new Date();
+  html += '<div style="padding:12px 20px 18px;display:flex;justify-content:space-between;align-items:flex-end">';
+  html += '<div style="width:40%"></div>';
+  html += '<div style="text-align:center">';
+  html += '<div style="font-size:11px;font-style:italic;color:var(--g4);margin-bottom:6px"><input id="tkSignDate" type="text" value="' + esc(CFG.location) + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear() + '" style="border:1px solid var(--g2);border-radius:5px;padding:3px 8px;font-family:inherit;font-size:11px;font-style:italic;color:var(--g4);text-align:center;width:280px;outline:none" onfocus="this.style.borderColor=\'var(--gold)\'" onblur="this.style.borderColor=\'var(--g2)\'"></div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:28px">Giáo viên bộ môn</div>';
+  html += '<div style="font-size:11.5px;font-weight:700;color:var(--navy);padding-top:4px;min-width:130px">' + esc(CFG.teacher) + '</div>';
+  html += '</div></div>';
+
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+function doExportThongKe(clsMode) {
+  document.getElementById('tkExportDlg').classList.remove('open');
+  exportThongKe(clsMode);
+}
+
+async function exportThongKe(clsMode) {
+  clsMode = clsMode || 'all';
+  var months  = getTKMonths(tkFilterMode);
+  var label   = getTKLabel(tkFilterMode);
+  var hkRange = getHKDateRange(tkFilterMode);
+
+  var ktMap = {};
+  studentList.forEach(function(s) { if (s.cls) ktMap[s.cls] = true; });
+
+  var dispCls = allClasses.filter(function(c) {
+  var hasLesson = getLessonsInRange(c, hkRange.start, hkRange.end) > 0;
+  if (tkClsFilterMode === 'kt') return hasLesson && !!ktMap[c];
+  return hasLesson;
+});
+
+  if (!dispCls.length) { toast('⚠️ Không có dữ liệu để xuất', 't-warn'); return; }
+
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('ThongKe');
+  var fT  = {name:'Times New Roman',size:13,bold:true};
+  var fB  = {name:'Times New Roman',size:10,bold:true};
+  var fM  = {name:'Times New Roman',size:10};
+  var fHd = {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}};
+  var fRed= {name:'Times New Roman',size:10,bold:true,color:{argb:'FFAA2020'}};
+  var fBl = {name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A2744'}};
+  var fGo = {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}};
+  var bgHd= {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}};
+  var bgH2= {type:'pattern',pattern:'solid',fgColor:{argb:'FF172447'}};
+  var bgSm= {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}};
+  var bgKT= {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF0F0'}};
+  var bT  = {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  var aCC = {horizontal:'center',vertical:'middle',wrapText:true};
+  var aLC = {horizontal:'left',  vertical:'middle',wrapText:true};
+  var aRC = {horizontal:'right', vertical:'middle'};
+
+  var totalCols = 6 + months.length * 4 + 1;
+
+  // Căn độ rộng cột
+  ws.getColumn(1).width = 4;
+  ws.getColumn(2).width = 14;
+  ws.getColumn(3).width = 6;
+  ws.getColumn(4).width = 8;
+  ws.getColumn(5).width = 6;
+  ws.getColumn(6).width = 5;
+  for (var ci = 0; ci < months.length * 4; ci++) {
+    var baseW = [4, 5, 8, 7];
+    ws.getColumn(7 + ci).width = baseW[ci % 4];
+  }
+  ws.getColumn(7 + months.length * 4).width = 10;
+
+  // Dòng 1-2: Tiêu đề đơn vị
+  var r1 = ws.getRow(1); r1.height = 16;
+  r1.getCell(1).value = 'UỶ BAN NHÂN DÂN XÃ GIA PHÚ';
+  r1.getCell(1).font  = {name:'Times New Roman',size:11,bold:true};
+  r1.getCell(1).alignment = aCC;
+  ws.mergeCells(1,1,1,totalCols);
+
+  var r2 = ws.getRow(2); r2.height = 16;
+  r2.getCell(1).value = 'TRƯỜNG ' + CFG.school.toUpperCase();
+  r2.getCell(1).font  = {name:'Times New Roman',size:11,bold:true};
+  r2.getCell(1).alignment = aCC;
+  ws.mergeCells(2,1,2,totalCols);
+
+  // Dòng 3: Tên bảng
+  var r3 = ws.getRow(3); r3.height = 20;
+  r3.getCell(1).value = 'THỐNG KÊ';
+  r3.getCell(1).font  = fT;
+  r3.getCell(1).alignment = aCC;
+  ws.mergeCells(3,1,3,totalCols);
+
+  var r4 = ws.getRow(4); r4.height = 18;
+  r4.getCell(1).value = 'SỐ LỚP VÀ SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP';
+  r4.getCell(1).font  = {name:'Times New Roman',size:11,bold:true};
+  r4.getCell(1).alignment = aCC;
+  ws.mergeCells(4,1,4,totalCols);
+
+  var r5 = ws.getRow(5); r5.height = 15;
+  r5.getCell(1).value = label;
+  r5.getCell(1).font  = {name:'Times New Roman',size:11,bold:false,italic:true};
+  r5.getCell(1).alignment = aCC;
+  ws.mergeCells(5,1,5,totalCols);
+
+  ws.getRow(6).height = 4;
+
+  // Header bảng dòng 7
+  var r7 = ws.getRow(7); r7.height = 30;
+  function hc(row, col, val, merge2) {
+    var c = row.getCell(col);
+    c.value = val; c.font = fHd; c.fill = bgHd;
+    c.alignment = aCC; c.border = bT;
+    if (merge2) ws.mergeCells(7, col, 8, col);
+  }
+  hc(r7,1,'TT',true);
+  hc(r7,2,'Họ và tên GV\ndạy ở lớp có\nHS học hoà nhập',true);
+  hc(r7,3,'Lớp',true);
+  hc(r7,4,'Số tiết\nthực dạy/\ntháng',true);
+  hc(r7,5,'Số\nsinh\nKT',true);
+  hc(r7,6,'Lớp\nhọc',true);
+
+  months.forEach(function(x, i) {
+    var col = 7 + i * 4;
+    var c = r7.getCell(col);
+    c.value = 'Tháng ' + x.m + '/' + String(x.y).slice(2);
+    c.font = fHd; c.fill = bgHd; c.alignment = aCC; c.border = bT;
+    ws.mergeCells(7, col, 7, col+3);
+  });
+
+  var lastCol = 7 + months.length * 4;
+  var cGC = r7.getCell(lastCol);
+  cGC.value = 'Ghi chú'; cGC.font = fHd; cGC.fill = bgHd; cGC.alignment = aCC; cGC.border = bT;
+  ws.mergeCells(7, lastCol, 8, lastCol);
+
+  // Header bảng dòng 8 (sub)
+  var r8 = ws.getRow(8); r8.height = 22;
+  months.forEach(function(x, i) {
+    var col = 7 + i * 4;
+    ['Số lớp','Liết\ndạy/lớp','Tên\nmôn day','Tổng\nsố tiết'].forEach(function(v,j){
+      var c = r8.getCell(col+j);
+      c.value = v; c.font = fHd; c.fill = bgH2; c.alignment = aCC; c.border = bT;
+    });
+  });
+
+  // Dữ liệu
+  var colTotals = {};
+  months.forEach(function(x){ colTotals[mk(x.m,x.y)] = 0; });
+  var totalLessons = 0;
+
+  dispCls.forEach(function(cls, i) {
+    var row = ws.getRow(9 + i); row.height = 14;
+    var isKT = !!ktMap[cls];
+    var lopThucDay = getLessonsInRange(cls, hkRange.start, hkRange.end);
+    var hsCount = studentList.filter(function(s){return s.cls===cls;}).length;
+    totalLessons += lopThucDay;
+
+    var bgRow = isKT ? bgKT : null;
+
+    function dc(col, val, fo, al) {
+      var c = row.getCell(col);
+      c.value = val; c.font = fo||fM; c.border = bT;
+      c.alignment = al||aCC;
+      if (bgRow) c.fill = bgRow;
+    }
+
+    dc(1, i+1, fM);
+    dc(2, CFG.teacher, fM, aLC);
+    dc(3, cls, isKT ? fRed : fBl);
+    dc(4, lopThucDay||null, fM);
+    dc(5, hsCount||null, fM);
+    dc(6, 1, fM);
+
+    months.forEach(function(x, mi) {
+      var v = getMonthLessonsInRange(cls, x.m, x.y, hkRange.start, hkRange.end);
+      colTotals[mk(x.m,x.y)] += v;
+      var col = 7 + mi * 4;
+      dc(col,   1,              fM);
+      dc(col+1, v||null,        fM);
+      dc(col+2, v>0?CFG.subject:null, fM);
+      dc(col+3, v||null,        v>0?{name:'Times New Roman',size:10,bold:true}:fM);
+    });
+
+    dc(lastCol, isKT ? 'KT' : null, isKT ? {name:'Times New Roman',size:10,bold:true,color:{argb:'FFCC0000'}} : fM, aLC);
+  });
+
+  // Dòng tổng
+  var sumRow = ws.getRow(9 + dispCls.length); sumRow.height = 16;
+  function sc(col, val, fo, al) {
+    var c = sumRow.getCell(col);
+    c.value = val; c.font = fo||fHd; c.fill = bgSm; c.border = bT;
+    c.alignment = al||aCC;
+  }
+  ws.mergeCells(9+dispCls.length, 1, 9+dispCls.length, 3);
+  sc(1,'Tổng số', fHd, aRC);
+  sc(4, totalLessons, {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}});
+  sc(5, null, fHd); sc(6, null, fHd);
+  months.forEach(function(x, i) {
+    var v = colTotals[mk(x.m,x.y)];
+    var col = 7 + i * 4;
+    sc(col,   dispCls.length, fHd);
+    sc(col+1, null, fHd);
+    sc(col+2, null, fHd);
+    sc(col+3, v||null, {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}});
+  });
+  sc(lastCol, null, fHd);
+
+  // Ký tên
+  var signRow = 9 + dispCls.length + 2;
+  var now = new Date();
+  var dateStr = CFG.location + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
+  var midCol = Math.floor(totalCols * 0.6);
+  ws.getRow(signRow).getCell(midCol).value = dateStr;
+  ws.getRow(signRow).getCell(midCol).font = {name:'Times New Roman',size:10,italic:true};
+  ws.getRow(signRow).getCell(midCol).alignment = aCC;
+  ws.mergeCells(signRow, midCol, signRow, totalCols-1);
+
+  ws.getRow(signRow+1).getCell(midCol).value = 'Giáo viên bộ môn';
+  ws.getRow(signRow+1).getCell(midCol).font = {name:'Times New Roman',size:10,bold:true};
+  ws.getRow(signRow+1).getCell(midCol).alignment = aCC;
+  ws.mergeCells(signRow+1, midCol, signRow+1, totalCols-1);
+
+  ws.getRow(signRow+4).getCell(midCol).value = CFG.teacher;
+  ws.getRow(signRow+4).getCell(midCol).font = {name:'Times New Roman',size:11,bold:true};
+  ws.getRow(signRow+4).getCell(midCol).alignment = aCC;
+  ws.mergeCells(signRow+4, midCol, signRow+4, totalCols-1);
+
+  var buf = await wb.xlsx.writeBuffer();
+  var fname = 'thong_ke_' + (tkFilterMode==='hk1'?'HKI':tkFilterMode==='hk2'?'HKII':'ca_nam') + '_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx';
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), fname);
+  toast('📊 Đã xuất thống kê ' + (tkFilterMode==='hk1'?'HKI':tkFilterMode==='hk2'?'HKII':'cả năm'), 't-ok');
+}
+// ══ LỌC LỚP CHẤM CÔNG ════════════════
+function setCCFilter(mode) {
+  ccFilterMode = mode;
+  var btnAll = document.getElementById('ccBtnAll');
+  var btnKT  = document.getElementById('ccBtnKT');
+  if (btnAll && btnKT) {
+    if (mode === 'all') {
+      btnAll.style.background = 'var(--navy)'; btnAll.style.color = '#fff';
+      btnKT.style.background  = '';            btnKT.style.color  = '';
+    } else {
+      btnKT.style.background  = 'var(--red)';  btnKT.style.color  = '#fff';
+      btnAll.style.background = '';            btnAll.style.color = '';
+    }
+  }
+  renderTable(activeMonth);
+}
+
+// ══ LỌC LỚP TỔNG HỢP ═════════════════
+function setClsFilter(mode) {
+  clsFilterMode = mode;
+  var btnAll = document.getElementById('btnShowAll');
+  var btnKT  = document.getElementById('btnShowKT');
+  if (btnAll && btnKT) {
+    if (mode === 'all') {
+      btnAll.style.background = 'var(--navy)'; btnAll.style.color = '#fff';
+      btnKT.style.background  = '';            btnKT.style.color  = '';
+    } else {
+      btnKT.style.background  = 'var(--red)';  btnKT.style.color  = '#fff';
+      btnAll.style.background = '';            btnAll.style.color = '';
+    }
+  }
+  renderSummary();
+}
+
+// ══ CONFIRM DIALOG ════════════════════
+function openConfirm(ico, title, body, okText, okClass, cb2) {
+
+  G('dlgIco').textContent = ico || '⚠️';
+  G('dlgTitle').textContent = title || 'Xác nhận';
+  G('dlgBody').innerHTML = body || '';
+  var okBtn = G('dlgOkBtn');
+  okBtn.textContent = okText || 'Xác nhận';
+  okBtn.className = 'btn btn-sm ' + (okClass || 'btn-danger');
+  confirmCb = cb2;
+  G('confirmDlg').classList.add('open');
+}
+function closeConfirm() { G('confirmDlg').classList.remove('open'); confirmCb = null; }
+function doConfirm() { var cb = confirmCb; closeConfirm(); if (cb) cb(); }
+
+function askClearAll() {
+  openConfirm('🗑️','Xoá toàn bộ dữ liệu',
+    '<span style="color:var(--red);font-weight:700">CẢNH BÁO:</span> Xoá toàn bộ dữ liệu, danh sách HS KT và cài đặt. <b>Không thể hoàn tác!</b><br><br>Hãy sao lưu trước khi xoá.',
+    '🗑️ Xoá tất cả','btn-danger',function(){
+      lessonData={};manualEdits={};noteData={};allClasses=[];studentList=[];weekCount=0;sheetCount=0;
+      CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
+      var skVals = [SK.l, SK.e, SK.n, SK.c, SK.s, SK.m, SK.cfg, SK.ts];
+      skVals.forEach(function(k){localStorage.removeItem(k);});
+      buildTabs();updateTopbar();applyForm();renderStudents();
+      G('statsArea').style.display='none';
+      G('tblBody').innerHTML='<div class="empty"><div class="ico">📁</div><h3>Chưa có dữ liệu</h3></div>';
+      G('navBadge').style.display='';
+      toast('🗑️ Đã xoá toàn bộ','t-warn');
+      showPage('upload',G('navUpload'));
+    }
+  );
+}
+
+function askResetCfg() {
+  openConfirm('↺','Đặt lại cài đặt',
+    'Đặt lại tất cả cài đặt về mặc định? Dữ liệu và DS HS KT không bị ảnh hưởng.',
+    '↺ Đặt lại','btn-primary',function(){
+      CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
+      saveCFG();applyForm();renderCurrent();updateTopbar();
+      toast('↺ Đã đặt lại cài đặt','t-info');
+    }
+  );
+}
+
+// ══ BACKUP — ĐÃ SỬA ══════════════════
+// FIX 1: exportBackup — dùng array thay vì Object.values để tránh lỗi ES6 
+// FIX 2: dlBlob thêm vào DOM trước khi click, dọn dẹp sau
+function exportBackup() {
+  try {
+    var d = {
+      lessonData:   lessonData,
+      manualEdits:  manualEdits,
+      noteData:     noteData,
+      allClasses:   allClasses,
+      studentList:  studentList,
+      weekCount:    weekCount,
+      sheetCount:   sheetCount,
+      CFG:          CFG,
+      exportedAt:   new Date().toISOString(),
+      version:      APP_VER
+    };
+    var jsonStr = JSON.stringify(d, null, 2);
+    var blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+    var fname = 'backup_chamcong_v' + APP_VER + '_' + new Date().toISOString().slice(0,10) + '.json';
+    dlBlob(blob, fname);
+    toast('💾 Đã xuất file sao lưu', 't-ok');
+  } catch(e) {
+    toast('❌ Lỗi sao lưu: ' + e.message, 't-err');
+  }
+}
+
+// FIX 3: importBackup — tách handler ra addEventListener riêng (xem phần INIT)
+// Hàm này chỉ xử lý file đã được chọn
+function importBackup(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+
+  // FIX: đọc file trước, reset input sau (tránh mất file reference)
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var raw = ev.target.result;
+      if (!raw) throw new Error('File trống');
+      var d = JSON.parse(raw);
+      if (!d || !d.lessonData) throw new Error('File không đúng định dạng backup');
+
+      var dateStr = d.exportedAt ? d.exportedAt.slice(0,10) : '?';
+      var ver     = d.version    ? d.version               : '?';
+
+      openConfirm('📥', 'Khôi phục sao lưu',
+        'Khôi phục từ file ngày <b>' + dateStr + '</b> (v' + ver + ').<br>Dữ liệu hiện tại sẽ bị <b>thay thế</b>.',
+        '📥 Khôi phục', 'btn-primary',
+        function() {
+          lessonData   = d.lessonData   || {};
+          manualEdits  = d.manualEdits  || {};
+          noteData     = d.noteData     || {};
+          allClasses   = d.allClasses   || [];
+          studentList  = d.studentList  || [];
+          weekCount    = d.weekCount    || 0;
+          sheetCount   = d.sheetCount   || 0;
+          if (d.CFG) {
+            Object.keys(DEFAULT_CFG).forEach(function(k) {
+              if (d.CFG[k] !== undefined) CFG[k] = d.CFG[k];
+            });
+          }
+          saveCFG();
+          saveStorage(true);
+          updateTabDots();
+          updateStatCards();
+          applyForm();
+          renderCurrent();
+          updateTopbar();
+          renderStudents();
+          toast('✅ Khôi phục thành công!', 't-ok');
+          showNotice('ok', '✅ Khôi phục thành công từ file ngày ' + dateStr);
+        }
+      );
+    } catch(err) {
+      toast('❌ File không hợp lệ: ' + err.message, 't-err');
+    }
+  };
+  reader.onerror = function() {
+    toast('❌ Không thể đọc file sao lưu', 't-err');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ══ NOTICES & TOAST ═══════════════════
+function showNotice(type, msg) {
+  clearNotices();
+  var map = {ok:'nOk',err:'nErr',warn:'nWarn',info:'nInfo'};
+  var el = G(map[type]);
+  if (el) { el.innerHTML = msg; el.classList.add('show'); }
+}
+function clearNotices() {
+  ['nOk','nErr','nWarn'].forEach(function(id){var el=G(id);if(el)el.classList.remove('show');});
+}
+function toggleMobMenu(){
+  var sb=document.querySelector('.sidebar');
+  var ov=document.getElementById('mobOverlay');
+  var isOpen=sb.classList.contains('mob-open');
+  sb.classList.toggle('mob-open',!isOpen);
+  ov.classList.toggle('show',!isOpen);
+}
+function toast(msg, cls) {
+  cls = cls || 't-info';
+  var w = G('toastWrap');
+  var t = document.createElement('div');
+  t.className = 'toast ' + cls;
+  t.textContent = msg;
+  w.appendChild(t);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){t.classList.add('show');});});
+  setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove();},280);}, 3000);
+}
+</script>
+</body>
+</html>
