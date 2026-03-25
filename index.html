@@ -370,8 +370,10 @@ tr.row-kt td.td-cls{color:var(--red)}
 }
 @media(max-width:900px){
   :root{--sb-w:0px;--tb-h:54px}
-  .sidebar{transform:translateX(-210px);transition:transform .25s}
+  .sidebar{transform:translateX(-210px);transition:transform .25s;width:220px!important;height:100vh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
   .sidebar.mob-open{transform:translateX(0)!important}
+  .sb-nav{flex:1!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;max-height:calc(100vh - 120px)!important;padding-bottom:20px!important}
+  .sb-foot{flex-shrink:0!important}
   .topbar{left:0}.main{margin-left:0}
   .sg{grid-template-columns:1fr}
   .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:299}
