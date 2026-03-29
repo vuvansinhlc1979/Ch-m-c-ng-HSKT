@@ -2435,11 +2435,25 @@ function buildSheet(wb, key, ktFilter) {
 
   var dispCls;
   if (ktFilter && Object.keys(ktFilter).length > 0) {
-    dispCls = allClasses.filter(function(c){return ktFilter[c];});
+    dispCls = allClasses.filter(function(c){
+      var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
+      return ktFilter[r];
+    });
   } else if (CFG.onlyKTCls && Object.keys(ktMap).length > 0) {
-    dispCls = allClasses.filter(function(c){return ktMap[c];});
+    dispCls = allClasses.filter(function(c){
+      var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
+      return ktMap[r];
+    });
   } else {
-    dispCls = allClasses.length > 0 ? allClasses : Object.keys(clsSet).sort(function(a,b){return a.localeCompare(b,'vi');});
+    var clsInMonth = Object.keys(clsSet);
+    if (allClasses.length > 0) {
+      // Ưu tiên allClasses nhưng chỉ lấy lớp có dữ liệu trong tháng này
+      dispCls = allClasses.filter(function(c){ return clsSet[c]; });
+      // Nếu không lớp nào khớp thì lấy tất cả allClasses
+      if (!dispCls.length) dispCls = allClasses;
+    } else {
+      dispCls = clsInMonth.sort(function(a,b){return a.localeCompare(b,'vi');});
+    }
   }
 
   var mgL=CFG.mgLeft/2.54, mgR=CFG.mgRight/2.54, mgT=CFG.mgTop/2.54;
