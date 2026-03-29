@@ -2303,8 +2303,9 @@ function renderSummary() {
     bars += '</div>';
   });
   G('chartArea').innerHTML =
-    '<div style="display:flex;align-items:flex-end;gap:6px;height:200px;padding:10px 4px 0;border-bottom:2px solid var(--g1)">' + bars + '</div>' +
-    '';
+    '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">' +
+    '<div style="display:flex;align-items:flex-end;gap:6px;height:200px;padding:10px 4px 0;border-bottom:2px solid var(--g1);min-width:700px">' + bars + '</div>' +
+    '</div>';
 
   if (!allClasses.length) { G('clsArea').innerHTML='<div class="empty"><p>Chưa có dữ liệu</p></div>'; return; }
 
@@ -2367,7 +2368,7 @@ function renderSummary() {
 
   var sumRow = '<tr class="sum-row"><td colspan="3">Tổng cộng</td>' + gByM.map(function(v){return '<td>'+(v||'')+'</td>';}).join('') + '<td>' + gTotal + '</td><td></td></tr>';
 
-  G('clsArea').innerHTML = '<table class="cls-tbl"><thead>' + thead + '</thead><tbody>' + tbody + sumRow + '</tbody></table>';
+  G('clsArea').innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="cls-tbl"><thead>' + thead + '</thead><tbody>' + tbody + sumRow + '</tbody></table></div>';
 }
 
 function gotoMonth(key) {
