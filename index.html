@@ -939,6 +939,75 @@ tr.row-kt td.td-cls{color:var(--red)}
 var APP_VER = '4.0';
 var SK = { l:'bcc_l', e:'bcc_e', n:'bcc_n', c:'bcc_c', s:'bcc_s', m:'bcc_m', cfg:'bcc_cfg', ts:'bcc_ts' };
 
+// ── IndexedDB wrapper (thay thế localStorage) ──
+var IDB = (function() {
+  var DB_NAME = 'ChamCongDB', DB_VER = 1, STORE = 'kv';
+  var _db = null;
+
+  function open() {
+    return new Promise(function(res, rej) {
+      if (_db) { res(_db); return; }
+      var req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = function(e) {
+        e.target.result.createObjectStore(STORE, { keyPath: 'k' });
+      };
+      req.onsuccess = function(e) { _db = e.target.result; res(_db); };
+      req.onerror   = function(e) { rej(e.target.error); };
+    });
+  }
+
+  function set(key, val) {
+    return open().then(function(db) {
+      return new Promise(function(res, rej) {
+        var tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put({ k: key, v: val });
+        tx.oncomplete = res; tx.onerror = function(e) { rej(e.target.error); };
+      });
+    });
+  }
+
+  function get(key) {
+    return open().then(function(db) {
+      return new Promise(function(res, rej) {
+        var tx = db.transaction(STORE, 'readonly');
+        var req = tx.objectStore(STORE).get(key);
+        req.onsuccess = function() { res(req.result ? req.result.v : null); };
+        req.onerror   = function(e) { rej(e.target.error); };
+      });
+    });
+  }
+
+  function remove(key) {
+    return open().then(function(db) {
+      return new Promise(function(res, rej) {
+        var tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).delete(key);
+        tx.oncomplete = res; tx.onerror = function(e) { rej(e.target.error); };
+      });
+    });
+  }
+
+  function getSize() {
+    return open().then(function(db) {
+      return new Promise(function(res) {
+        var tx = db.transaction(STORE, 'readonly');
+        var total = 0;
+        tx.objectStore(STORE).openCursor().onsuccess = function(e) {
+          var cursor = e.target.result;
+          if (cursor) {
+            total += JSON.stringify(cursor.value).length;
+            cursor.continue();
+          } else {
+            res(total);
+          }
+        };
+      });
+    });
+  }
+
+  return { set: set, get: get, remove: remove, getSize: getSize };
+})();
+
 var MONTHS = [
   {m:8,y:2025,lbl:'T8/2025'},{m:9,y:2025,lbl:'T9/2025'},
   {m:10,y:2025,lbl:'T10/2025'},{m:11,y:2025,lbl:'T11/2025'},
@@ -1005,20 +1074,15 @@ function safeJSON(str, def) {
 window.addEventListener('load', function() {
   loadCFG();
   applyForm();
-  loadStorage();
   buildTabs();
   updateTopbar();
+  loadStorage(); // async — tự render khi xong
 
   var now = new Date();
   var curKey = mk(now.getMonth() + 1, now.getFullYear());
   var found = MONTHS.filter(function(x) { return mk(x.m, x.y) === curKey; });
   activeMonth = (CFG.autoNav && found.length) ? curKey : mk(9, 2025);
   setActiveTab(activeMonth);
-
-  if (Object.keys(lessonData).length > 0) {
-    showPage('chamcong', G('navCC'));
-    renderTable(activeMonth);
-  }
 
   // Clock
   function tick() {
@@ -1076,86 +1140,95 @@ function showPage(id, btn) {
 
 // ── STORAGE ──
 function saveStorage(silent) {
-  try {
-    localStorage.setItem(SK.l, JSON.stringify(lessonData));
-    localStorage.setItem(SK.e, JSON.stringify(manualEdits));
-    localStorage.setItem(SK.n, JSON.stringify(noteData));
-    localStorage.setItem(SK.c, JSON.stringify(allClasses));
-    localStorage.setItem(SK.s, JSON.stringify(studentList));
-    localStorage.setItem(SK.m, JSON.stringify({ weekCount: weekCount, sheetCount: sheetCount }));
-    var ts = new Date().toISOString();
-    localStorage.setItem(SK.ts, ts);
+  var ts = new Date().toISOString();
+  Promise.all([
+    IDB.set(SK.l, JSON.stringify(lessonData)),
+    IDB.set(SK.e, JSON.stringify(manualEdits)),
+    IDB.set(SK.n, JSON.stringify(noteData)),
+    IDB.set(SK.c, JSON.stringify(allClasses)),
+    IDB.set(SK.s, JSON.stringify(studentList)),
+    IDB.set(SK.m, JSON.stringify({ weekCount: weekCount, sheetCount: sheetCount })),
+    IDB.set(SK.ts, ts)
+  ]).then(function() {
     G('tbSaveTime').textContent = 'Lưu: ' + nowTime();
     hasUnsaved = false;
     G('unsavedDot').classList.remove('show');
     updateStorageInfo();
     if (!silent) toast('💾 Đã lưu', 't-ok');
-  } catch(e) {
+  }).catch(function(e) {
     toast('⚠️ Lỗi lưu: ' + e.message, 't-err');
-  }
+  });
 }
 
 function loadStorage() {
-  try {
-    var raw = localStorage.getItem(SK.l);
-    if (!raw) return;
-    lessonData  = safeJSON(localStorage.getItem(SK.l), {});
-    manualEdits = safeJSON(localStorage.getItem(SK.e), {});
-    noteData    = safeJSON(localStorage.getItem(SK.n), {});
-    allClasses  = safeJSON(localStorage.getItem(SK.c), []);
-    studentList = safeJSON(localStorage.getItem(SK.s), []);
-    var meta    = safeJSON(localStorage.getItem(SK.m), {});
-    weekCount   = meta.weekCount || 0;
-    sheetCount  = meta.sheetCount || 0;
-    var ts = localStorage.getItem(SK.ts);
-    if (ts) {
-      var d = new Date(ts);
+  Promise.all([
+    IDB.get(SK.l), IDB.get(SK.e), IDB.get(SK.n),
+    IDB.get(SK.c), IDB.get(SK.s), IDB.get(SK.m), IDB.get(SK.ts)
+  ]).then(function(vals) {
+    if (!vals[0]) return; // chưa có dữ liệu
+    lessonData   = safeJSON(vals[0], {});
+    manualEdits  = safeJSON(vals[1], {});
+    noteData     = safeJSON(vals[2], {});
+    allClasses   = safeJSON(vals[3], []);
+    studentList  = safeJSON(vals[4], []);
+    var meta     = safeJSON(vals[5], {});
+    weekCount    = meta.weekCount  || 0;
+    sheetCount   = meta.sheetCount || 0;
+    if (vals[6]) {
+      var d = new Date(vals[6]);
       G('tbSaveTime').textContent = 'Lưu: ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
     }
     updateStatCards();
     updateTabDots();
     G('navBadge').style.display = 'none';
     showNotice('ok', '✅ Đã khôi phục dữ liệu từ phiên làm việc trước.');
-  } catch(e) {
+    if (Object.keys(lessonData).length > 0) {
+      showPage('chamcong', G('navCC'));
+      renderTable(activeMonth);
+    }
+  }).catch(function(e) {
     showNotice('err', '❌ Lỗi đọc dữ liệu: ' + e.message);
-  }
+  });
 }
 
 function loadCFG() {
-  try {
-    var c = localStorage.getItem(SK.cfg);
+  // Khởi động nhanh với default trước, sau đó load async
+  curPS = CFG.pageSize;
+  curOrientation = CFG.orientation;
+  IDB.get(SK.cfg).then(function(c) {
     if (c) {
-      var parsed = JSON.parse(c);
-      Object.keys(DEFAULT_CFG).forEach(function(k) {
-        if (parsed[k] !== undefined) CFG[k] = parsed[k];
-      });
+      try {
+        var parsed = JSON.parse(c);
+        Object.keys(DEFAULT_CFG).forEach(function(k) {
+          if (parsed[k] !== undefined) CFG[k] = parsed[k];
+        });
+        curPS = CFG.pageSize;
+        curOrientation = CFG.orientation;
+        updateTopbar();
+        applyForm();
+      } catch(e) {}
     }
-    curPS = CFG.pageSize;
-    curOrientation = CFG.orientation; // FIX: use curOrientation
-  } catch(e) { CFG = JSON.parse(JSON.stringify(DEFAULT_CFG)); }
+  }).catch(function() {});
 }
 
 function saveCFG() {
-  try { localStorage.setItem(SK.cfg, JSON.stringify(CFG)); } catch(e) {}
+  IDB.set(SK.cfg, JSON.stringify(CFG)).catch(function(e) {
+    console.warn('saveCFG error:', e);
+  });
 }
 
 function updateStorageInfo() {
-  try {
-    var total = 0;
-    var skVals = [SK.l, SK.e, SK.n, SK.c, SK.s, SK.m, SK.cfg, SK.ts];
-    skVals.forEach(function(k) {
-      var v = localStorage.getItem(k); if (v) total += v.length;
-    });
-    var kb = (total / 1024).toFixed(1);
-    var pct = Math.min(100, total / (5 * 1024 * 1024) * 100);
+  IDB.getSize().then(function(total) {
+    var kb  = (total / 1024).toFixed(1);
+    var pct = Math.min(100, total / (500 * 1024 * 1024) * 100); // giới hạn ~500MB
     var bar = G('storageBar');
     var txt = G('storageText');
     if (bar) {
       bar.style.width = pct + '%';
       bar.className = 'storage-bar-fill' + (pct > 80 ? ' err' : pct > 50 ? ' warn' : '');
     }
-    if (txt) txt.textContent = kb + ' KB / ~5000 KB';
-  } catch(e) {}
+    if (txt) txt.textContent = kb + ' KB / ~500.000 KB';
+  }).catch(function() {});
 }
 
 // ── FILE PROCESSING ──
@@ -2242,6 +2315,20 @@ function renderSummary() {
     ? allClasses.filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r]; })
     : allClasses;
 
+  var gByM = [];
+  MONTHS.forEach(function(x) {
+    var v = 0;
+    displayClasses.forEach(function(cls) {
+      var mD = (lessonData[mk(x.m,x.y)] || {})[cls] || {};
+      var mE = (manualEdits[mk(x.m,x.y)] || {})[cls] || {};
+      for (var d = 1; d <= mDays(x.m,x.y); d++) {
+        v += mE[d] !== undefined ? mE[d] : (mD[d] || 0);
+      }
+    });
+    gByM.push(v);
+  });
+  var gTotal = gByM.reduce(function(a,b){return a+b;}, 0);
+
   if (!displayClasses.length) {
     G('clsArea').innerHTML='<div class="empty"><p>Không có lớp nào có HS khuyết tật</p></div>';
     return;
@@ -2260,7 +2347,10 @@ function renderSummary() {
     MONTHS.forEach(function(x) {
       var v = 0;
       var mD = (lessonData[mk(x.m,x.y)] || {})[cls] || {};
-      Object.keys(mD).forEach(function(d){ v += mD[d]; });
+      var mE = (manualEdits[mk(x.m,x.y)] || {})[cls] || {};
+      for (var d = 1; d <= mDays(x.m,x.y); d++) {
+        v += mE[d] !== undefined ? mE[d] : (mD[d] || 0);
+      }
       tot += v;
       cells += '<td' + (v>0&&isKT?' class="kt-cell"':'') + '>' + (v||'') + '</td>';
     });
@@ -2275,14 +2365,6 @@ function renderSummary() {
     tbody += '</tr>';
   });
 
-  var gByM = [];
-  MONTHS.forEach(function(x) {
-    var v = 0;
-    var mD = lessonData[mk(x.m,x.y)] || {};
-    Object.keys(mD).forEach(function(cls){ Object.keys(mD[cls]).forEach(function(d){ v += mD[cls][d]; }); });
-    gByM.push(v);
-  });
-  var gTotal = gByM.reduce(function(a,b){return a+b;}, 0);
   var sumRow = '<tr class="sum-row"><td colspan="3">Tổng cộng</td>' + gByM.map(function(v){return '<td>'+(v||'')+'</td>';}).join('') + '<td>' + gTotal + '</td><td></td></tr>';
 
   G('clsArea').innerHTML = '<table class="cls-tbl"><thead>' + thead + '</thead><tbody>' + tbody + sumRow + '</tbody></table>';
@@ -3296,7 +3378,7 @@ function askClearAll() {
       lessonData={};manualEdits={};noteData={};allClasses=[];studentList=[];weekCount=0;sheetCount=0;
       CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
       var skVals = [SK.l, SK.e, SK.n, SK.c, SK.s, SK.m, SK.cfg, SK.ts];
-      skVals.forEach(function(k){localStorage.removeItem(k);});
+      skVals.forEach(function(k){ IDB.remove(k); });
       buildTabs();updateTopbar();applyForm();renderStudents();
       G('statsArea').style.display='none';
       G('tblBody').innerHTML='<div class="empty"><div class="ico">📁</div><h3>Chưa có dữ liệu</h3></div>';
