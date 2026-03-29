@@ -8,6 +8,19 @@
 <script src="exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyA0PWK9gykLNxWdw64dssSLqOk9skPQFvo",
+  authDomain: "chamcong-hskt.firebaseapp.com",
+  projectId: "chamcong-hskt",
+  storageBucket: "chamcong-hskt.firebasestorage.app",
+  messagingSenderId: "709614407858",
+  appId: "1:709614407858:web:1eca5fb6f05de4077eb9ab"
+});
+</script>
 <style>
 @import url('');
 :root{
@@ -395,6 +408,19 @@ tr.row-kt td.td-cls{color:var(--red)}
 </style>
 
 <!-- SIDEBAR -->
+<div id="loginScreen" style="position:fixed;inset:0;background:#0d1b3e;z-index:9999;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="font-size:48px;margin-bottom:12px">📋</div>
+    <h2 style="color:#0d1b3e;font-size:18px;font-weight:700;margin-bottom:6px">Hệ Thống Chấm Công</h2>
+    <p style="color:#5c6880;font-size:12px;margin-bottom:6px">Trường TH Số 2 Gia Phú</p>
+    <p style="color:#9ba5bc;font-size:11px;margin-bottom:24px">Đăng nhập để tiếp tục</p>
+    <div id="loginMsg" style="display:none;padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;line-height:1.5"></div>
+    <button id="btnLogin" onclick="doLogin()" style="background:#c8973a;color:#0d1b3e;border:none;padding:13px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%">
+      🔐 Đăng nhập bằng Google
+    </button>
+    <p style="color:#9ba5bc;font-size:10px;margin-top:16px;line-height:1.6">Chỉ tài khoản được cấp phép mới truy cập được</p>
+  </div>
+</div> 
 <nav class="sidebar">
   <div class="sb-brand">
     <div class="sb-brand-icon">⚙️</div>
@@ -2772,139 +2798,6 @@ function buildSheet(wb, key, ktFilter) {
   });
 }
 
-// ══ EXPORT PDF ════════════════════════
-function exportPDF() {
-  if (!activeMonth) { toast('⚠️ Chưa chọn tháng', 't-warn'); return; }
-  var parts = activeMonth.split('_');
-  var y = parseInt(parts[0]), m = parseInt(parts[1]);
-  var days = mDays(m, y);
-
-  var ktMap = {};
-  studentList.forEach(function(s) { if (s.cls) ktMap[s.cls] = true; });
-
-  var dispCls = allClasses.length > 0 ? allClasses : [];
-  if (!dispCls.length) { toast('⚠️ Không có dữ liệu để xuất PDF', 't-warn'); return; }
-
-  var dn = [], dw = [];
-  for (var d = 1; d <= days; d++) {
-    var wd = mWd(d, m, y);
-    if (hideWeekend && (wd === 'T7' || wd === 'CN')) continue;
-    dn.push(d); dw.push(wd);
-  }
-
-  var { jsPDF } = window.jspdf;
-  var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: CFG.pageSize || 'a4' });
-
-  doc.setFont('helvetica');
-
-  // Tiêu đề
-  doc.setFontSize(9);
-  doc.text('Đơn vị: ' + CFG.school, 14, 10);
-  doc.text('Mã QHNS: ' + CFG.code, 14, 15);
-
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
-  doc.text('BANG CHAM CONG GIAO VIEN DAY HOC SINH KHUYET TAT HOC HOA NHAP', 148, 22, { align: 'center' });
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Thang ' + pad2(m) + ' nam ' + y + ' - Giao vien: ' + CFG.teacher + ' - Nam hoc ' + CFG.schoolYear, 148, 28, { align: 'center' });
-
-  // Chuẩn bị dữ liệu bảng
-  var headRow1 = [
-    { content: 'STT', rowSpan: 2, styles: { halign: 'center', fillColor: [13,27,62], textColor: 255, fontSize: 7 } },
-    { content: 'Ho va ten', rowSpan: 2, styles: { halign: 'center', fillColor: [13,27,62], textColor: 255, fontSize: 7 } },
-    { content: 'Lop', rowSpan: 2, styles: { halign: 'center', fillColor: [13,27,62], textColor: 255, fontSize: 7 } },
-    { content: 'Mon', rowSpan: 2, styles: { halign: 'center', fillColor: [13,27,62], textColor: 255, fontSize: 7 } },
-    { content: 'Ngay trong thang', colSpan: dn.length, styles: { halign: 'center', fillColor: [13,27,62], textColor: 255, fontSize: 7 } },
-    { content: 'Tong', rowSpan: 2, styles: { halign: 'center', fillColor: [13,27,62], textColor: 255, fontSize: 7 } }
-  ];
-  var headRow2 = dn.map(function(d, i) {
-    var isSun = dw[i] === 'CN', isSat = dw[i] === 'T7';
-    var bg = isSun ? [255,250,237] : isSat ? [243,240,255] : [23,36,71];
-    var tc = isSun ? [100,80,0] : isSat ? [80,50,150] : [255,255,255];
-    return { content: d, styles: { halign: 'center', fillColor: bg, textColor: tc, fontSize: 6, cellPadding: 1 } };
-  });
-
-  var body = [];
-  var dTot = dn.map(function() { return 0; });
-  var grand = 0;
-
-  dispCls.forEach(function(cls, idx) {
-    var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
-    var xlsMon  = cls.indexOf('||') >= 0 ? cls.split('||')[1] : CFG.subject;
-    var isKT    = !!ktMap[realCls];
-    var rTot    = 0;
-    var row     = [idx+1, CFG.teacher, realCls, xlsMon];
-
-    dn.forEach(function(d, i) {
-      var cnt = getEff(activeMonth, cls, d);
-      if (cnt > 0) { rTot += cnt; dTot[i] += cnt; grand += cnt; }
-      var isSun = dw[i]==='CN', isSat = dw[i]==='T7';
-      var cellStyle = {};
-      if (cnt > 0) cellStyle = { fillColor: [230,244,236], textColor: [26,107,60], fontStyle: 'bold' };
-      else if (isSun) cellStyle = { fillColor: [255,250,237] };
-      else if (isSat) cellStyle = { fillColor: [243,240,255] };
-      row.push({ content: cnt || '', styles: Object.assign({ halign:'center', fontSize:7, cellPadding:1 }, cellStyle) });
-    });
-
-    row.push({ content: rTot || '', styles: { halign:'center', fontStyle:'bold', fillColor:[255,252,230] } });
-    var rowStyles = isKT ? { textColor: [181,42,42] } : {};
-    body.push(row.map(function(c, ci) {
-      if (typeof c === 'object') return c;
-      return { content: c, styles: Object.assign({ fontSize:8, halign: ci<2?'left':'center' }, rowStyles) };
-    }));
-  });
-
-  // Dòng tổng
-  var sumRow = [
-    { content: 'Cong', colSpan: 4, styles: { halign:'right', fontStyle:'bold', fillColor:[13,27,62], textColor:255, fontSize:8 } }
-  ];
-  dTot.forEach(function(v) {
-    sumRow.push({ content: v || '', styles: { halign:'center', fontStyle:'bold', fillColor:[13,27,62], textColor:[200,151,58], fontSize:7 } });
-  });
-  sumRow.push({ content: grand, styles: { halign:'center', fontStyle:'bold', fillColor:[13,27,62], textColor:[200,151,58], fontSize:8 } });
-  body.push(sumRow);
-
-  // Tính độ rộng cột
-  var dayColW = Math.max(3.5, Math.min(5.5, 230 / dn.length));
-  var colWidths = [6, 22, 8, 14];
-  dn.forEach(function() { colWidths.push(dayColW); });
-  colWidths.push(8);
-
-  doc.autoTable({
-    head: [headRow1, headRow2],
-    body: body,
-    startY: 33,
-    margin: { left: 7, right: 7 },
-    columnStyles: colWidths.reduce(function(acc, w, i) { acc[i] = { cellWidth: w }; return acc; }, {}),
-    styles: { font: 'helvetica', fontSize: 8, cellPadding: 1.2, lineWidth: 0.1, lineColor: [180,180,180], overflow: 'ellipsize' },
-    headStyles: { fontSize: 7, cellPadding: 1 },
-    tableWidth: 'wrap',
-    didDrawPage: function(data) {
-      // Footer ký tên
-      var finalY = data.cursor.y + 8;
-      if (finalY > doc.internal.pageSize.height - 30) return;
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.text(CFG.location + ', ngay ' + new Date().getDate() + ' thang ' + pad2(m) + ' nam ' + y, 200, finalY, { align: 'center' });
-      finalY += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Nguoi cham cong', 50,  finalY, { align: 'center' });
-      doc.text('PHT, Phu trach CM',    148, finalY, { align: 'center' });
-      doc.text('Hieu truong',          250, finalY, { align: 'center' });
-      finalY += 18;
-      doc.text(CFG.teacher,   50,  finalY, { align: 'center' });
-      doc.text(CFG.pht,       148, finalY, { align: 'center' });
-      doc.text(CFG.principal, 250, finalY, { align: 'center' });
-    }
-  });
-
-  var fname = 'bang_cham_cong_T' + m + '_' + y + '.pdf';
-  doc.save(fname);
-  toast('📄 Đã xuất PDF: ' + fname, 't-ok');
-}
-
 // ══ EXPORT TEMPLATE ═══════════════════
 async function exportTemplate() {
   var wb = new ExcelJS.Workbook(); wb.creator = 'HT Cham Cong v' + APP_VER;
@@ -3829,7 +3722,55 @@ document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); doUndo(); }
   if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); doRedo(); }
 });
+// ══ FIREBASE AUTH ══════════════════════
+var _fbdb = null;
+var _fbauth = null;
+try { _fbdb = firebase.firestore(); _fbauth = firebase.auth(); } catch(e) {}
 
+function doLogin() {
+  if (!_fbauth) { alert('Firebase chưa được cấu hình!'); return; }
+  var btn = document.getElementById('btnLogin');
+  btn.textContent = '⏳ Đang kết nối...';
+  btn.disabled = true;
+  var provider = new firebase.auth.GoogleAuthProvider();
+  _fbauth.signInWithPopup(provider).catch(function(e) {
+    showLoginMsg('❌ Lỗi: ' + e.message, '#fceaea', '#b52a2a');
+    btn.textContent = '🔐 Đăng nhập bằng Google';
+    btn.disabled = false;
+  });
+}
+
+function showLoginMsg(msg, bg, color) {
+  var el = document.getElementById('loginMsg');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.background = bg;
+  el.style.color = color;
+  el.textContent = msg;
+}
+
+if (_fbauth) {
+  _fbauth.onAuthStateChanged(function(user) {
+    var screen = document.getElementById('loginScreen');
+    if (!user) {
+      if (screen) screen.style.display = 'flex';
+      return;
+    }
+    showLoginMsg('⏳ Đang kiểm tra quyền...', '#e3f2fd', '#1565a8');
+    _fbdb.collection('allowed_users').doc(user.email).get().then(function(doc) {
+      if (doc.exists && doc.data().active === true) {
+        if (screen) screen.style.display = 'none';
+      } else {
+        _fbauth.signOut();
+        showLoginMsg('🚫 Tài khoản ' + user.email + ' chưa được cấp quyền. Liên hệ admin.', '#fceaea', '#b52a2a');
+        var btn = document.getElementById('btnLogin');
+        if (btn) { btn.textContent = '🔐 Đăng nhập bằng Google'; btn.disabled = false; }
+      }
+    }).catch(function(e) {
+      showLoginMsg('❌ Lỗi kiểm tra: ' + e.message, '#fceaea', '#b52a2a');
+    });
+  });
+}
 var hideWeekend = false;
 function toggleHideWeekend() {
   hideWeekend = !hideWeekend;
