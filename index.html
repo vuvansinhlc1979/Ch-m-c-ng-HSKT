@@ -186,7 +186,7 @@ td{padding:6px 3px;text-align:center;border:1px solid var(--g1);vertical-align:m
 td.td-stt{color:var(--g3);font-size:10px}
 td.td-name{text-align:left;padding-left:9px;font-weight:500;color:var(--navy);white-space:nowrap}
 td.td-cls{font-weight:700;color:var(--navy2);font-size:11px}
-td.td-mon{color:var(--g3);font-size:10px}
+td.td-mon{color:var(--g5);font-size:10px;font-weight:500}
 td.td-day{min-width:22px;max-width:27px;font-size:10px;font-weight:500;cursor:pointer;user-select:none}
 td.td-day:hover{outline:2px solid var(--gold);z-index:2;position:relative}
 td.d-sun{background:#fffaed;color:#9a7200}
@@ -230,7 +230,7 @@ tr.row-kt td.td-cls{color:var(--red)}
 .mc.empty .mc-val{color:var(--g2)}
 .cls-tbl{width:100%;border-collapse:collapse;font-size:11px}
 .cls-tbl th{background:var(--navy);color:#fff;padding:6px 9px;font-size:10px;text-align:center}
-.cls-tbl td{padding:6px 9px;border-bottom:1px solid var(--g1);text-align:center}
+.cls-tbl td{padding:6px 9px;border-bottom:1px solid var(--g1);text-align:center;color:var(--g5)}
 .cls-tbl tr:hover td{background:rgba(200,151,58,.04)}
 .cls-tbl .ft{font-weight:700;color:var(--navy)}
 .cls-tbl tr.sum-row td{background:var(--navy);color:#fff;font-weight:700}
@@ -370,10 +370,8 @@ tr.row-kt td.td-cls{color:var(--red)}
 }
 @media(max-width:900px){
   :root{--sb-w:0px;--tb-h:54px}
-  .sidebar{transform:translateX(-210px);transition:transform .25s;width:220px!important;height:100vh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+  .sidebar{transform:translateX(-210px);transition:transform .25s}
   .sidebar.mob-open{transform:translateX(0)!important}
-  .sb-nav{flex:1!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;max-height:calc(100vh - 120px)!important;padding-bottom:20px!important}
-  .sb-foot{flex-shrink:0!important}
   .topbar{left:0}.main{margin-left:0}
   .sg{grid-template-columns:1fr}
   .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:299}
@@ -949,10 +947,10 @@ var MONTHS = [
 var WD = ['CN','T2','T3','T4','T5','T6','T7'];
 
 var DEFAULT_CFG = {
-  teacher:'Vũ Văn Sinh', subject:'Mĩ thuật',
-  school:'Trường TH Số 2 Gia Phú', code:'1027296',
-  pht:'Đinh Thị Ngân', principal:'Nguyễn Thị Thuý',
-  schoolYear:'2025 - 2026', location:'Gia Phú',
+  teacher:'', subject:'',
+  school:'', code:'',
+  pht:'', principal:'',
+  schoolYear:'2025 - 2026', location:'',
   pageSize:'A4', orientation:'landscape',
   mgTop:1.9, mgBot:1.9, mgLeft:1.3, mgRight:1.3, mgHd:0.8, mgFt:0.8,
   fitPage:true, repeatRow:true,
@@ -1207,6 +1205,7 @@ function parseDMY(s) {
 
 function parseSheets(wb, fname) {
   var tmpData = {}, classSet = {};
+  var tmpTeacher = '';
   var tmpWeeks = 0, tmpSheets = 0;
   var parseLog = [], warnings = [];
   var maxDay = CFG.maxDayLessons || 5;
@@ -1216,6 +1215,10 @@ function parseSheets(wb, fname) {
     var ws = wb.Sheets[sname];
     var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
     if (rows.length < 5) return;
+
+    // Tự động đọc tên giáo viên từ D2 (index dòng 1, cột 3)
+    var autoTeacher = String((rows[1] && rows[1][3]) || '').trim();
+    if (autoTeacher && !tmpTeacher) tmpTeacher = autoTeacher;
 
     rows.forEach(function(row) {
       var anyTuan = row.some(function(c) { return String(c || '').trim().indexOf('Tuần') === 0; });
@@ -1289,21 +1292,23 @@ function parseSheets(wb, fname) {
       var status  = String(row[colStt] || '').trim().toLowerCase();
       var skip    = (status === 'bỏ học' || status === 'vắng' || status === 'nghỉ');
 
-      if (cls && subject === CFG.subject && !skip) {
+      var subjectOk = !CFG.subject || subject.toLowerCase() === CFG.subject.toLowerCase() || CFG.subject.trim() === '';
+        if (cls && subject && !skip && subjectOk) {
         var mo = curDate.getMonth() + 1;
         var yr = curDate.getFullYear();
         var dy = curDate.getDate();
         if (dy < 1 || dy > 31) return;
         var key = mk(mo, yr);
+        var clsKey = (CFG.subject === '') ? (cls + '||' + subject) : cls;
         if (!tmpData[key]) tmpData[key] = {};
-        if (!tmpData[key][cls]) tmpData[key][cls] = {};
-        tmpData[key][cls][dy] = (tmpData[key][cls][dy] || 0) + 1;
-        if (tmpData[key][cls][dy] > maxDay) {
-          var wMsg = cls + ': ' + dy + '/' + mo + '/' + yr + ' — ' + tmpData[key][cls][dy] + ' tiết';
+        if (!tmpData[key][clsKey]) tmpData[key][clsKey] = {};
+        tmpData[key][clsKey][dy] = (tmpData[key][clsKey][dy] || 0) + 1;
+        if (tmpData[key][clsKey][dy] > maxDay) {
+          var wMsg = clsKey + ': ' + dy + '/' + mo + '/' + yr + ' — ' + tmpData[key][clsKey][dy] + ' tiết';
           var exists = warnings.some(function(w) { return w === wMsg; });
           if (!exists) warnings.push(wMsg);
         }
-        classSet[cls] = true;
+        classSet[clsKey] = true;
         sheetL++;
       }
     });
@@ -1322,6 +1327,16 @@ function parseSheets(wb, fname) {
     parseLog: parseLog,
     warnings: warnings,
     fname: fname
+  };
+  pendingData = {
+    tmpData: tmpData,
+    classSet: classSet,
+    tmpWeeks: tmpWeeks,
+    tmpSheets: tmpSheets,
+    parseLog: parseLog,
+    warnings: warnings,
+    fname: fname,
+    tmpTeacher: tmpTeacher
   };
   showVerify(pendingData);
 }
@@ -1402,13 +1417,28 @@ function confirmData() {
   if (!pendingData) return;
   var pd = pendingData;
   var clsArr = Object.keys(pd.classSet).sort(function(a, b) {
-    var ga = parseInt(a[0]) || 0, gb = parseInt(b[0]) || 0;
-    return ga !== gb ? ga - gb : a.localeCompare(b, 'vi');
+    var rA = a.indexOf('||')>=0 ? a.split('||')[0] : a;
+    var rB = b.indexOf('||')>=0 ? b.split('||')[0] : b;
+    var ga = parseInt(rA[0]) || 0, gb = parseInt(rB[0]) || 0;
+    if (ga !== gb) return ga - gb;
+    if (rA !== rB) return rA.localeCompare(rB, 'vi');
+    return a.localeCompare(b, 'vi');
   });
   lessonData = pd.tmpData;
   allClasses = clsArr;
   weekCount = pd.tmpWeeks;
   sheetCount = pd.tmpSheets;
+  lessonData = pd.tmpData;
+  allClasses = clsArr;
+  weekCount = pd.tmpWeeks;
+  sheetCount = pd.tmpSheets;
+
+  // Cập nhật tên giáo viên nếu đọc được từ file (luôn ghi đè)
+  if (pd.tmpTeacher) {
+    CFG.teacher = pd.tmpTeacher;
+    saveCFG();
+    updateTopbar();
+  }
   updateTabDots();
   updateStatCards();
   saveStorage(true);
@@ -1510,7 +1540,7 @@ function renderTable(key) {
 
   var dispCls;
   if (ccFilterMode === 'kt') {
-    dispCls = allClasses.filter(function(c) { return !!ktMap[c]; });
+    dispCls = allClasses.filter(function(c) { var r = c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r]; });
     G('ktFilterNote').style.display = 'inline';
   } else {
     dispCls = allClasses.length > 0 ? allClasses : Object.keys(allInMonth).sort(function(a,b){return a.localeCompare(b,'vi');});
@@ -1565,7 +1595,8 @@ function renderTable(key) {
   var stt = 1;
 
   dispCls.forEach(function(cls) {
-    var isKT = !!ktMap[cls];
+    var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
+    var isKT = !!ktMap[realCls];
     var rT = 0;
     var cells = '';
     for (var i = 0; i < dn.length; i++) {
@@ -1587,9 +1618,12 @@ function renderTable(key) {
 var noteCell = showNote ? '<td class="td-note" data-key="' + key + '" data-cls="' + esc(cls) + '" onclick="handleNote(this)">' + ktBadge + esc(note) + '</td>' : '';
     html += '<tr' + rowCls + '>';
     html += '<td class="td-stt">' + stt++ + '</td>';
+    var clsParts = cls.indexOf('||') >= 0 ? cls.split('||') : null;
+    var dispCls2 = clsParts ? clsParts[0] : cls;
+    var dispMon  = clsParts ? clsParts[1] : CFG.subject;
     html += '<td class="td-name">' + esc(CFG.teacher) + '</td>';
-    html += '<td class="td-cls">' + esc(cls) + '</td>';
-    html += '<td class="td-mon">' + esc(CFG.subject) + '</td>';
+    html += '<td class="td-cls">' + esc(dispCls2) + '</td>';
+    html += '<td class="td-mon">' + esc(dispMon) + '</td>';
     html += cells;
     html += '<td class="td-tot">' + (rT || '') + '</td>';
     html += noteCell;
@@ -2203,7 +2237,7 @@ function renderSummary() {
   studentList.forEach(function(s){if(s.cls)ktMap[s.cls]=true;});
 
   var displayClasses = clsFilterMode === 'kt'
-    ? allClasses.filter(function(c){ return !!ktMap[c]; })
+    ? allClasses.filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r]; })
     : allClasses;
 
   if (!displayClasses.length) {
@@ -2211,13 +2245,14 @@ function renderSummary() {
     return;
   }
 
-  var thead = '<tr><th>Lớp</th><th>Khối</th>';
+  var thead = '<tr><th>Lớp</th><th>Môn</th><th>Khối</th>';
   MONTHS.forEach(function(x){ thead += '<th>T'+x.m+'/'+String(x.y).slice(2)+'</th>'; });
   thead += '<th>Tổng</th><th>KT</th></tr>';
 
   var tbody = '';
   displayClasses.forEach(function(cls) {
-    var isKT = !!ktMap[cls];
+    var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
+    var isKT = !!ktMap[realCls];
     var tot = 0;
     var cells = '';
     MONTHS.forEach(function(x) {
@@ -2228,8 +2263,11 @@ function renderSummary() {
       cells += '<td' + (v>0&&isKT?' class="kt-cell"':'') + '>' + (v||'') + '</td>';
     });
     tbody += '<tr>';
-    tbody += '<td class="ft"' + (isKT?' style="color:var(--red)"':'') + '>' + esc(cls) + '</td>';
-    tbody += '<td>' + (cls[0]||'?') + '</td>' + cells;
+    var thucCls = cls.indexOf('||')>=0 ? cls.split('||')[0] : cls;
+    var thucMon = cls.indexOf('||')>=0 ? cls.split('||')[1] : (CFG.subject||'');
+    tbody += '<td class="ft"' + (isKT?' style="color:var(--red)"':'') + '>' + esc(thucCls) + '</td>';
+    tbody += '<td style="color:var(--g5);font-size:10px;font-weight:500">' + esc(thucMon) + '</td>';
+    tbody += '<td>' + (thucCls[0]||'?') + '</td>' + cells;
     tbody += '<td class="ft">' + (tot||'') + '</td>';
     tbody += '<td>' + (isKT ? '<span style="color:var(--red);font-weight:700;font-size:10px">KT</span>' : '') + '</td>';
     tbody += '</tr>';
@@ -2243,7 +2281,7 @@ function renderSummary() {
     gByM.push(v);
   });
   var gTotal = gByM.reduce(function(a,b){return a+b;}, 0);
-  var sumRow = '<tr class="sum-row"><td colspan="2">Tổng cộng</td>' + gByM.map(function(v){return '<td>'+(v||'')+'</td>';}).join('') + '<td>' + gTotal + '</td><td></td></tr>';
+  var sumRow = '<tr class="sum-row"><td colspan="3">Tổng cộng</td>' + gByM.map(function(v){return '<td>'+(v||'')+'</td>';}).join('') + '<td>' + gTotal + '</td><td></td></tr>';
 
   G('clsArea').innerHTML = '<table class="cls-tbl"><thead>' + thead + '</thead><tbody>' + tbody + sumRow + '</tbody></table>';
 }
@@ -2485,13 +2523,17 @@ function buildSheet(wb, key, ktFilter) {
   for (var i = 0; i < days; i++) dTot.push(0);
 
   dispCls.forEach(function(cls) {
-    var isKT = !!ktMap[cls];
+    var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
+    var isKT = !!ktMap[realCls];
     var row = ws.getRow(exR); row.height = 14;
     var clsFill = isKT ? fKT : null;
     S(row.getCell(CS), stt++, fM, clsFill, aCC, bT);
+    var xlsParts = cls.indexOf('||') >= 0 ? cls.split('||') : null;
+    var xlsCls = xlsParts ? xlsParts[0] : cls;
+    var xlsMon = xlsParts ? xlsParts[1] : CFG.subject;
     S(row.getCell(CN), CFG.teacher, fM, clsFill, aLC, bT);
-    S(row.getCell(CC), cls, {name:'Times New Roman',size:10,bold:true,color:{argb:isKT?'FFAA2020':'FF1A2744'}}, clsFill, aCC, bT);
-    S(row.getCell(CM), CFG.subject, fM, clsFill, aCC, bT);
+    S(row.getCell(CC), xlsCls, {name:'Times New Roman',size:10,bold:true,color:{argb:isKT?'FFAA2020':'FF1A2744'}}, clsFill, aCC, bT);
+    S(row.getCell(CM), xlsMon, fM, clsFill, aCC, bT);
     var rTot = 0;
     dn.forEach(function(dd, i) {
       var c = CD1 + i, wd = dw[i];
@@ -2630,7 +2672,7 @@ function cb(id) { return !!(G(id)&&G(id).checked); }
 
 function saveConfig() {
   CFG.teacher   = gv('cfg-teacher') || CFG.teacher;
-  CFG.subject   = gv('cfg-subject') || CFG.subject;
+  CFG.subject   = gv('cfg-subject');
   CFG.school    = gv('cfg-school')  || CFG.school;
   CFG.code      = gv('cfg-code')    || CFG.code;
   CFG.pht       = gv('cfg-pht')     || CFG.pht;
@@ -2815,8 +2857,9 @@ function renderThongKe(mode) {
 
   // Chỉ lấy lớp có tiết dạy trong kỳ này
   var dispCls = allClasses.filter(function(c) {
+    var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
     var hasLesson = getLessonsInRange(c, hkRange.start, hkRange.end) > 0;
-    if (tkClsFilterMode === 'kt') return hasLesson && !!ktMap[c];
+    if (tkClsFilterMode === 'kt') return hasLesson && !!ktMap[r];
     return hasLesson;
   });
 
@@ -2851,25 +2894,31 @@ function renderThongKe(mode) {
     totalLopThucDay += lopThucDay > 0 ? 1 : 0;
     grandTotal += lopThucDay;
     var hsCount = studentList.filter(function(s){return s.cls===cls;}).length;
-    var isKT = !!ktMap[cls];
+    var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
+    var isKT = !!ktMap[realCls];
 
     var cells = '';
     months.forEach(function(x) {
       var v = getMonthLessonsInRange(cls, x.m, x.y, hkRange.start, hkRange.end);
       colTotals[mk(x.m,x.y)] += v;
-      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">1</td>';
-      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (v > 0 ? v : '') + '</td>';
-      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (v > 0 ? esc(CFG.subject) : '') + '</td>';
-      cells += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px;font-weight:' + (v>0?'700':'400') + ';color:' + (v>0?'var(--navy)':'var(--g2)') + '">' + (v > 0 ? v : '') + '</td>';
+      cells += '<td style="text-align:center;' + tdStyle + '">1</td>';
+      cells += '<td style="text-align:center;' + tdStyle + '">' + (v > 0 ? v : '') + '</td>';
+      var tkMonDisplay = cls.indexOf('||') >= 0 ? cls.split('||')[1] : (CFG.subject || '');
+      cells += '<td style="text-align:center;' + tdStyle + '">' + (v > 0 ? esc(tkMonDisplay) : '') + '</td>';
+      cells += '<td style="text-align:center;' + tdStyle + ';font-weight:' + (v>0?'700':'400') + '">' + (v > 0 ? v : '') + '</td>';
     });
 
-    rows += '<tr style="border-bottom:1px solid var(--g1);color:' + (isKT?'#cc0000':'#1a2744') + '">';
-    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px;color:var(--g3)">' + (i+1) + '</td>';
-    rows += '<td style="border:1px solid var(--g1);font-size:10px;font-weight:500;color:var(--navy);padding:4px 6px">' + esc(CFG.teacher.split(' ').slice(-1)[0]) + ' ' + esc(CFG.teacher.split(' ').slice(0,-1).join(' ')) + '</td>';
-    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px;font-weight:700;color:' + (isKT?'var(--red)':'var(--navy)') + '">' + esc(cls) + '</td>';
-    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (lopThucDay > 0 ? lopThucDay : '') + '</td>';
-    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + hsCount + '</td>';
-    rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">1</td>';
+    rows += '<tr style="border-bottom:1px solid var(--g1);color:' + (isKT?'#cc0000':'#1a2744') + ';background:' + (isKT?'#fff0f0':'#fff') + '">';
+    var tdStyle = 'border:1px solid var(--g1);font-size:10px;color:' + (isKT?'#cc0000':'#1a2744');
+    rows += '<td style="text-align:center;' + tdStyle + '">' + (i+1) + '</td>';
+    rows += '<td style="' + tdStyle + ';font-weight:500;padding:4px 6px">' + esc(CFG.teacher.split(' ').slice(-1)[0]) + ' ' + esc(CFG.teacher.split(' ').slice(0,-1).join(' ')) + '</td>';
+    var tkCls = cls.indexOf('||')>=0 ? cls.split('||')[0] : cls;
+    var tkMon = cls.indexOf('||')>=0 ? cls.split('||')[1] : (CFG.subject||'');
+    rows += '<td style="text-align:center;' + tdStyle + ';font-weight:700">' + esc(tkCls) + '</td>';
+    rows += '<td style="text-align:center;' + tdStyle + ';font-weight:500">' + esc(tkMon) + '</td>';
+    rows += '<td style="text-align:center;' + tdStyle + '">' + (lopThucDay > 0 ? lopThucDay : '') + '</td>';
+    rows += '<td style="text-align:center;' + tdStyle + '">' + hsCount + '</td>';
+    rows += '<td style="text-align:center;' + tdStyle + '">1</td>';
     rows += cells;
     rows += '<td style="text-align:center;border:1px solid var(--g1);font-size:10px">' + (isKT ? '<span style="color:#cc0000;font-weight:700;font-size:10px">KT</span>' : '') + '</td>';
     rows += '</tr>';
@@ -2908,6 +2957,7 @@ function renderThongKe(mode) {
   html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:24px">TT</th>';
   html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:90px">Họ và tên GV<br>dạy ở lớp có<br>HS học hoà nhập</th>';
   html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:35px">Lớp</th>';
+html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:45px">Môn</th>';
   html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:38px">Số tiết<br>thực dạy/<br>tháng</th>';
   html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:32px">Số<br>sinh<br>KT</th>';
   html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3px;text-align:center;border:1px solid rgba(255,255,255,.15);font-size:9.5px;min-width:28px">Lớp<br>học</th>';
@@ -2919,7 +2969,7 @@ function renderThongKe(mode) {
   html += '<tbody>' + rows + '</tbody>';
   html += '<tfoot>';
   html += '<tr style="background:var(--navy)">';
-  html += '<td colspan="3" style="text-align:right;padding:6px 8px;color:#fff;font-weight:700;font-size:10px;border:1px solid rgba(255,255,255,.15)">Tổng số</td>';
+  html += '<td colspan="4" style="text-align:right;padding:6px 8px;color:#fff;font-weight:700;font-size:10px;border:1px solid rgba(255,255,255,.15)">Tổng số</td>';
   html += '<td style="text-align:center;color:var(--gold2);font-weight:700;font-size:10px;border:1px solid rgba(255,255,255,.15)">' + totalLessons + '</td>';
   html += '<td style="text-align:center;color:var(--gold2);font-size:10px;border:1px solid rgba(255,255,255,.15)"></td>';
   html += '<td style="text-align:center;color:var(--gold2);font-size:10px;border:1px solid rgba(255,255,255,.15)"></td>';
@@ -2958,8 +3008,9 @@ async function exportThongKe(clsMode) {
   studentList.forEach(function(s) { if (s.cls) ktMap[s.cls] = true; });
 
   var dispCls = allClasses.filter(function(c) {
+  var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
   var hasLesson = getLessonsInRange(c, hkRange.start, hkRange.end) > 0;
-  if (tkClsFilterMode === 'kt') return hasLesson && !!ktMap[c];
+  if (tkClsFilterMode === 'kt') return hasLesson && !!ktMap[r];
   return hasLesson;
 });
 
@@ -3077,7 +3128,8 @@ async function exportThongKe(clsMode) {
 
   dispCls.forEach(function(cls, i) {
     var row = ws.getRow(9 + i); row.height = 14;
-    var isKT = !!ktMap[cls];
+    var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
+    var isKT = !!ktMap[realCls];
     var lopThucDay = getLessonsInRange(cls, hkRange.start, hkRange.end);
     var hsCount = studentList.filter(function(s){return s.cls===cls;}).length;
     totalLessons += lopThucDay;
@@ -3104,7 +3156,8 @@ async function exportThongKe(clsMode) {
       var col = 7 + mi * 4;
       dc(col,   1,              fM);
       dc(col+1, v||null,        fM);
-      dc(col+2, v>0?CFG.subject:null, fM);
+      var xlsMonDisplay = cls.indexOf('||') >= 0 ? cls.split('||')[1] : (CFG.subject || '');
+      dc(col+2, v>0?xlsMonDisplay:null, fM);
       dc(col+3, v||null,        v>0?{name:'Times New Roman',size:10,bold:true}:fM);
     });
 
