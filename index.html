@@ -25,12 +25,12 @@
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g0);color:var(--g5);min-height:100vh}
 
 /* SIDEBAR */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sb-w);background:var(--navy);display:flex;flex-direction:column;z-index:300;box-shadow:3px 0 16px rgba(13,27,62,.18)}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:210px;background:var(--navy);display:flex;flex-direction:column;z-index:300;box-shadow:3px 0 16px rgba(13,27,62,.18);min-height:100vh;overflow-y:auto}
 .sb-brand{padding:0 14px;height:var(--tb-h);display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
 .sb-brand-icon{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .sb-brand-title{font-family:'Newsreader',serif;font-size:13px;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-brand-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.5px;text-transform:uppercase;margin-top:1px}
-.sb-nav{flex:1;padding:8px 7px;overflow-y:auto}
+.sb-nav{flex:1;padding:8px 7px;overflow-y:auto;display:block!important;visibility:visible!important;opacity:1!important}
 .sb-sec{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);letter-spacing:1.4px;text-transform:uppercase;padding:10px 10px 5px;margin-top:4px}
 .sb-btn{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:var(--r);cursor:pointer;color:rgba(255,255,255,.6);font-size:12px;font-weight:500;transition:.13s;border:none;background:none;width:100%;text-align:left;font-family:inherit;margin-bottom:1px}
 .sb-btn:hover{background:rgba(255,255,255,.07);color:#fff}
@@ -370,13 +370,14 @@ tr.row-kt td.td-cls{color:var(--red)}
 }
 @media(max-width:900px){
   :root{--sb-w:0px;--tb-h:54px}
-  .sidebar{transform:translateX(-210px);transition:transform .25s}
-  .sidebar.mob-open{transform:translateX(0)!important}
+  .sidebar{width:210px!important;transform:translateX(-210px);transition:transform .25s;min-height:100vh!important;height:100%!important;overflow-y:auto!important}
+  .sidebar.mob-open{transform:translateX(0)!important;width:210px!important}
   .topbar{left:0}.main{margin-left:0}
   .sg{grid-template-columns:1fr}
   .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:299}
   .mob-overlay.show{display:block}
-  #mobMenuBtn{display:flex!important;width:44px!important;height:44px!important;font-size:22px!important;background:var(--gold)!important;border:none!important;color:var(--navy)!important;border-radius:8px!important;cursor:pointer!important;align-items:center!important;justify-content:center!important;font-weight:700!important;flex-shrink:0!important}
+  #mobMenuBtn{display:flex!important}
+  #fabMenuBtn{display:flex!important}
 }
 @media(max-width:600px){
   .main{padding:10px 8px}
@@ -451,6 +452,7 @@ tr.row-kt td.td-cls{color:var(--red)}
   </div>
   <div class="tb-right">
     <button id="mobMenuBtn" onclick="toggleMobMenu()" style="display:none;background:var(--gold);border:none;color:var(--navy);font-size:22px;width:44px;height:44px;border-radius:8px;cursor:pointer;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;position:relative;z-index:250">☰</button>
+<button onclick="toggleMobMenu()" style="display:none;position:fixed;bottom:20px;right:16px;width:52px;height:52px;background:var(--gold);border:none;color:var(--navy);font-size:26px;font-weight:900;border-radius:50%;z-index:500;box-shadow:0 4px 16px rgba(0,0,0,.35);cursor:pointer;align-items:center;justify-content:center" id="fabMenuBtn">☰</button>
     <button class="btn btn-success btn-sm" onclick="manualSave()" id="topSaveBtn">💾 Lưu</button>
     <span class="tb-badge">v4.0</span>
     <div class="tb-meta">
@@ -3385,14 +3387,25 @@ function toggleMobMenu(){
   var sb=document.querySelector('.sidebar');
   var ov=document.getElementById('mobOverlay');
   var isOpen=sb.classList.contains('mob-open');
-  sb.classList.toggle('mob-open',!isOpen);
-  ov.classList.toggle('show',!isOpen);
-  // Đảm bảo sidebar luôn hiển thị đúng trên mobile
   if(!isOpen){
+    sb.style.position='fixed';
+    sb.style.left='0';
+    sb.style.top='0';
+    sb.style.bottom='0';
+    sb.style.width='210px';
+    sb.style.background='#0d1b3e';
+    sb.style.display='flex';
+    sb.style.flexDirection='column';
     sb.style.zIndex='400';
     sb.style.transform='translateX(0)';
+    sb.style.overflowY='auto';
+    sb.style.minHeight='100vh';
+    sb.classList.add('mob-open');
+    ov.classList.add('show');
   } else {
     sb.style.transform='translateX(-210px)';
+    sb.classList.remove('mob-open');
+    ov.classList.remove('show');
   }
 }
 function toast(msg, cls) {
