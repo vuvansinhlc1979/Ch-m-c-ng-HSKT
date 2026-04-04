@@ -439,6 +439,9 @@ tr.row-kt td.td-cls{color:var(--red)}
     <button class="sb-btn" onclick="doPrint()">
       <span class="ic">🖨️</span> In Bảng
     </button>
+    <button class="sb-btn" onclick="exportToTemplate()">
+  <span class="ic">📋</span> Xuất file mẫu QĐ
+</button>
   </div>
   <div class="sb-foot">
     <span class="sb-ver">v4.0</span><br>
@@ -483,6 +486,7 @@ tr.row-kt td.td-cls{color:var(--red)}
   <button class="btn btn-sm btn-primary" id="gPrint" onclick="doPrint()" style="background:rgba(255,255,255,.12);border:none;color:#fff">🖨️ In</button>
   <button class="btn btn-sm btn-gold" onclick="openExportDialog('month')">📊 Xuất tháng</button>
   <button class="btn btn-sm btn-outline" onclick="exportPDF()" style="border-color:rgba(255,255,255,.25);color:#fff" title="Xuất PDF tháng hiện tại">📄 Xuất PDF</button>
+  <button class="btn btn-sm btn-gold" onclick="exportToTemplate()" title="Điền dữ liệu vào file mẫu gốc (.xlsx theo QĐ)">📋 Xuất file mẫu QĐ</button>
   <button class="btn btn-sm btn-danger" onclick="openExportDialog('all')" style="background:rgba(255,255,255,.12);border:none;color:#fff">📦 Xuất tất cả</button>
   <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
   <button class="btn btn-sm btn-outline" id="tkBtnHK1" onclick="setTKFilter('hk1')" style="border-color:rgba(255,255,255,.25);color:#fff">📘 HK I</button>
@@ -1066,8 +1070,8 @@ var DEFAULT_CFG = {
   pht:'', principal:'',
   schoolYear:'2025 - 2026', location:'',
   pageSize:'A4', orientation:'landscape',
-  mgTop:1.9, mgBot:1.9, mgLeft:1.3, mgRight:1.3, mgHd:0.8, mgFt:0.8,
-  fitPage:true, repeatRow:true,
+mgTop:1, mgBot:1, mgLeft:1, mgRight:0.5, mgHd:0.5, mgFt:0.5,
+fitPage:true, repeatRow:true,
   colorPrimary:'#0d1b3e', colorPrimary2:'#172447', colorCol:'navy',
   showNote:true, colorWk:true, showKT:true, autoNav:true, autoSave:true,
   fn1:'bang_cham_cong_T{M}_{Y}', fn2:'bang_cham_cong_namhoc_{Y1}_{Y2}',
@@ -2635,7 +2639,7 @@ function buildSheet(wb, key, ktFilter) {
     pageSetup: {
       paperSize: CFG.pageSize === 'A3' ? 8 : 9,
       orientation: CFG.orientation || 'landscape',
-      fitToPage: CFG.fitPage !== false, fitToWidth: 1, fitToHeight: 0,
+      fitToPage: true, fitToWidth: 1, fitToHeight: 0,
       margins: { left:mgL, right:mgR, top:mgT, bottom:mgB, header:mgH, footer:mgF },
       printTitlesRow: CFG.repeatRow !== false ? '6:8' : undefined
     },
@@ -2643,7 +2647,10 @@ function buildSheet(wb, key, ktFilter) {
   });
 
   ws.getColumn(CS).width=4; ws.getColumn(CN).width=13; ws.getColumn(CC).width=5.5; ws.getColumn(CM).width=7;
-  for (var ci = CD1; ci <= CDN; ci++) ws.getColumn(ci).width = 2.9;
+  var _targetW = CFG.pageSize === 'A3' ? 220 : 158;
+var _fixColsW = 4 + 13 + 5.5 + 7 + 6.5 + (NC === CNT ? 9 : 0);
+var _dayColW = Math.max(2.8, (_targetW - _fixColsW) / days);
+for (var ci = CD1; ci <= CDN; ci++) ws.getColumn(ci).width = _dayColW;
   ws.getColumn(CT).width = 6.5;
   if (NC === CNT) ws.getColumn(CNT).width = 9;
 
@@ -2707,13 +2714,17 @@ function buildSheet(wb, key, ktFilter) {
   });
 
   var stt = 1, exR = 9;
+  var _pageH2 = CFG.pageSize === 'A3' ? 419 : 595;
+var _marginPt2 = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
+var _fixedPt2 = 71 + 48 + 15 + 70;
+var _dataRowH2 = Math.min(30, Math.max(14, (_pageH2 - _marginPt2 - _fixedPt2) / (dispCls.length + 1)));
   var dTot = [];
   for (var i = 0; i < days; i++) dTot.push(0);
 
   dispCls.forEach(function(cls) {
     var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
     var isKT = !!ktMap[realCls];
-    var row = ws.getRow(exR); row.height = 14;
+    var row = ws.getRow(exR); row.height = _dataRowH2;
     var clsFill = isKT ? fKT : null;
     S(row.getCell(CS), stt++, fM, clsFill, aCC, bT);
     var xlsParts = cls.indexOf('||') >= 0 ? cls.split('||') : null;
@@ -2744,7 +2755,7 @@ function buildSheet(wb, key, ktFilter) {
     exR++;
   });
 
-  var sRow = ws.getRow(exR); sRow.height = 15;
+  var sRow = ws.getRow(exR); sRow.height = _dataRowH2;
   S(sRow.getCell(CS),'Cộng',fB,fSM,{horizontal:'right',vertical:'middle'});
   ws.mergeCells(exR,CS,exR,CM);
   [CS,CN,CC,CM].forEach(function(c){sRow.getCell(c).fill=fSM;sRow.getCell(c).border=bT;});
@@ -2904,7 +2915,412 @@ function exportPDF() {
   doc.save(fname);
   toast('📄 Đã xuất PDF: ' + fname, 't-ok');
 }
+// ══ XUẤT VÀO FILE MẪU QĐ ══════════════
+async function exportToTemplate() {
+  if (!Object.keys(lessonData).length) {
+    toast('⚠️ Chưa có dữ liệu để xuất', 't-warn');
+    return;
+  }
+  if (window.showOpenFilePicker) {
+    try {
+      var [fh] = await window.showOpenFilePicker({
+        types: [{ description: 'Excel', accept: {
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+        }}]
+      });
+      var file = await fh.getFile();
+      _processTemplateFile(file);
+    } catch(e) {
+      if (e.name !== 'AbortError')
+        toast('❌ Không mở được file: ' + e.message, 't-err');
+    }
+  } else {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.xlsx';
+    inp.onchange = function(ev) {
+      if (ev.target.files[0]) _processTemplateFile(ev.target.files[0]);
+    };
+    document.body.appendChild(inp);
+    inp.click();
+    document.body.removeChild(inp);
+  }
+}
 
+function _processTemplateFile(file) {
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      var wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(e.target.result);
+
+      var SHEET_MAP = {
+        'T9':{m:9,y:2025},'T10':{m:10,y:2025},'T11':{m:11,y:2025},'T12':{m:12,y:2025},
+        'T1-KHI':{m:1,y:2026},'T1- KII':{m:1,y:2026},
+        'T2':{m:2,y:2026},'T3':{m:3,y:2026},'T4':{m:4,y:2026},'T5':{m:5,y:2026}
+      };
+      var WD_NAMES = ['CN','T2','T3','T4','T5','T6','T7'];
+
+      wb.eachSheet(function(ws) {
+        var sname = ws.name.trim();
+        if (!SHEET_MAP[sname]) return;
+
+        var mo = SHEET_MAP[sname].m, yr = SHEET_MAP[sname].y;
+        var key  = mk(mo, yr);
+        var days = mDays(mo, yr);
+
+        // ── Tìm cấu trúc sheet ──
+        var dayRowIdx = -1, wdRowIdx = -1, dataStartRow = -1, sumRowIdx = -1;
+        var dayColStart = -1, totCol = -1, noteCol = -1;
+        var nameCol = 2, clsCol = 3, monCol = 4;
+
+        ws.eachRow(function(row, ri) {
+          // Dòng số ngày: có >=15 số từ 1-31 ở cột >4
+          if (dayRowIdx < 0 && ri > 5) {
+            var cnt = 0, fc = -1;
+            row.eachCell({includeEmpty:false}, function(cell, col) {
+              if (typeof cell.value === 'number' && cell.value >= 1 && cell.value <= 31 && col > 4) {
+                cnt++; if (fc < 0) fc = col;
+              }
+            });
+            if (cnt >= 15) { dayRowIdx = ri; dayColStart = fc; }
+          }
+          if (dayRowIdx > 0 && wdRowIdx < 0 && ri > dayRowIdx) wdRowIdx = ri;
+          // Dòng data: cột A = số 1
+          if (wdRowIdx > 0 && dataStartRow < 0 && ri > wdRowIdx) {
+            if (ws.getRow(ri).getCell(1).value === 1) dataStartRow = ri;
+          }
+          // Dòng Cộng
+          if (dataStartRow > 0 && ri > dataStartRow + 1) {
+            var aStr = String(ws.getRow(ri).getCell(1).value||'') +
+                       String(ws.getRow(ri).getCell(2).value||'');
+            if (aStr.toLowerCase().indexOf('cộng') >= 0 || aStr.toLowerCase().indexOf('cong') >= 0)
+              sumRowIdx = ri;
+          }
+        });
+
+        if (dayRowIdx < 0 || dataStartRow < 0) {
+          console.warn('[Template] Không tìm được cấu trúc sheet:', sname);
+          return;
+        }
+
+        // Tìm totCol, noteCol từ header
+        for (var hri = Math.max(1, dayRowIdx-3); hri < dayRowIdx; hri++) {
+          ws.getRow(hri).eachCell({includeEmpty:false}, function(cell, col) {
+            if (col <= dayColStart) return;
+            var v = String(cell.value||'').toLowerCase();
+            if ((v.indexOf('tổng')>=0||v.indexOf('tong')>=0) && totCol < 0) totCol = col;
+            if ((v.indexOf('ghi')>=0||v.indexOf('chú')>=0||v.indexOf('chu')>=0) && noteCol < 0) noteCol = col;
+          });
+        }
+        // Fallback: totCol = cột ngay sau ngày cuối
+        if (totCol < 0) totCol = dayColStart + days;
+        // Fallback noteCol
+        if (noteCol < 0) noteCol = totCol + 1;
+
+        // Số ngày trong file mẫu (đọc từ dòng số ngày)
+        var oldDayCount = 0;
+        ws.getRow(dayRowIdx).eachCell({includeEmpty:false}, function(cell, col) {
+          if (col >= dayColStart && typeof cell.value === 'number' &&
+              cell.value >= 1 && cell.value <= 31) oldDayCount++;
+        });
+        if (oldDayCount < 5) oldDayCount = totCol > dayColStart ? totCol - dayColStart : 30;
+
+        console.log('[Template]', sname, 'dayRow='+dayRowIdx, 'dayColStart='+dayColStart,
+          'totCol='+totCol, 'noteCol='+noteCol, 'dataStart='+dataStartRow,
+          'sumRow='+sumRowIdx, 'oldDays='+oldDayCount, 'newDays='+days);
+
+        // ── Cập nhật tiêu đề (dòng 1-5) ──
+        ws.eachRow(function(row, ri) {
+          if (ri > 6) return;
+          row.eachCell({includeEmpty:false}, function(cell) {
+            var v = String(cell.value||'');
+            if (v.indexOf('ĐƠN VỊ')>=0 || v.indexOf('Đơn vị')>=0)
+              cell.value = 'ĐƠN VỊ: ' + CFG.school.toUpperCase();
+            if (v.indexOf('QHNS')>=0) {
+              var nx = row.getCell(cell.col+1);
+              if (nx) { nx.value = CFG.code; nx.numFmt = '@'; }
+            }
+            if (v.indexOf('BẢNG CHẤM CÔNG')>=0)
+              cell.value = 'BẢNG CHẤM CÔNG GIÁO VIÊN DẠY HỌC SINH KHUYẾT TẬT HỌC HÒA NHẬP NĂM HỌC ' + CFG.schoolYear;
+            if (v.indexOf('Tháng')===0 || (v.indexOf('Tháng')>=0 && v.indexOf('năm')>=0 && ri<=6))
+              cell.value = 'Tháng ' + pad2(mo) + ' năm ' + yr;
+          });
+        });
+
+        // ── Cập nhật dòng số ngày & thứ (KHÔNG splice) ──
+        // Lấy style mẫu từ ô đầu tiên
+        var refDay = ws.getRow(dayRowIdx).getCell(dayColStart);
+        var refWd  = ws.getRow(wdRowIdx).getCell(dayColStart);
+        var sDayFont = refDay.font  ? JSON.parse(JSON.stringify(refDay.font))  : {name:'Times New Roman',size:8,bold:true};
+        var sDayFill = refDay.fill  ? JSON.parse(JSON.stringify(refDay.fill))  : null;
+        var sDayBdr  = refDay.border? JSON.parse(JSON.stringify(refDay.border)): null;
+        var sDayAln  = refDay.alignment ? JSON.parse(JSON.stringify(refDay.alignment)) : {horizontal:'center',vertical:'middle'};
+        var sWdFont  = refWd.font   ? JSON.parse(JSON.stringify(refWd.font))   : {name:'Times New Roman',size:8,bold:true};
+        var sWdFill  = refWd.fill   ? JSON.parse(JSON.stringify(refWd.fill))   : null;
+        var sWdBdr   = refWd.border ? JSON.parse(JSON.stringify(refWd.border)) : null;
+        var sWdAln   = refWd.alignment ? JSON.parse(JSON.stringify(refWd.alignment)) : {horizontal:'center',vertical:'middle'};
+
+        // Xóa toàn bộ vùng ngày cũ
+        var maxCol = dayColStart + Math.max(oldDayCount, days) + 3;
+        for (var c = dayColStart; c <= maxCol; c++) {
+          ws.getRow(dayRowIdx).getCell(c).value = null;
+          ws.getRow(wdRowIdx).getCell(c).value  = null;
+        }
+        // Ghi ngày & thứ mới
+        for (var d = 1; d <= days; d++) {
+          var col = dayColStart + d - 1;
+          var dc = ws.getRow(dayRowIdx).getCell(col);
+          var wc = ws.getRow(wdRowIdx).getCell(col);
+          dc.value = d; dc.font = JSON.parse(JSON.stringify(sDayFont));
+          if (sDayFill) dc.fill = JSON.parse(JSON.stringify(sDayFill));
+          if (sDayBdr)  dc.border = JSON.parse(JSON.stringify(sDayBdr));
+          dc.alignment = JSON.parse(JSON.stringify(sDayAln));
+          wc.value = WD_NAMES[new Date(yr, mo-1, d).getDay()];
+          wc.font = JSON.parse(JSON.stringify(sWdFont));
+          if (sWdFill) wc.fill = JSON.parse(JSON.stringify(sWdFill));
+          if (sWdBdr)  wc.border = JSON.parse(JSON.stringify(sWdBdr));
+          wc.alignment = JSON.parse(JSON.stringify(sWdAln));
+        }
+
+        // ── Danh sách lớp cần điền ──
+        var clsInMonth = {};
+        Object.keys(lessonData[key]||{}).forEach(function(c){clsInMonth[c]=true;});
+        Object.keys(manualEdits[key]||{}).forEach(function(c){clsInMonth[c]=true;});
+        var newClsList = allClasses.filter(function(c){return clsInMonth[c];});
+        if (!newClsList.length) newClsList = allClasses.slice();
+
+        // ── Đọc dòng hiện có trong file mẫu ──
+        var templateRows = []; // [{ri}]
+        var scanEnd = sumRowIdx > 0 ? sumRowIdx : dataStartRow + 60;
+        for (var ri = dataStartRow; ri < scanEnd; ri++) {
+          var aVal = ws.getRow(ri).getCell(1).value;
+          if (typeof aVal === 'number' || ws.getRow(ri).getCell(clsCol).value)
+            templateRows.push(ri);
+        }
+        var oldCount = templateRows.length;
+        var newCount = newClsList.length;
+
+        // Lấy style từ dòng đầu tiên làm tham chiếu
+        var refDataRow = ws.getRow(dataStartRow);
+
+        // ── Nếu cần thêm dòng: thêm vào TRƯỚC dòng Cộng, copy style ──
+        if (newCount > oldCount) {
+          var insertAt = sumRowIdx > 0 ? sumRowIdx : dataStartRow + oldCount;
+          for (var ai = 0; ai < newCount - oldCount; ai++) {
+            ws.spliceRows(insertAt + ai, 0, []);
+            var newRow = ws.getRow(insertAt + ai);
+            newRow.height = refDataRow.height || 14;
+            refDataRow.eachCell({includeEmpty:true}, function(rc, col) {
+              var nc = newRow.getCell(col);
+              if (rc.font)      nc.font      = JSON.parse(JSON.stringify(rc.font));
+              if (rc.fill)      nc.fill      = JSON.parse(JSON.stringify(rc.fill));
+              if (rc.border)    nc.border    = JSON.parse(JSON.stringify(rc.border));
+              if (rc.alignment) nc.alignment = JSON.parse(JSON.stringify(rc.alignment));
+            });
+          }
+          if (sumRowIdx > 0) sumRowIdx += (newCount - oldCount);
+        }
+
+        // ── Ẩn dòng thừa (height=0) thay vì xóa — giữ nguyên định dạng ──
+        if (newCount < oldCount) {
+          for (var hi = newCount; hi < oldCount; hi++) {
+            var hideRow = ws.getRow(dataStartRow + hi);
+            hideRow.height = 0;   // ẩn dòng
+            hideRow.hidden = true;
+            // Xóa nội dung để không in ra
+            hideRow.eachCell({includeEmpty:false}, function(cell) { cell.value = null; });
+          }
+        }
+
+        // ── Ghi dữ liệu từng dòng lớp ──
+        newClsList.forEach(function(cls, i) {
+          var ri  = dataStartRow + i;
+          var row = ws.getRow(ri);
+          row.hidden = false;
+          if (!row.height || row.height === 0) row.height = refDataRow.height || 14;
+
+          var realCls = cls.indexOf('||')>=0 ? cls.split('||')[0] : cls;
+          var mon     = cls.indexOf('||')>=0 ? cls.split('||')[1] : (CFG.subject||'');
+
+          // Ghi thông tin cố định
+          row.getCell(1).value       = i + 1;
+          row.getCell(nameCol).value = CFG.teacher;
+          row.getCell(clsCol).value  = realCls;
+          row.getCell(monCol).value  = mon;
+
+          // Xóa dữ liệu số cũ trong vùng ngày
+          for (var c = dayColStart; c <= dayColStart + Math.max(oldDayCount, days) + 3; c++) {
+            var cell = row.getCell(c);
+            if (typeof cell.value === 'number') cell.value = null;
+            else if (cell.value && typeof cell.value === 'object' && !cell.value.formula) cell.value = null;
+          }
+
+          // Điền số tiết
+          var rTot = 0;
+          for (var d = 1; d <= days; d++) {
+            var cnt = getEff(key, cls, d);
+            if (cnt > 0) { row.getCell(dayColStart + d - 1).value = cnt; rTot += cnt; }
+          }
+
+          // Tổng số tiết
+          var tcell = row.getCell(totCol);
+          tcell.value = rTot > 0 ? rTot : null;
+          if (!tcell.font) tcell.font = {name:'Times New Roman',size:10,bold:true};
+          tcell.alignment = {horizontal:'center',vertical:'middle'};
+
+          // Ghi chú
+          var noteVal = (noteData[key]&&noteData[key][cls]) || null;
+          if (noteVal) {
+            var nc = row.getCell(noteCol);
+            nc.value = noteVal;
+            nc.font  = {name:'Times New Roman',size:10};
+            nc.alignment = {horizontal:'left',vertical:'middle',wrapText:true};
+          }
+        });
+
+        // ── Dòng Cộng ──
+        if (sumRowIdx > 0) {
+          var sumRow = ws.getRow(sumRowIdx);
+          // Xóa số cũ
+          for (var c = dayColStart; c <= totCol + 2; c++) {
+            var sc = sumRow.getCell(c);
+            if (typeof sc.value === 'number') sc.value = null;
+            else if (sc.value && typeof sc.value === 'object' && !sc.value.formula) sc.value = null;
+          }
+          // Điền tổng ngày
+          var grand = 0;
+          for (var d = 1; d <= days; d++) {
+            var colD = dayColStart + d - 1;
+            var colSum = 0;
+            newClsList.forEach(function(cls){colSum += getEff(key, cls, d);});
+            grand += colSum;
+            if (colSum > 0) sumRow.getCell(colD).value = colSum;
+          }
+          // Xóa ô thừa nếu tháng ngắn hơn mẫu
+          for (var c = dayColStart + days; c < dayColStart + oldDayCount + 3; c++) {
+            if (typeof sumRow.getCell(c).value === 'number') sumRow.getCell(c).value = null;
+          }
+          // Tổng tổng
+          var totSC = sumRow.getCell(totCol);
+          totSC.value = grand || null;
+          if (!totSC.font || !totSC.font.bold)
+            totSC.font = {name:'Times New Roman',size:10,bold:true};
+        }
+
+        // ── Vùng ký tên ──
+        var signBase = (sumRowIdx > 0 ? sumRowIdx : dataStartRow + newCount) + 2;
+        var lastDataCol = totCol > 0 ? totCol : dayColStart + days;
+        var midCol = Math.floor((dayColStart + lastDataCol) / 2);
+        var colL   = 1;
+        var colM   = Math.max(2, Math.floor(lastDataCol * 0.40));
+        var colR   = Math.max(3, Math.floor(lastDataCol * 0.72));
+
+        // Xóa vùng ký tên cũ
+        var clearEnd = signBase + 8;
+        for (var ri2 = signBase - 1; ri2 <= clearEnd; ri2++) {
+          ws.getRow(ri2).eachCell({includeEmpty:false}, function(cell) {
+            if (cell.value && typeof cell.value !== 'object') cell.value = null;
+            else if (cell.value && typeof cell.value === 'object' && !cell.value.formula) cell.value = null;
+          });
+        }
+
+        function wSign(ri3, col, val, bold, italic) {
+          var c = ws.getRow(ri3).getCell(col);
+          c.value = val;
+          c.font  = {name:'Times New Roman',size:10,bold:!!bold,italic:!!italic};
+          c.alignment = {horizontal:'center',vertical:'middle'};
+        }
+        var dateStr = (CFG.location||'Gia Phú') + ', ngày ' + days + ' tháng ' + pad2(mo) + ' năm ' + yr;
+        wSign(signBase,   midCol, dateStr,                      false, true);
+        wSign(signBase+1, colL,   'Người chấm công',            true,  false);
+        wSign(signBase+1, colM,   'PHT, Phụ trách chuyên môn',  true,  false);
+        wSign(signBase+1, colR,   'Hiệu trưởng',                true,  false);
+        wSign(signBase+4, colL,   CFG.teacher,                  true,  false);
+        wSign(signBase+4, colM,   CFG.pht,                      true,  false);
+        wSign(signBase+4, colR,   CFG.principal,                true,  false);
+      });
+
+      // Xuất file
+      console.log('[Template] Bat dau writeBuffer...');
+      var buf;
+      try {
+        buf = await wb.xlsx.writeBuffer();
+        console.log('[Template] writeBuffer OK, size=', buf.byteLength);
+      } catch(wbErr) {
+        console.error('[Template] writeBuffer FAILED:', wbErr);
+        toast('❌ Lỗi ghi file: ' + wbErr.message, 't-err');
+        return;
+      }
+      var fname = 'bang_cham_cong_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '_QD.xlsx';
+      dlBlob(new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), fname);
+      toast('✅ Đã điền dữ liệu vào file mẫu: ' + fname, 't-ok');
+
+    } catch(err) {
+      toast('❌ Lỗi xử lý file mẫu: ' + err.message, 't-err');
+      console.error('[Template] ERROR:', err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function _fillSummarySheet(ws, sname) {
+  // Xác định kỳ: Tổng KỲ I hay KỲ II
+  var isHK2 = sname.indexOf('II') >= 0 || sname.indexOf('2') >= 0;
+  var hkMonths = isHK2
+    ? [{m:1,y:2026},{m:2,y:2026},{m:3,y:2026},{m:4,y:2026},{m:5,y:2026}]
+    : [{m:9,y:2025},{m:10,y:2025},{m:11,y:2025},{m:12,y:2025},{m:1,y:2026}];
+
+  // Đọc cấu trúc: tìm dòng bắt đầu dữ liệu (cột A có số 1)
+  var dataStartRow = -1;
+  ws.eachRow(function(row, ri) {
+    if (row.getCell(1).value === 1 && dataStartRow < 0 && ri > 4)
+      dataStartRow = ri;
+  });
+  if (dataStartRow < 0) return;
+
+  // Map cột tháng: dựa vào cấu trúc file mẫu
+  // T9=col5-9, T10=col10-14, T11=col15-19, T12=col20-24, T1=col25-29
+  // Mỗi tháng có 5 cột: [Số lớp, Số HS, Tên lớp, Tên môn, Tổng tiết]
+  var monthColStart = [5, 10, 15, 20, 25]; // cột bắt đầu của mỗi tháng
+
+  // Đọc danh sách lớp từ cột C (col 3)
+  var clsList = [];
+  ws.eachRow(function(row, ri) {
+    if (ri < dataStartRow) return;
+    var a = row.getCell(1).value;
+    var c = row.getCell(3).value;
+    if (typeof a === 'number' && c) clsList.push({ri: ri, cls: String(c).trim()});
+  });
+
+  clsList.forEach(function(item) {
+    var row = ws.getRow(item.ri);
+    var cls = item.cls;
+    // Tìm clsKey
+    var clsKey = allClasses.filter(function(c) {
+      var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
+      return r === cls;
+    })[0] || cls;
+    var mon = clsKey.indexOf('||')>=0 ? clsKey.split('||')[1] : (CFG.subject || '');
+
+    // Cập nhật tên GV cột B
+    row.getCell(2).value = CFG.teacher;
+
+    // Điền từng tháng
+    hkMonths.forEach(function(x, i) {
+      var key = mk(x.m, x.y);
+      var total = 0;
+      var mDays2 = mDays(x.m, x.y);
+      for (var d = 1; d <= mDays2; d++) total += getEff(key, clsKey, d);
+
+      var baseCol = monthColStart[i];
+      row.getCell(baseCol).value     = total > 0 ? 1 : null; // Số lớp
+      row.getCell(baseCol + 1).value = null; // Số HS (để trống, do không có data)
+      row.getCell(baseCol + 2).value = total > 0 ? cls : null;  // Tên lớp
+      row.getCell(baseCol + 3).value = total > 0 ? mon : null;  // Tên môn
+      row.getCell(baseCol + 4).value = total || null; // Tổng tiết
+    });
+  });
+}
 // ══ EXPORT TEMPLATE ═══════════════════
 async function exportTemplate() {
   var wb = new ExcelJS.Workbook(); wb.creator = 'HT Cham Cong v' + APP_VER;
@@ -3367,7 +3783,21 @@ async function exportThongKe(clsMode) {
 
   try {
     var wb = new ExcelJS.Workbook();
-    var ws = wb.addWorksheet('ThongKe');
+    var ws = wb.addWorksheet('ThongKe', {
+  pageSetup: {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: CFG.orientation || 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    }
+  }
+});
     var fT  = {name:'Times New Roman',size:13,bold:true};
     var fB  = {name:'Times New Roman',size:10,bold:true};
     var fM  = {name:'Times New Roman',size:10};
@@ -3398,24 +3828,28 @@ async function exportThongKe(clsMode) {
     ws.getColumn(6).width = 6;
     ws.getColumn(7).width = 5;
     // Độ rộng cột tháng
-    for (var ci = 0; ci < months.length * 4; ci++) {
-      var baseW = [4, 5, 8, 7];
-      ws.getColumn(fixedCols + 1 + ci).width = baseW[ci % 4];
-    }
+    var _tkFixedW = 4+14+6+10+8+6+5+10;
+var _tkTarget = 158;
+var _tkMonthTotalW = Math.max(months.length * 24, _tkTarget - _tkFixedW);
+var _tkMonthW = _tkMonthTotalW / months.length;
+var _tkRatio = [0.17, 0.21, 0.33, 0.29];
+for (var ci = 0; ci < months.length * 4; ci++) {
+  ws.getColumn(fixedCols + 1 + ci).width = Math.max(3.5, _tkMonthW * _tkRatio[ci % 4]);
+}
     ws.getColumn(lastCol).width = 10;
 
     // Dòng 1-5: Tiêu đề
     var r1 = ws.getRow(1); r1.height = 16;
     r1.getCell(1).value = 'UỶ BAN NHÂN DÂN XÃ GIA PHÚ';
     r1.getCell(1).font  = {name:'Times New Roman',size:11,bold:true};
-    r1.getCell(1).alignment = aCC;
-    ws.mergeCells(1,1,1,totalCols);
+    r1.getCell(1).alignment = aLC;
+ws.mergeCells(1,1,1,Math.floor(totalCols*0.45));
 
-    var r2 = ws.getRow(2); r2.height = 16;
-    r2.getCell(1).value = 'TRƯỜNG ' + CFG.school.toUpperCase();
-    r2.getCell(1).font  = {name:'Times New Roman',size:11,bold:true};
-    r2.getCell(1).alignment = aCC;
-    ws.mergeCells(2,1,2,totalCols);
+var r2 = ws.getRow(2); r2.height = 16;
+r2.getCell(1).value = 'TRƯỜNG ' + CFG.school.toUpperCase();
+r2.getCell(1).font  = {name:'Times New Roman',size:11,bold:true};
+r2.getCell(1).alignment = aLC;
+ws.mergeCells(2,1,2,Math.floor(totalCols*0.45));
 
     var r3 = ws.getRow(3); r3.height = 20;
     r3.getCell(1).value = 'THỐNG KÊ';
@@ -3478,9 +3912,13 @@ async function exportThongKe(clsMode) {
     var colTotals = {};
     months.forEach(function(x){ colTotals[mk(x.m,x.y)] = 0; });
     var totalLessons = 0;
+    var _pageH = CFG.pageSize === 'A3' ? 419 : 595;
+var _marginPt = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
+var _fixedPt = 89 + 52 + 16 + 80;
+var _dataRowH = Math.min(30, Math.max(14, (_pageH - _marginPt - _fixedPt) / (dispCls.length + 1)));
 
     dispCls.forEach(function(cls, i) {
-      var row = ws.getRow(9 + i); row.height = 14;
+      var row = ws.getRow(9 + i); row.height = _dataRowH;
       var realCls = cls.indexOf('||') >= 0 ? cls.split('||')[0] : cls;
       var xlsMon  = cls.indexOf('||') >= 0 ? cls.split('||')[1] : (CFG.subject||'');
       var isKT = !!ktMap[realCls];
@@ -3521,7 +3959,7 @@ async function exportThongKe(clsMode) {
 
     // Dòng tổng
     var sumRowIdx = 9 + dispCls.length;
-    var sumRow = ws.getRow(sumRowIdx); sumRow.height = 16;
+    var sumRow = ws.getRow(sumRowIdx); sumRow.height = _dataRowH;
     function sc(col, val, fo, al) {
       var c = sumRow.getCell(col);
       c.value = val; c.font = fo||fHd; c.fill = bgSm; c.border = bT;
@@ -3545,21 +3983,21 @@ async function exportThongKe(clsMode) {
     var signRow = sumRowIdx + 2;
     var now = new Date();
     var dateStr = CFG.location + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
-    var midCol = Math.floor(totalCols * 0.6);
-    ws.getRow(signRow).getCell(midCol).value = dateStr;
-    ws.getRow(signRow).getCell(midCol).font = {name:'Times New Roman',size:10,italic:true};
-    ws.getRow(signRow).getCell(midCol).alignment = aCC;
-    ws.mergeCells(signRow, midCol, signRow, totalCols-1);
+    var midCol = Math.floor(totalCols * 0.65);
+ws.getRow(signRow).getCell(midCol).value = dateStr;
+ws.getRow(signRow).getCell(midCol).font = {name:'Times New Roman',size:10,italic:true};
+ws.getRow(signRow).getCell(midCol).alignment = aCC;
+ws.mergeCells(signRow, midCol, signRow, totalCols);
 
-    ws.getRow(signRow+1).getCell(midCol).value = 'Giáo viên bộ môn';
-    ws.getRow(signRow+1).getCell(midCol).font = {name:'Times New Roman',size:10,bold:true};
-    ws.getRow(signRow+1).getCell(midCol).alignment = aCC;
-    ws.mergeCells(signRow+1, midCol, signRow+1, totalCols-1);
+ws.getRow(signRow+1).getCell(midCol).value = 'Giáo viên bộ môn';
+ws.getRow(signRow+1).getCell(midCol).font = {name:'Times New Roman',size:10,bold:true};
+ws.getRow(signRow+1).getCell(midCol).alignment = aCC;
+ws.mergeCells(signRow+1, midCol, signRow+1, totalCols);
 
-    ws.getRow(signRow+4).getCell(midCol).value = CFG.teacher;
-    ws.getRow(signRow+4).getCell(midCol).font = {name:'Times New Roman',size:11,bold:true};
-    ws.getRow(signRow+4).getCell(midCol).alignment = aCC;
-    ws.mergeCells(signRow+4, midCol, signRow+4, totalCols-1);
+ws.getRow(signRow+4).getCell(midCol).value = CFG.teacher;
+ws.getRow(signRow+4).getCell(midCol).font = {name:'Times New Roman',size:11,bold:true};
+ws.getRow(signRow+4).getCell(midCol).alignment = aCC;
+ws.mergeCells(signRow+4, midCol, signRow+4, totalCols);
 
     var buf = await wb.xlsx.writeBuffer();
     var fname = 'thong_ke_' + (tkFilterMode==='hk1'?'HKI':tkFilterMode==='hk2'?'HKII':'ca_nam') + '_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx';
