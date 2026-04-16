@@ -423,6 +423,12 @@ tr.row-kt td.td-cls{color:var(--red)}
     <button class="sb-btn" onclick="showPage('tonghop',this)" id="navTH">
       <span class="ic">📊</span> Tổng Hợp Năm
     </button>
+    <button class="sb-btn" onclick="showPage('bieu1',this)" id="navB1">
+      <span class="ic">📋</span> Biểu 1a–1e
+    </button>
+    <button class="sb-btn" onclick="showPage('bieubienban',this)" id="navBB">
+      <span class="ic">📝</span> Biểu Biên Bản
+    </button>
     <button class="sb-btn" onclick="showPage('thongke',this)" id="navTK">
       <span class="ic">📑</span> Thống Kê HK
     </button>
@@ -493,6 +499,8 @@ tr.row-kt td.td-cls{color:var(--red)}
   <button class="btn btn-sm btn-outline" id="tkBtnHK2" onclick="setTKFilter('hk2')" style="border-color:rgba(255,255,255,.25);color:#fff">📗 HK II</button>
   <button class="btn btn-sm btn-outline" id="tkBtnAll" onclick="setTKFilter('all')" style="border-color:rgba(255,255,255,.25);color:#fff">📙 Cả năm</button>
   <button class="btn btn-sm btn-gold" onclick="document.getElementById('tkExportDlg').classList.add('open')">📊 Xuất TK</button>
+  <button class="btn btn-sm btn-gold" onclick="showPage('bieu1',document.getElementById('navB1'))">📋 Biểu 1a-1e</button>
+  <button class="btn btn-sm btn-gold" onclick="showPage('bieubienban',document.getElementById('navBB'))">📝 Biên Bản</button>
   <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
   <div style="flex:1"></div>
   <button class="btn btn-sm btn-gold" id="gBtnAll" onclick="setGlobalFilter('all')">📋 Tất cả lớp</button>
@@ -698,7 +706,129 @@ tr.row-kt td.td-cls{color:var(--red)}
     </div>
   </div>
 </div>
+<!-- PAGE: BIỂU 1a-1e -->
+<div id="page-bieu1" style="display:none">
+  
+</div>
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);">
+      <h2 style="color:#fff;">📋 Xuất Biểu thống kê 1a – 1e (Tiểu học)</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="previewBieu('1a')" style="border-color:var(--gold);color:var(--gold)">👁 Xem 1a</button>
+<button class="btn btn-outline btn-sm" onclick="previewBieu('1b')" style="border-color:var(--gold);color:var(--gold)">👁 Xem 1b</button>
+<button class="btn btn-outline btn-sm" onclick="previewBieu('1c')" style="border-color:var(--gold);color:var(--gold)">👁 Xem 1c</button>
+<button class="btn btn-outline btn-sm" onclick="previewBieu('1d')" style="border-color:var(--gold);color:var(--gold)">👁 Xem 1d</button>
+<button class="btn btn-outline btn-sm" onclick="previewBieu('1e')" style="border-color:var(--gold);color:var(--gold)">👁 Xem 1e</button>
+<button class="btn btn-success btn-sm" onclick="exportAllBieu1()">📦 Xuất tất cả (1 file)</button>
+<button class="btn btn-outline btn-sm" onclick="previewBieuMau1()" style="border-color:var(--gold);color:var(--gold)">👁 Xem mẫu 1</button>
+<button class="btn btn-gold btn-sm" onclick="exportBieuMau1()">📊 Xuất mẫu 1</button>
 
+      </div>
+    </div>
+    <div class="card-bd">
+      <div class="notice n-info show">
+        💡 <b>Biểu 1a:</b> Thống kê số lớp & số tiết dạy HSKT theo khối lớp (Tiểu học — Lớp 1 đến 5).
+        <b>Biểu 1b:</b> Tổng hợp số tiết thực dạy theo tuần (T9–T1).
+        <b>Biểu 1c:</b> Tổng hợp tiết dạy theo tháng HK1.
+        <b>Biểu 1d:</b> Dự toán kinh phí chi trả chế độ.
+        <b>Biểu 1e:</b> DS viên chức đề nghị hưởng phụ cấp ưu đãi.
+      </div>
+
+      <!-- Cài đặt lương cho Biểu 1d/1e -->
+      <div class="section-card" style="margin-top:12px">
+        <div class="ss-title">⚙️ Thông số lương dùng cho Biểu 1d & 1e</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Hệ số lương</label>
+            <input type="number" step="0.01" id="b1d-luong" class="hs-input" value="3.99" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Hệ số PC khu vực</label>
+            <input type="number" step="0.01" id="b1d-kv" class="hs-input" value="0.5" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Hệ số PC ưu đãi</label>
+            <input type="number" step="0.001" id="b1d-uuai" class="hs-input" value="1.3965" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Mức lương cơ sở (đồng)</label>
+            <input type="number" id="b1d-luongcs" class="hs-input" value="2340000" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Chức vụ GV</label>
+            <input type="text" id="b1d-chucvu" class="hs-input" value="Giáo viên" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Mức phụ cấp ưu đãi (vd: 0.2 = 20%)</label>
+            <input type="number" step="0.01" id="b1d-mucpc" class="hs-input" value="0.2" style="width:100%">
+          </div>
+        </div>
+        <p class="form-hint">Các thông số này dùng để tính tiền trong Biểu 1d và 1e. Điều chỉnh theo hệ số thực tế của giáo viên.</p>
+      </div>
+
+      <!-- Preview thống kê -->
+      <div class="section-card" style="margin-top:12px" id="b1Preview">
+        <div class="ss-title">📈 Xem trước dữ liệu sẽ xuất</div>
+        <div id="b1PreviewContent">
+          <div class="ck-empty">Bấm nút xuất để tạo file. Dữ liệu lấy từ LBG và DS HSKT đã nhập.</div>
+        </div>
+      </div>
+      <!-- Preview Biểu mẫu số 1 -->
+<div class="section-card" style="margin-top:12px" id="bMau1Preview">
+  <div class="ss-title">📋 Xem trước Biểu mẫu số 1 (Danh sách HSKT chi tiết)</div>
+  <div id="bMau1PreviewContent">
+    <div class="ck-empty">Bấm "Xem mẫu 1" để hiển thị danh sách.</div>
+  </div>
+</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: BIỂU BIÊN BẢN -->
+<div id="page-bieubienban" style="display:none">
+  <div class="card">
+    <div class="card-hd" style="background:var(--navy);">
+      <h2 style="color:#fff;">📝 Biểu kèm biên bản xét duyệt</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="previewBieuBienBan()" style="border-color:var(--gold);color:var(--gold)">👁 Xem trước</button>
+<button class="btn btn-gold btn-sm" onclick="exportBieuBienBan()">📊 Xuất biểu biên bản</button>
+      </div>
+    </div>
+    <div class="card-bd">
+      <div class="notice n-info show">
+        💡 Biểu tổng hợp số tiết thực dạy của GV tại các lớp có HSKT, kèm theo biên bản xét duyệt.
+        Gồm: Họ tên GV, trình độ CM, chức vụ, môn dạy, lớp, tên HSKT, số tiết, ký xác nhận.
+      </div>
+      <div class="section-card" style="margin-top:12px">
+        <div class="ss-title">⚙️ Thông tin biên bản</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ngày biên bản (vd: 15/10/2025)</label>
+            <input type="text" id="bb-ngay" class="hs-input" value="" placeholder="15/10/2025" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Trình độ chuyên môn GV</label>
+            <input type="text" id="bb-trinhdо" class="hs-input" value="Đại học" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Chức vụ GV</label>
+            <input type="text" id="bb-chucvu" class="hs-input" value="Giáo viên" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>Tổ trưởng chuyên môn</label>
+            <input type="text" id="bb-totruong" class="hs-input" value="" placeholder="Họ tên tổ trưởng CM" style="width:100%">
+          </div>
+        </div>
+      </div>
+      <div class="section-card" style="margin-top:12px">
+        <div class="ss-title">📋 Xem trước danh sách sẽ xuất</div>
+        <div id="bbPreviewContent">
+          <div class="ck-empty">Bấm "Xuất biểu biên bản" để tạo file Excel.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- PAGE: CÀI ĐẶT -->
 <div id="page-settings" style="display:none">
   <div class="sg">
@@ -1180,7 +1310,7 @@ function triggerRestore() {
 
 // ── NAVIGATION ──
 function showPage(id, btn) {
-  var pages = ['upload','chamcong','hocsinh','kiemtra','tonghop','thongke','settings'];
+  var pages = ['upload','chamcong','hocsinh','kiemtra','tonghop','thongke','settings','bieu1','bieubienban'];
   pages.forEach(function(k) {
     var el = G('page-' + k);
     if (el) el.style.display = k === id ? 'block' : 'none';
@@ -4267,7 +4397,1737 @@ document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); doUndo(); }
   if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); doRedo(); }
 });
+// ══════════════════════════════════════════
+//  BIỂU 1a, 1b, 1c, 1d, 1e & BIỂU BIÊN BẢN
+// ══════════════════════════════════════════
 
+// Helper: lấy tổng tiết theo kỳ (T9-T1 = HK1 tiểu học)
+var BIEU1_MONTHS = [
+  {m:9,y:2025},{m:10,y:2025},{m:11,y:2025},{m:12,y:2025},{m:1,y:2026}
+];
+var BIEU1_MONTH_LABELS = ['Tháng 9','Tháng 10','Tháng 11','Tháng 12','Tháng 1 (năm liền kề)'];
+var TIEU_HOC_KHOI = [1,2,3,4,5]; // khối tiểu học
+
+function getTongTietCls(cls) {
+  var total = 0;
+  BIEU1_MONTHS.forEach(function(x) {
+    var key = mk(x.m, x.y);
+    var mD = (lessonData[key]||{})[cls]||{};
+    var mE = (manualEdits[key]||{})[cls]||{};
+    for (var d=1;d<=mDays(x.m,x.y);d++) {
+      total += mE[d]!==undefined ? mE[d] : (mD[d]||0);
+    }
+  });
+  return total;
+}
+
+function getTietThang(cls, mo, yr) {
+  var key = mk(mo, yr);
+  var mD = (lessonData[key]||{})[cls]||{};
+  var mE = (manualEdits[key]||{})[cls]||{};
+  var t=0;
+  for (var d=1;d<=mDays(mo,yr);d++) t += mE[d]!==undefined?mE[d]:(mD[d]||0);
+  return t;
+}
+
+// Lấy DS lớp theo khối (vd: khối 1 = lớp bắt đầu bằng '1')
+function getClsByKhoi(khoi) {
+  return allClasses.filter(function(c) {
+    var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
+    return r[0] === String(khoi);
+  });
+}
+
+// Lấy map: lớp → danh sách HSKT trong lớp đó
+function getKTMapByCls() {
+  var m = {};
+  studentList.forEach(function(s) {
+    if (!s.cls) return;
+    if (!m[s.cls]) m[s.cls] = [];
+    m[s.cls].push(s);
+  });
+  return m;
+}
+
+// Style chung cho ExcelJS
+function bieuStyles() {
+  return {
+    fT:   {name:'Times New Roman',size:13,bold:true},
+    fB:   {name:'Times New Roman',size:10,bold:true},
+    fM:   {name:'Times New Roman',size:10},
+    fHd:  {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}},
+    fRed: {name:'Times New Roman',size:10,bold:true,color:{argb:'FFCC0000'}},
+    bgHd: {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}},
+    bgH2: {type:'pattern',pattern:'solid',fgColor:{argb:'FF172447'}},
+    bgSm: {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}},
+    bgYe: {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}},
+    bT:   {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}},
+    bM:   {top:{style:'medium'},left:{style:'medium'},bottom:{style:'medium'},right:{style:'medium'}},
+    aCC:  {horizontal:'center',vertical:'middle',wrapText:true},
+    aLC:  {horizontal:'left',vertical:'middle',wrapText:true},
+    aRC:  {horizontal:'right',vertical:'middle'}
+  };
+}
+
+function setCell(cell, val, font, fill, align, border) {
+  if (val !== undefined) cell.value = val;
+  if (font)   cell.font   = font;
+  if (fill)   cell.fill   = fill;
+  if (align)  cell.alignment = align;
+  if (border) cell.border = border;
+}
+
+function addBieuHeader(ws, tieuDe, bieu) {
+  var S = bieuStyles();
+  ws.getRow(1).height = 28;
+  setCell(ws.getRow(1).getCell(1),
+    'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
+    {name:'Times New Roman',size:10,bold:true}, null,
+    {horizontal:'left',vertical:'middle',wrapText:true}
+  );
+  // Nhãn biểu góc phải
+  var lastCol = ws.columnCount || 10;
+  ws.getRow(1).getCell(lastCol).value = bieu;
+  ws.getRow(1).getCell(lastCol).font = {name:'Times New Roman',size:10,bold:true};
+  ws.getRow(1).getCell(lastCol).alignment = {horizontal:'right',vertical:'middle'};
+
+  ws.getRow(2).height = 32;
+  setCell(ws.getRow(2).getCell(1), tieuDe,
+    {name:'Times New Roman',size:12,bold:true}, null,
+    {horizontal:'center',vertical:'middle',wrapText:true}
+  );
+}
+
+// ──────────────────────────────────────────
+//  BIỂU 1a: Thống kê số lớp & tiết dạy HSKT
+//  (Tiểu học: khối 1-5, mỗi khối 4 cột)
+// ──────────────────────────────────────────
+async function exportBieu1a() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Biểu 1a');
+  
+  // === CẤU HÌNH TRANG IN TỪ CFG ===
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: CFG.orientation || 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    },
+    printTitlesRow: CFG.repeatRow !== false ? '6:8' : undefined
+  };
+  
+  var S = bieuStyles();
+  
+  // === TỰ ĐỘNG TÍNH ĐỘ RỘNG CỘT DỰA TRÊN KHỔ GIẤY ===
+  var targetWidth = CFG.pageSize === 'A3' ? 280 : 210; // mm sang pixel xấp xỉ
+  var fixedColsW = [4, 18, 6, 8, 8]; // STT, Họ tên, Tổng lớp, Số HSKT, Số tiết
+  var khoiCols = 4; // mỗi khối 4 cột: Số lớp, Liệt kê, Tên môn, Tổng tiết
+  var khoiCount = 5; // khối 1-5
+  var totalFixedW = fixedColsW.reduce((a,b) => a + b, 0);
+  var khoiTotalW = targetWidth - totalFixedW - 10; // trừ cột ghi chú
+  var khoiColW = khoiTotalW / (khoiCount * khoiCols);
+  
+  var colWidths = [4, 18, 6, 8, 8];
+  for (var i = 0; i < khoiCount * khoiCols; i++) colWidths.push(Math.max(4, Math.min(15, khoiColW)));
+  colWidths.push(10); // cột ghi chú
+  colWidths.forEach(function(w,i){ ws.getColumn(i+1).width = w; });
+  var totalCols = colWidths.length;
+  
+  // === PHẦN CÒN LẠI GIỮ NGUYÊN (tạo header, dữ liệu, ký tên) ===
+  ws.mergeCells(1,1,1,5);
+  ws.mergeCells(1,totalCols,1,totalCols);
+  addBieuHeader(ws, '', 'Biểu 1a');
+
+  ws.getRow(2).height = 36;
+  setCell(ws.getRow(2).getCell(1),
+    'THỐNG KÊ SỐ LỚP VÀ SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\n' +
+    'Học kỳ I, năm học ' + CFG.schoolYear,
+    S.fT, null, S.aCC
+  );
+  ws.mergeCells(2,1,2,totalCols);
+
+  ws.getRow(3).height = 40;
+  function hd3(col, val, rs, cs, endCol) {
+    setCell(ws.getRow(3).getCell(col), val, S.fHd, S.bgHd, S.aCC, S.bT);
+    if (rs > 1 || cs > 1) ws.mergeCells(3,col,3+rs-1,endCol||col+cs-1);
+  }
+  hd3(1,'Số\nTT',3,1);
+  hd3(2,'Họ và tên GV dạy ở lớp\ncó học sinh học hoà nhập',3,1);
+  hd3(3,'Tổng số',1,3,5);
+  var kCol = 6;
+  TIEU_HOC_KHOI.forEach(function(k) {
+    hd3(kCol, 'Khối ' + k, 1, 4, kCol+3);
+    kCol += 4;
+  });
+  hd3(totalCols,'Ghi chú',3,1);
+
+  ws.getRow(4).height = 28;
+  ['Lớp','Số HSKT\nhọc hoà nhập','Số tiết\nthực dạy/tuần'].forEach(function(v,i){
+    setCell(ws.getRow(4).getCell(3+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
+  });
+  kCol = 6;
+  TIEU_HOC_KHOI.forEach(function() {
+    ['Số\nlớp','Liệt kê\ntên lớp','Tên môn dạy','Tổng số tiết\nthực dạy/tuần'].forEach(function(v,i){
+      setCell(ws.getRow(4).getCell(kCol+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
+    });
+    kCol += 4;
+  });
+
+  ws.getRow(5).height = 16;
+  ['A','B','1','2','3'].forEach(function(v,i){
+    setCell(ws.getRow(5).getCell(1+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
+  });
+  var sttN = 4;
+  TIEU_HOC_KHOI.forEach(function() {
+    for (var j=0;j<4;j++) {
+      setCell(ws.getRow(5).getCell(5+sttN+j-4), String(sttN+j-3), S.fHd, S.bgH2, S.aCC, S.bT);
+    }
+    sttN+=4;
+  });
+  setCell(ws.getRow(5).getCell(totalCols), String(sttN-3), S.fHd, S.bgH2, S.aCC, S.bT);
+
+  var ktMap = getKTMapByCls();
+  var dataRow = 6;
+  ws.getRow(dataRow).height = 18;
+  var row = ws.getRow(dataRow);
+  setCell(row.getCell(1), 1, S.fM, null, S.aCC, S.bT);
+  setCell(row.getCell(2), CFG.teacher, S.fM, null, S.aLC, S.bT);
+
+  var allKtCls = allClasses.filter(function(c) {
+    var r = c.indexOf('||')>=0?c.split('||')[0]:c;
+    return !!ktMap[r];
+  });
+  var tongLop = allKtCls.length;
+  var tongHS  = studentList.length;
+  var tongTiet = 0;
+  allKtCls.forEach(function(c){ tongTiet += getTongTietCls(c); });
+  setCell(row.getCell(3), tongLop,  S.fB, S.bgYe, S.aCC, S.bT);
+  setCell(row.getCell(4), tongHS,   S.fM, null, S.aCC, S.bT);
+  setCell(row.getCell(5), tongTiet, S.fB, S.bgYe, S.aCC, S.bT);
+
+  kCol = 6;
+  TIEU_HOC_KHOI.forEach(function(k) {
+    var clsKhoi = getClsByKhoi(k).filter(function(c){
+      var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r];
+    });
+    var kLop  = clsKhoi.length;
+    var kTiet = 0; clsKhoi.forEach(function(c){ kTiet += getTongTietCls(c); });
+    var kNames = clsKhoi.map(function(c){return c.indexOf('||')>=0?c.split('||')[0]:c;}).join(', ');
+    var kMon   = CFG.subject || '';
+    setCell(row.getCell(kCol),   kLop||null,  S.fM, null, S.aCC, S.bT);
+    setCell(row.getCell(kCol+1), kNames||null,S.fM, null, S.aLC, S.bT);
+    setCell(row.getCell(kCol+2), kMon||null,  S.fM, null, S.aCC, S.bT);
+    setCell(row.getCell(kCol+3), kTiet||null, S.fB, S.bgYe, S.aCC, S.bT);
+    kCol += 4;
+  });
+  setCell(row.getCell(totalCols), null, S.fM, null, S.aCC, S.bT);
+
+  dataRow++;
+  var sumRow = ws.getRow(dataRow); sumRow.height = 18;
+  ws.mergeCells(dataRow,1,dataRow,2);
+  setCell(sumRow.getCell(1),'Tổng số', S.fB, S.bgSm, S.aRC);
+  setCell(sumRow.getCell(3), tongLop, {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+  setCell(sumRow.getCell(4), tongHS,  {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+  setCell(sumRow.getCell(5), tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+
+  var signR = dataRow + 2;
+  var now = new Date();
+  var dateStr = (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
+  var midC = Math.floor(totalCols * 0.65);
+  ws.getRow(signR).getCell(midC).value = dateStr;
+  ws.getRow(signR).getCell(midC).font = {name:'Times New Roman',size:10,italic:true};
+  ws.getRow(signR).getCell(midC).alignment = S.aCC;
+  ws.mergeCells(signR, midC, signR, totalCols);
+  ws.getRow(signR+1).getCell(midC).value = 'Giáo viên bộ môn';
+  ws.getRow(signR+1).getCell(midC).font = S.fB;
+  ws.getRow(signR+1).getCell(midC).alignment = S.aCC;
+  ws.mergeCells(signR+1,midC,signR+1,totalCols);
+  ws.getRow(signR+4).getCell(midC).value = CFG.teacher;
+  ws.getRow(signR+4).getCell(midC).font = S.fB;
+  ws.getRow(signR+4).getCell(midC).alignment = S.aCC;
+  ws.mergeCells(signR+4,midC,signR+4,totalCols);
+
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'Bieu1a_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
+  toast('✅ Đã xuất Biểu 1a', 't-ok');
+}
+
+// ──────────────────────────────────────────
+//  BIỂU 1b: Tổng hợp tiết dạy theo TUẦN (T9–T1)
+//  Mỗi tháng 5 cột tuần
+// ──────────────────────────────────────────
+async function exportBieu1b() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Biểu 1b');
+  
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: CFG.orientation || 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    },
+    printTitlesRow: CFG.repeatRow !== false ? '6:8' : undefined
+  };
+  
+  var S = bieuStyles();
+  
+  // === TỰ ĐỘNG TÍNH ĐỘ RỘNG CỘT ===
+  var targetWidth = CFG.pageSize === 'A3' ? 280 : 210;
+  var fixedW = [4, 18, 7];
+  var monthCols = 5;
+  var months5 = BIEU1_MONTHS;
+  var totalDataCols = months5.length * monthCols;
+  var totalCols = 3 + totalDataCols + 2;
+  
+  var fixedTotal = fixedW.reduce((a,b) => a + b, 0);
+  var dataColWidth = Math.max(4, Math.min(8, (targetWidth - fixedTotal - 18) / totalDataCols));
+  
+  fixedW.forEach(function(w,i){ ws.getColumn(i+1).width = w; });
+  for (var i=4; i<=3+totalDataCols; i++) ws.getColumn(i).width = dataColWidth;
+  ws.getColumn(totalCols-1).width = 8;
+  ws.getColumn(totalCols).width = 10;
+  
+  // === PHẦN CÒN LẠI GIỮ NGUYÊN ===
+  ws.mergeCells(1,1,1,5); ws.mergeCells(1,totalCols,1,totalCols);
+  setCell(ws.getRow(1).getCell(1),
+    'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
+    {name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true}
+  );
+  ws.getRow(1).getCell(totalCols).value = 'Biểu 1b';
+  ws.getRow(1).getCell(totalCols).font  = S.fB;
+  ws.getRow(1).getCell(totalCols).alignment = {horizontal:'right',vertical:'middle'};
+
+  ws.getRow(2).height = 36;
+  setCell(ws.getRow(2).getCell(1),
+    'TỔNG HỢP SỐ TIẾT THỰC DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\nHọc kỳ I, năm học ' + CFG.schoolYear,
+    S.fT, null, S.aCC
+  );
+  ws.mergeCells(2,1,2,totalCols);
+
+  ws.getRow(3).height = 22;
+  setCell(ws.getRow(3).getCell(1),'Số\nTT',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,1,4,1);
+  setCell(ws.getRow(3).getCell(2),'Họ và tên GV dạy ở lớp có học sinh học hoà nhập',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,2,4,2);
+  setCell(ws.getRow(3).getCell(3),'Lớp dạy',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,3,4,3);
+
+  var mStartCol = 4;
+  months5.forEach(function(x, mi) {
+    var label = BIEU1_MONTH_LABELS[mi];
+    var c = ws.getRow(3).getCell(mStartCol + mi*monthCols);
+    setCell(c, label, S.fHd, S.bgHd, S.aCC, S.bT);
+    ws.mergeCells(3, mStartCol+mi*monthCols, 3, mStartCol+mi*monthCols+monthCols-1);
+  });
+  setCell(ws.getRow(3).getCell(totalCols-1),'Tổng số tiết\nthực dạy',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,totalCols-1,4,totalCols-1);
+  setCell(ws.getRow(3).getCell(totalCols),'Ghi chú',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,totalCols,4,totalCols);
+
+  ws.getRow(4).height = 18;
+  months5.forEach(function(x, mi) {
+    for (var w=1; w<=monthCols; w++) {
+      setCell(ws.getRow(4).getCell(mStartCol+mi*monthCols+w-1), 'Tuần '+w, S.fHd, S.bgH2, S.aCC, S.bT);
+    }
+  });
+
+  ws.getRow(5).height = 14;
+  ['A','B','1'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  for (var ci=4; ci<=totalCols; ci++) setCell(ws.getRow(5).getCell(ci), String(ci-3), S.fHd, S.bgH2, S.aCC, S.bT);
+
+  var dataStartRow = 6;
+  var ktCls = allClasses.filter(function(c){
+    var r=c.indexOf('||')>=0?c.split('||')[0]:c;
+    return !!getKTMapByCls()[r];
+  });
+
+  var colTotals = [];
+  for (var i=0; i<totalDataCols; i++) colTotals.push(0);
+  var grandTotal = 0;
+
+  ktCls.forEach(function(cls, stt) {
+    var realCls = cls.indexOf('||')>=0 ? cls.split('||')[0] : cls;
+    var row = ws.getRow(dataStartRow + stt); row.height = 16;
+    setCell(row.getCell(1), stt+1, S.fM, null, S.aCC, S.bT);
+    setCell(row.getCell(2), CFG.teacher, S.fM, null, S.aLC, S.bT);
+    setCell(row.getCell(3), realCls, S.fB, null, S.aCC, S.bT);
+
+    var rowTotal = 0;
+    months5.forEach(function(x, mi) {
+      var key = mk(x.m, x.y);
+      var mD  = (lessonData[key]||{})[cls]||{};
+      var mE  = (manualEdits[key]||{})[cls]||{};
+      var days= mDays(x.m, x.y);
+
+      for (var w=0; w<monthCols; w++) {
+        var startD = w*7+1, endD = Math.min((w+1)*7, days);
+        var wTiet = 0;
+        for (var d=startD; d<=endD; d++) wTiet += mE[d]!==undefined?mE[d]:(mD[d]||0);
+        var colIdx = mStartCol + mi*monthCols + w;
+        setCell(row.getCell(colIdx), wTiet||null, S.fM, wTiet>0?S.bgYe:null, S.aCC, S.bT);
+        colTotals[mi*monthCols+w] += wTiet;
+        rowTotal += wTiet;
+      }
+    });
+    setCell(row.getCell(totalCols-1), rowTotal||null, S.fB, S.bgYe, S.aCC, S.bT);
+    setCell(row.getCell(totalCols), null, S.fM, null, S.aCC, S.bT);
+    grandTotal += rowTotal;
+  });
+
+  var sumR = dataStartRow + ktCls.length;
+  var sumRow = ws.getRow(sumR); sumRow.height = 18;
+  ws.mergeCells(sumR,1,sumR,3);
+  setCell(sumRow.getCell(1),'Tổng số tiết',S.fB,S.bgSm,S.aRC);
+  colTotals.forEach(function(v,i){
+    setCell(sumRow.getCell(mStartCol+i), v||null,
+      {name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  });
+  setCell(sumRow.getCell(totalCols-1), grandTotal,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(sumRow.getCell(totalCols), null, S.fHd, S.bgSm, S.aCC, S.bT);
+
+  var signR = sumR + 2;
+  var now = new Date();
+  ws.getRow(signR).getCell(Math.floor(totalCols*0.6)).value =
+    (CFG.location||'') + ', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear();
+  ws.getRow(signR).getCell(Math.floor(totalCols*0.6)).font = {name:'Times New Roman',size:10,italic:true};
+  ws.getRow(signR).getCell(Math.floor(totalCols*0.6)).alignment = S.aCC;
+  ws.mergeCells(signR,Math.floor(totalCols*0.6),signR,totalCols);
+  ws.getRow(signR+1).getCell(Math.floor(totalCols*0.6)).value = 'Giáo viên bộ môn';
+  ws.getRow(signR+1).getCell(Math.floor(totalCols*0.6)).font = S.fB;
+  ws.getRow(signR+1).getCell(Math.floor(totalCols*0.6)).alignment = S.aCC;
+  ws.mergeCells(signR+1,Math.floor(totalCols*0.6),signR+1,totalCols);
+  ws.getRow(signR+4).getCell(Math.floor(totalCols*0.6)).value = CFG.teacher;
+  ws.getRow(signR+4).getCell(Math.floor(totalCols*0.6)).font = S.fB;
+  ws.getRow(signR+4).getCell(Math.floor(totalCols*0.6)).alignment = S.aCC;
+  ws.mergeCells(signR+4,Math.floor(totalCols*0.6),signR+4,totalCols);
+
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'Bieu1b_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
+  toast('✅ Đã xuất Biểu 1b', 't-ok');
+}
+
+// ──────────────────────────────────────────
+//  BIỂU 1c: Tổng hợp tiết dạy theo THÁNG HK1
+//  (T9, T10, T11, T12, T1) — Số lớp + Tổng tiết
+// ──────────────────────────────────────────
+async function exportBieu1c() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Biểu 1c');
+  
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: CFG.orientation || 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    },
+    printTitlesRow: CFG.repeatRow !== false ? '6:8' : undefined
+  };
+  
+  var S = bieuStyles();
+  
+  // === TỰ ĐỘNG TÍNH ĐỘ RỘNG CỘT ===
+  var targetWidth = CFG.pageSize === 'A3' ? 280 : 210;
+  var fixW = [4, 18, 14];
+  var monthsCount = BIEU1_MONTHS.length;
+  var monthPairWidth = Math.max(12, Math.min(20, (targetWidth - fixW.reduce((a,b)=>a+b,0) - 20) / monthsCount));
+  
+  fixW.forEach(function(w,i){ ws.getColumn(i+1).width = w; });
+  for (var i=0; i<monthsCount; i++) {
+    ws.getColumn(4 + i*2).width = monthPairWidth * 0.35;
+    ws.getColumn(4 + i*2 + 1).width = monthPairWidth * 0.65;
+  }
+  ws.getColumn(4 + monthsCount*2).width = 10;
+  ws.getColumn(4 + monthsCount*2 + 1).width = 10;
+  var totalCols = 4 + monthsCount*2 + 2;
+  
+  // === PHẦN CÒN LẠI GIỮ NGUYÊN ===
+  ws.mergeCells(1,1,1,5); ws.getRow(1).getCell(totalCols).value = 'Biểu 1c';
+  setCell(ws.getRow(1).getCell(1),
+    'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
+    {name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true}
+  );
+  ws.getRow(1).getCell(totalCols).font = S.fB;
+  ws.getRow(1).getCell(totalCols).alignment = {horizontal:'right',vertical:'middle'};
+
+  ws.getRow(2).height = 36;
+  setCell(ws.getRow(2).getCell(1),
+    'TỔNG HỢP SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\nHọc kỳ I, năm học ' + CFG.schoolYear,
+    S.fT, null, S.aCC
+  );
+  ws.mergeCells(2,1,2,totalCols);
+
+  ws.getRow(3).height = 26;
+  [['Số\nTT',1,1],['Họ và tên GV',1,1],['Môn được phân công giảng dạy',1,1]].forEach(function(v,i){
+    setCell(ws.getRow(3).getCell(1+i),v[0],S.fHd,S.bgHd,S.aCC,S.bT);
+    ws.mergeCells(3,1+i,4,1+i);
+  });
+  var mCol = 4;
+  BIEU1_MONTHS.forEach(function(x, mi) {
+    setCell(ws.getRow(3).getCell(mCol), BIEU1_MONTH_LABELS[mi], S.fHd, S.bgHd, S.aCC, S.bT);
+    ws.mergeCells(3,mCol,3,mCol+1);
+    mCol += 2;
+  });
+  setCell(ws.getRow(3).getCell(totalCols-1),'Tổng số tiết\nthực dạy HK I',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,totalCols-1,4,totalCols-1);
+  setCell(ws.getRow(3).getCell(totalCols),'Ghi chú',S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(3,totalCols,4,totalCols);
+
+  ws.getRow(4).height = 22;
+  mCol = 4;
+  BIEU1_MONTHS.forEach(function() {
+    setCell(ws.getRow(4).getCell(mCol),  'Tổng số\nLớp', S.fHd, S.bgH2, S.aCC, S.bT);
+    setCell(ws.getRow(4).getCell(mCol+1),'Tổng số tiết\nthực dạy', S.fHd, S.bgH2, S.aCC, S.bT);
+    mCol += 2;
+  });
+
+  ws.getRow(5).height = 14;
+  ['A','B','1'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  for (var n=4;n<=totalCols;n++) setCell(ws.getRow(5).getCell(n),String(n-3),S.fHd,S.bgH2,S.aCC,S.bT);
+
+  var ktCls = allClasses.filter(function(c){
+    var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!getKTMapByCls()[r];
+  });
+  var dataR = 6;
+  var colTotTiet = []; BIEU1_MONTHS.forEach(function(){ colTotTiet.push(0); });
+  var grandTot = 0;
+
+  ktCls.forEach(function(cls, stt) {
+    var xlsMon = cls.indexOf('||')>=0 ? cls.split('||')[1] : (CFG.subject||'');
+    var row = ws.getRow(dataR+stt); row.height = 16;
+    setCell(row.getCell(1), stt+1, S.fM, null, S.aCC, S.bT);
+    setCell(row.getCell(2), CFG.teacher, S.fM, null, S.aLC, S.bT);
+    setCell(row.getCell(3), xlsMon, S.fM, null, S.aCC, S.bT);
+    var rowTot = 0;
+    mCol = 4;
+    BIEU1_MONTHS.forEach(function(x, mi) {
+      var v = getTietThang(cls, x.m, x.y);
+      setCell(row.getCell(mCol),   1,      S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(mCol+1), v||null,S.fM, v>0?S.bgYe:null, S.aCC, S.bT);
+      colTotTiet[mi] += v; rowTot += v;
+      mCol += 2;
+    });
+    setCell(row.getCell(totalCols-1), rowTot||null, S.fB, S.bgYe, S.aCC, S.bT);
+    setCell(row.getCell(totalCols), null, S.fM, null, S.aCC, S.bT);
+    grandTot += rowTot;
+  });
+
+  var sumR = dataR + ktCls.length;
+  ws.mergeCells(sumR,1,sumR,3);
+  setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC);
+  mCol = 4;
+  BIEU1_MONTHS.forEach(function(x, mi) {
+    setCell(ws.getRow(sumR).getCell(mCol), ktCls.length,
+      {name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+    setCell(ws.getRow(sumR).getCell(mCol+1), colTotTiet[mi]||null,
+      {name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+    mCol += 2;
+  });
+  setCell(ws.getRow(sumR).getCell(totalCols-1), grandTot,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(sumR).getCell(totalCols), null, S.fHd, S.bgSm, S.aCC, S.bT);
+
+  var sRow = sumR+2; var now=new Date(); var mid=Math.floor(totalCols*0.6);
+  ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear();
+  ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true};
+  ws.getRow(sRow).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow,mid,sRow,totalCols);
+  ws.getRow(sRow+1).getCell(mid).value='Giáo viên bộ môn';
+  ws.getRow(sRow+1).getCell(mid).font=S.fB;
+  ws.getRow(sRow+1).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
+  ws.getRow(sRow+4).getCell(mid).value=CFG.teacher;
+  ws.getRow(sRow+4).getCell(mid).font=S.fB;
+  ws.getRow(sRow+4).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow+4,mid,sRow+4,totalCols);
+
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'Bieu1c_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
+  toast('✅ Đã xuất Biểu 1c', 't-ok');
+}
+
+// ──────────────────────────────────────────
+//  BIỂU 1d: Dự toán kinh phí
+// ──────────────────────────────────────────
+async function exportBieu1d() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Biểu 1d');
+  
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: 'portrait',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    },
+    printTitlesRow: CFG.repeatRow !== false ? '4:6' : undefined
+  };
+  
+  // === PHẦN CÒN LẠI CỦA HÀM exportBieu1d CŨ GIỮ NGUYÊN ===
+  var S  = bieuStyles();
+
+  var luong   = parseFloat((document.getElementById('b1d-luong')||{value:3.99}).value)||3.99;
+  var kv      = parseFloat((document.getElementById('b1d-kv')||{value:0.5}).value)||0.5;
+  var uuai    = parseFloat((document.getElementById('b1d-uuai')||{value:1.3965}).value)||1.3965;
+  var luongCS = parseFloat((document.getElementById('b1d-luongcs')||{value:2340000}).value)||2340000;
+  var chucvu  = (document.getElementById('b1d-chucvu')||{value:'Giáo viên'}).value || 'Giáo viên';
+  var mucPC   = parseFloat((document.getElementById('b1d-mucpc')||{value:0.2}).value)||0.2;
+
+  var tongCacPC = kv + uuai;
+  var tongLuongThang = (luong + tongCacPC) * luongCS;
+  var tienMotGiay = tongLuongThang / (luong * 39.8);
+  var muc1GiayPC  = tienMotGiay * mucPC;
+  var tongTiet    = 0;
+  allClasses.forEach(function(c){ tongTiet += getTongTietCls(c); });
+  var tongTien    = muc1GiayPC * tongTiet;
+
+  [4,22,8,8,8,8,10,8,8,8,8,8,8,14,14,10,14,18,10].forEach(function(w,i){ws.getColumn(i+1).width=w;});
+  var totalCols = 19;
+
+  ws.mergeCells(1,1,1,5);
+  setCell(ws.getRow(1).getCell(1),
+    'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
+    {name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true}
+  );
+  ws.getRow(1).getCell(totalCols).value='Biểu 1d';
+  ws.getRow(1).getCell(totalCols).font=S.fB;
+  ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+
+  ws.getRow(2).height=36;
+  setCell(ws.getRow(2).getCell(1),
+    'DỰ TOÁN KINH PHÍ CHI TRẢ CHẾ ĐỘ DẠY HỌC SINH HỌC HOÀ NHẬP NĂM HỌC ' + CFG.schoolYear,
+    S.fT,null,S.aCC
+  );
+  ws.mergeCells(2,1,2,totalCols);
+
+  ws.getRow(3).height=16;
+  setCell(ws.getRow(3).getCell(totalCols-2),'Đơn vị tính: đồng',
+    {name:'Times New Roman',size:10,italic:true},null,{horizontal:'right',vertical:'middle'}
+  );
+
+  ws.getRow(4).height=28;
+  [
+    [1,'Số\nTT',3,1],[2,'Họ và tên GV',3,1],[3,'Chức vụ',3,1],[4,'Hệ số lương\nhiện hưởng',3,1],
+    [5,'Hệ số phụ cấp',1,9,13],[14,'Tổng tiền lương/tháng',3,1],
+    [15,'Số tiền 1 giờ dạy',3,1],[16,'Mức phụ cấp',3,1],
+    [17,'Tổng số tiết\nthực dạy',3,1],[18,'Phụ cấp ưu đãi\ngiảng dạy HSKT',3,1],
+    [19,'Ghi chú',3,1]
+  ].forEach(function(v){
+    setCell(ws.getRow(4).getCell(v[0]),v[1],S.fHd,S.bgHd,S.aCC,S.bT);
+    if(v[2]>1||v[3]>1) ws.mergeCells(4,v[0],4+v[2]-1,(v[4]||v[0]+v[3]-1));
+  });
+
+  ws.getRow(5).height=22;
+  ['Khu vực','Chức vụ','PC ưu đãi','PC đặc biệt','PC thu hút','PC trách nhiệm','PC TNNG','PC Đảng','Cộng phụ cấp'].forEach(function(v,i){
+    setCell(ws.getRow(5).getCell(5+i),v,S.fHd,S.bgH2,S.aCC,S.bT);
+  });
+
+  ws.getRow(6).height=14;
+  ['A','B','1','2'].forEach(function(v,i){ setCell(ws.getRow(6).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  for(var n=5;n<=totalCols;n++) setCell(ws.getRow(6).getCell(n),String(n-3),S.fHd,S.bgH2,S.aCC,S.bT);
+
+  ws.getRow(7).height=18;
+  var r7 = ws.getRow(7);
+  function dc7(col, val, fo) {
+    setCell(r7.getCell(col), val, fo||S.fM, null, S.aCC, S.bT);
+  }
+  dc7(1,1); dc7(2,CFG.teacher,S.fB); dc7(3,chucvu); dc7(4,luong);
+  dc7(5,kv); dc7(6,0); dc7(7,uuai); dc7(8,0); dc7(9,0); dc7(10,0); dc7(11,0); dc7(12,0);
+  dc7(13,tongCacPC,S.fB);
+  dc7(14,Math.round(tongLuongThang),S.fB);
+  dc7(15,Math.round(tienMotGiay));
+  dc7(16,Math.round(muc1GiayPC));
+  dc7(17,tongTiet,S.fB);
+  dc7(18,Math.round(tongTien),{name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A6B34'}});
+  dc7(19,null);
+
+  ws.getRow(8).height=18;
+  ws.mergeCells(8,1,8,3);
+  setCell(ws.getRow(8).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC);
+  for(var ci=4;ci<=totalCols;ci++) setCell(ws.getRow(8).getCell(ci),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(8).getCell(17), tongTiet,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(8).getCell(18), Math.round(tongTien),
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+
+  var sRow=10; var now=new Date(); var mid=Math.floor(totalCols*0.6);
+  ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear();
+  ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true};
+  ws.getRow(sRow).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow,mid,sRow,totalCols);
+  ws.getRow(sRow+1).getCell(mid).value='Giáo viên bộ môn';
+  ws.getRow(sRow+1).getCell(mid).font=S.fB; ws.getRow(sRow+1).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
+  ws.getRow(sRow+4).getCell(mid).value=CFG.teacher;
+  ws.getRow(sRow+4).getCell(mid).font=S.fB; ws.getRow(sRow+4).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow+4,mid,sRow+4,totalCols);
+
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'Bieu1d_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
+  toast('✅ Đã xuất Biểu 1d', 't-ok');
+}
+
+// ──────────────────────────────────────────
+//  BIỂU 1e: Danh sách viên chức đề nghị hưởng phụ cấp
+// ──────────────────────────────────────────
+async function exportBieu1e() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Biểu 1e');
+  
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: 'portrait',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    },
+    printTitlesRow: CFG.repeatRow !== false ? '5:7' : undefined
+  };
+  
+  // === PHẦN CÒN LẠI CỦA HÀM exportBieu1e CŨ GIỮ NGUYÊN ===
+  var S  = bieuStyles();
+
+  var luongCS = parseFloat((document.getElementById('b1d-luongcs')||{value:2340000}).value)||2340000;
+  var luong   = parseFloat((document.getElementById('b1d-luong')||{value:3.99}).value)||3.99;
+  var kv      = parseFloat((document.getElementById('b1d-kv')||{value:0.5}).value)||0.5;
+  var uuai    = parseFloat((document.getElementById('b1d-uuai')||{value:1.3965}).value)||1.3965;
+  var mucPC   = parseFloat((document.getElementById('b1d-mucpc')||{value:0.2}).value)||0.2;
+  var chucvu  = (document.getElementById('b1d-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+
+  var tongCacPC = kv + uuai;
+  var tongLuong = (luong + tongCacPC) * luongCS;
+  var tien1Gio  = tongLuong / (luong * 39.8);
+  var tien1GioPC= tien1Gio * mucPC;
+  var tongTiet  = 0;
+  allClasses.forEach(function(c){ tongTiet += getTongTietCls(c); });
+  var tongTien  = Math.round(tien1GioPC * tongTiet);
+
+  [4,22,20,14,10,14,16].forEach(function(w,i){ ws.getColumn(i+1).width=w; });
+  var totalCols = 7;
+
+  ws.mergeCells(1,1,1,4);
+  setCell(ws.getRow(1).getCell(1),
+    'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
+    {name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true}
+  );
+  ws.getRow(1).getCell(totalCols).value='Biểu 1e';
+  ws.getRow(1).getCell(totalCols).font=S.fB;
+  ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+
+  ws.getRow(2).height=36;
+  setCell(ws.getRow(2).getCell(1),
+    'DANH SÁCH VIÊN CHỨC ĐỀ NGHỊ HƯỞNG CHẾ ĐỘ PHỤ CẤP ƯU ĐÃI DẠY\nHỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP',
+    S.fT,null,S.aCC
+  );
+  ws.mergeCells(2,1,2,totalCols);
+
+  var now=new Date();
+  ws.getRow(3).height=16;
+  setCell(ws.getRow(3).getCell(1),
+    '(Kèm theo văn bản số: .......... ngày '+now.getDate()+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear()+')',
+    {name:'Times New Roman',size:10,italic:true},null,{horizontal:'left',vertical:'middle'}
+  );
+  ws.mergeCells(3,1,3,totalCols);
+
+  ws.getRow(4).height=4;
+
+  ws.getRow(5).height=28;
+  ['Số\nTT','Họ và tên GV dạy ở lớp có học sinh học hoà nhập','Chức vụ, đơn vị công tác',
+   'Tổng số tiết thực dạy ở lớp có HSKT\nhọc hoà nhập','Mức phụ cấp','Số tiền/\n1 giờ dạy','Phụ cấp ưu đãi được hưởng'
+  ].forEach(function(v,i){
+    setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgHd,S.aCC,S.bT);
+    ws.mergeCells(5,1+i,6,1+i);
+  });
+
+  ws.getRow(7).height=14;
+  ['A','B','1','2','3','4','5'].forEach(function(v,i){
+    setCell(ws.getRow(7).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT);
+  });
+
+  ws.getRow(8).height=18;
+  var r8=ws.getRow(8);
+  setCell(r8.getCell(1),1,S.fM,null,S.aCC,S.bT);
+  setCell(r8.getCell(2),CFG.teacher,S.fB,null,S.aLC,S.bT);
+  setCell(r8.getCell(3),chucvu+' — '+CFG.school,S.fM,null,S.aLC,S.bT);
+  setCell(r8.getCell(4),tongTiet,S.fB,S.bgYe,S.aCC,S.bT);
+  setCell(r8.getCell(5),mucPC,S.fM,null,S.aCC,S.bT);
+  setCell(r8.getCell(6),Math.round(tien1GioPC),S.fM,null,S.aCC,S.bT);
+  setCell(r8.getCell(7),tongTien,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A6B34'}},S.bgYe,S.aCC,S.bT);
+
+  ws.getRow(9).height=18;
+  ws.mergeCells(9,1,9,3);
+  setCell(ws.getRow(9).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC);
+  setCell(ws.getRow(9).getCell(4),tongTiet,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(5),mucPC,S.fHd,S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(6),Math.round(tien1GioPC),
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(7),tongTien,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+
+  var sRow=11; var mid=4;
+  ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear();
+  ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true};
+  ws.getRow(sRow).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow,mid,sRow,totalCols);
+  ws.getRow(sRow+1).getCell(1).value='Người lập biểu';
+  ws.getRow(sRow+1).getCell(1).font=S.fB; ws.getRow(sRow+1).getCell(1).alignment=S.aCC;
+  ws.getRow(sRow+1).getCell(mid).value='Hiệu trưởng';
+  ws.getRow(sRow+1).getCell(mid).font=S.fB; ws.getRow(sRow+1).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
+  ws.getRow(sRow+4).getCell(1).value=CFG.teacher; ws.getRow(sRow+4).getCell(1).font=S.fB;
+  ws.getRow(sRow+4).getCell(1).alignment=S.aCC;
+  ws.getRow(sRow+4).getCell(mid).value=CFG.principal; ws.getRow(sRow+4).getCell(mid).font=S.fB;
+  ws.getRow(sRow+4).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(sRow+4,mid,sRow+4,totalCols);
+
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'Bieu1e_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
+  toast('✅ Đã xuất Biểu 1e', 't-ok');
+}
+
+// ──────────────────────────────────────────
+//  XUẤT TẤT CẢ BIỂU 1a-1e vào 1 file
+// ──────────────────────────────────────────
+async function exportAllBieu1() {
+  toast('⏳ Đang tạo file tổng hợp...', 't-info');
+  var wb = new ExcelJS.Workbook();
+  wb.creator = 'HT Cham Cong v' + APP_VER;
+  var mode = tkFilterMode || 'hk1';
+
+  await _buildBieu1aSheet(wb, mode);
+  await _buildBieu1bSheet(wb, mode);
+  await _buildBieu1cSheet(wb, mode);
+  await _buildBieu1dSheet(wb);
+  await _buildBieu1eSheet(wb);
+  await _buildBieuBienBanSheet(wb);
+
+  var suffix = mode === 'hk1' ? 'HKI' : mode === 'hk2' ? 'HKII' : 'CaNam';
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(
+    new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'TatCaBieu_1a_1e_BB_' + suffix + '_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx'
+  );
+  toast('✅ Đã xuất 1 file duy nhất gồm Biểu 1a–1e + Biên bản', 't-ok');
+}
+function getTongTietClsInMonths(cls, months) {
+  var total = 0;
+  months.forEach(function(x) {
+    var key = mk(x.m, x.y);
+    var mD = (lessonData[key]||{})[cls]||{};
+    var mE = (manualEdits[key]||{})[cls]||{};
+    for (var d=1;d<=mDays(x.m,x.y);d++)
+      total += mE[d]!==undefined ? mE[d] : (mD[d]||0);
+  });
+  return total;
+}
+
+function getBieu1Config(mode) {
+  if (mode === 'hk2') return {
+    months: [{m:1,y:2026},{m:2,y:2026},{m:3,y:2026},{m:4,y:2026},{m:5,y:2026}],
+    labels: ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5'],
+    hkLabel: 'Học kỳ II, năm học ' + CFG.schoolYear
+  };
+  if (mode === 'all') return {
+    months: [{m:9,y:2025},{m:10,y:2025},{m:11,y:2025},{m:12,y:2025},{m:1,y:2026},{m:2,y:2026},{m:3,y:2026},{m:4,y:2026},{m:5,y:2026}],
+    labels: ['Tháng 9','Tháng 10','Tháng 11','Tháng 12','Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5'],
+    hkLabel: 'Cả năm học ' + CFG.schoolYear
+  };
+  return {
+    months: [{m:9,y:2025},{m:10,y:2025},{m:11,y:2025},{m:12,y:2025},{m:1,y:2026}],
+    labels: ['Tháng 9','Tháng 10','Tháng 11','Tháng 12','Tháng 1 (năm liền kề)'],
+    hkLabel: 'Học kỳ I, năm học ' + CFG.schoolYear
+  };
+}
+// ── Hàm nội bộ: nhận wb từ ngoài, chỉ addWorksheet, KHÔNG tự dlBlob ──
+
+async function _buildBieu1aSheet(wb, mode) {
+  var bCfg = getBieu1Config(mode || 'hk1');
+  var ws = wb.addWorksheet('Biểu 1a');
+  var S = bieuStyles();
+  var cols = [4,18,6,8,8];
+  TIEU_HOC_KHOI.forEach(function(){ cols.push(5,14,12,8); });
+  cols.push(10);
+  cols.forEach(function(w,i){ ws.getColumn(i+1).width = w; });
+  var totalCols = cols.length;
+  ws.mergeCells(1,1,1,5); ws.mergeCells(1,totalCols,1,totalCols);
+  setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true});
+  ws.getRow(1).getCell(totalCols).value='Biểu 1a'; ws.getRow(1).getCell(totalCols).font=S.fB; ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+  ws.getRow(2).height=36;
+  setCell(ws.getRow(2).getCell(1),'THỐNG KÊ SỐ LỚP VÀ SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\n' + bCfg.hkLabel,S.fT,null,S.aCC);
+  ws.mergeCells(2,1,2,totalCols);
+  ws.getRow(3).height=40;
+  function hd3(col,val,rs,cs,endCol){ setCell(ws.getRow(3).getCell(col),val,S.fHd,S.bgHd,S.aCC,S.bT); if(rs>1||cs>1) ws.mergeCells(3,col,3+rs-1,endCol||col+cs-1); }
+  hd3(1,'Số\nTT',3,1); hd3(2,'Họ và tên GV dạy ở lớp\ncó học sinh học hoà nhập',3,1); hd3(3,'Tổng số',1,3,5);
+  var kCol=6;
+  TIEU_HOC_KHOI.forEach(function(k){ hd3(kCol,'Khối '+k,1,4,kCol+3); kCol+=4; });
+  hd3(totalCols,'Ghi chú',3,1);
+  ws.getRow(4).height=28;
+  ['Lớp','Số HSKT\nhọc hoà nhập','Số tiết\nthực dạy/tuần'].forEach(function(v,i){ setCell(ws.getRow(4).getCell(3+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  kCol=6;
+  TIEU_HOC_KHOI.forEach(function(){ ['Số\nlớp','Liệt kê\ntên lớp','Tên môn dạy','Tổng số tiết\nthực dạy/tuần'].forEach(function(v,i){ setCell(ws.getRow(4).getCell(kCol+i),v,S.fHd,S.bgH2,S.aCC,S.bT); }); kCol+=4; });
+  ws.getRow(5).height=16;
+  ['A','B','1','2','3'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  var sttN=4;
+  TIEU_HOC_KHOI.forEach(function(){ for(var j=0;j<4;j++){ setCell(ws.getRow(5).getCell(5+sttN+j-4),String(sttN+j-3),S.fHd,S.bgH2,S.aCC,S.bT); } sttN+=4; });
+  setCell(ws.getRow(5).getCell(totalCols),String(sttN-3),S.fHd,S.bgH2,S.aCC,S.bT);
+  var ktMap=getKTMapByCls(); var dataRow=6; ws.getRow(dataRow).height=18;
+  var row=ws.getRow(dataRow);
+  setCell(row.getCell(1),1,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),CFG.teacher,S.fM,null,S.aLC,S.bT);
+  var allKtCls=allClasses.filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r]; });
+  var tongLop=allKtCls.length, tongHS=studentList.length, tongTiet=0;
+  allKtCls.forEach(function(c){ tongTiet+=getTongTietCls(c); });
+  setCell(row.getCell(3),tongLop,S.fB,S.bgYe,S.aCC,S.bT); setCell(row.getCell(4),tongHS,S.fM,null,S.aCC,S.bT); setCell(row.getCell(5),tongTiet,S.fB,S.bgYe,S.aCC,S.bT);
+  kCol=6;
+  TIEU_HOC_KHOI.forEach(function(k){ var clsKhoi=getClsByKhoi(k).filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r]; }); var kLop=clsKhoi.length,kTiet=0; clsKhoi.forEach(function(c){ kTiet+=getTongTietCls(c); }); var kNames=clsKhoi.map(function(c){return c.indexOf('||')>=0?c.split('||')[0]:c;}).join(', '); setCell(row.getCell(kCol),kLop||null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(kCol+1),kNames||null,S.fM,null,S.aLC,S.bT); setCell(row.getCell(kCol+2),CFG.subject||null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(kCol+3),kTiet||null,S.fB,S.bgYe,S.aCC,S.bT); kCol+=4; });
+  setCell(row.getCell(totalCols),null,S.fM,null,S.aCC,S.bT);
+  dataRow++;
+  var sumRow=ws.getRow(dataRow); sumRow.height=18; ws.mergeCells(dataRow,1,dataRow,2);
+  setCell(sumRow.getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC); setCell(sumRow.getCell(3),tongLop,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(sumRow.getCell(4),tongHS,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(sumRow.getCell(5),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  var signR=dataRow+2,now=new Date(),midC=Math.floor(totalCols*0.65);
+  ws.getRow(signR).getCell(midC).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(signR).getCell(midC).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(signR).getCell(midC).alignment=S.aCC; ws.mergeCells(signR,midC,signR,totalCols);
+  ws.getRow(signR+1).getCell(midC).value='Giáo viên bộ môn'; ws.getRow(signR+1).getCell(midC).font=S.fB; ws.getRow(signR+1).getCell(midC).alignment=S.aCC; ws.mergeCells(signR+1,midC,signR+1,totalCols);
+  ws.getRow(signR+4).getCell(midC).value=CFG.teacher; ws.getRow(signR+4).getCell(midC).font=S.fB; ws.getRow(signR+4).getCell(midC).alignment=S.aCC; ws.mergeCells(signR+4,midC,signR+4,totalCols);
+}
+
+async function _buildBieu1bSheet(wb, mode) {
+  var bCfg = getBieu1Config(mode || 'hk1');
+  var ws = wb.addWorksheet('Biểu 1b');
+  var S = bieuStyles();
+  var fixedW=[4,18,7]; var monthCols=5; var months5=bCfg.months; var totalDataCols=months5.length*monthCols; var totalCols=3+totalDataCols+2;
+  fixedW.forEach(function(w,i){ ws.getColumn(i+1).width=w; }); for(var i=4;i<=3+totalDataCols;i++) ws.getColumn(i).width=5; ws.getColumn(totalCols-1).width=8; ws.getColumn(totalCols).width=10;
+  ws.mergeCells(1,1,1,5); ws.mergeCells(1,totalCols,1,totalCols);
+  setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true});
+  ws.getRow(1).getCell(totalCols).value='Biểu 1b'; ws.getRow(1).getCell(totalCols).font=S.fB; ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+  ws.getRow(2).height=36; setCell(ws.getRow(2).getCell(1),'TỔNG HỢP SỐ TIẾT THỰC DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\n'+bCfg.hkLabel,S.fT,null,S.aCC); ws.mergeCells(2,1,2,totalCols);
+  ws.getRow(3).height=22;
+  setCell(ws.getRow(3).getCell(1),'Số\nTT',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,1,4,1);
+  setCell(ws.getRow(3).getCell(2),'Họ và tên GV dạy ở lớp có học sinh học hoà nhập',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,2,4,2);
+  setCell(ws.getRow(3).getCell(3),'Lớp dạy',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,3,4,3);
+  var mStartCol=4;
+  months5.forEach(function(x,mi){ var c=ws.getRow(3).getCell(mStartCol+mi*monthCols); setCell(c,bCfg.labels[mi],S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,mStartCol+mi*monthCols,3,mStartCol+mi*monthCols+monthCols-1); });
+  setCell(ws.getRow(3).getCell(totalCols-1),'Tổng số tiết\nthực dạy',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,totalCols-1,4,totalCols-1);
+  setCell(ws.getRow(3).getCell(totalCols),'Ghi chú',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,totalCols,4,totalCols);
+  ws.getRow(4).height=18;
+  months5.forEach(function(x,mi){ for(var w=1;w<=monthCols;w++){ setCell(ws.getRow(4).getCell(mStartCol+mi*monthCols+w-1),'Tuần '+w,S.fHd,S.bgH2,S.aCC,S.bT); } });
+  ws.getRow(5).height=14;
+  ['A','B','1'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  for(var ci=4;ci<=totalCols;ci++) setCell(ws.getRow(5).getCell(ci),String(ci-3),S.fHd,S.bgH2,S.aCC,S.bT);
+  var dataStartRow=6; var ktCls=allClasses.filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!getKTMapByCls()[r]; });
+  var colTotals=[]; for(var i=0;i<totalDataCols;i++) colTotals.push(0); var grandTotal=0;
+  ktCls.forEach(function(cls,stt){ var realCls=cls.indexOf('||')>=0?cls.split('||')[0]:cls; var row=ws.getRow(dataStartRow+stt); row.height=16; setCell(row.getCell(1),stt+1,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),CFG.teacher,S.fM,null,S.aLC,S.bT); setCell(row.getCell(3),realCls,S.fB,null,S.aCC,S.bT); var rowTotal=0; months5.forEach(function(x,mi){ var key=mk(x.m,x.y); var mD=(lessonData[key]||{})[cls]||{}; var mE=(manualEdits[key]||{})[cls]||{}; var days=mDays(x.m,x.y); for(var w=0;w<monthCols;w++){ var startD=w*7+1,endD=Math.min((w+1)*7,days); var wTiet=0; for(var d=startD;d<=endD;d++) wTiet+=mE[d]!==undefined?mE[d]:(mD[d]||0); var colIdx=mStartCol+mi*monthCols+w; setCell(row.getCell(colIdx),wTiet||null,S.fM,wTiet>0?S.bgYe:null,S.aCC,S.bT); colTotals[mi*monthCols+w]+=wTiet; rowTotal+=wTiet; } }); setCell(row.getCell(totalCols-1),rowTotal||null,S.fB,S.bgYe,S.aCC,S.bT); setCell(row.getCell(totalCols),null,S.fM,null,S.aCC,S.bT); grandTotal+=rowTotal; });
+  var sumR=dataStartRow+ktCls.length; ws.mergeCells(sumR,1,sumR,3); setCell(ws.getRow(sumR).getCell(1),'Tổng số tiết',S.fB,S.bgSm,S.aRC); colTotals.forEach(function(v,i){ setCell(ws.getRow(sumR).getCell(mStartCol+i),v||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  var signR=sumR+2,now=new Date(),mid=Math.floor(totalCols*0.6);
+  ws.getRow(signR).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(signR).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(signR).getCell(mid).alignment=S.aCC; ws.mergeCells(signR,mid,signR,totalCols);
+  ws.getRow(signR+1).getCell(mid).value='Giáo viên bộ môn'; ws.getRow(signR+1).getCell(mid).font=S.fB; ws.getRow(signR+1).getCell(mid).alignment=S.aCC; ws.mergeCells(signR+1,mid,signR+1,totalCols);
+  ws.getRow(signR+4).getCell(mid).value=CFG.teacher; ws.getRow(signR+4).getCell(mid).font=S.fB; ws.getRow(signR+4).getCell(mid).alignment=S.aCC; ws.mergeCells(signR+4,mid,signR+4,totalCols);
+}
+
+async function _buildBieu1cSheet(wb, mode) {
+  var bCfg = getBieu1Config(mode || 'hk1');
+  var ws = wb.addWorksheet('Biểu 1c');
+  var S = bieuStyles();
+  var fixW=[4,18,14]; bCfg.months.forEach(function(){ fixW.push(7,10); }); fixW.push(10,10); fixW.forEach(function(w,i){ ws.getColumn(i+1).width=w; }); var totalCols=fixW.length;
+  ws.mergeCells(1,1,1,5); ws.getRow(1).getCell(totalCols).value='Biểu 1c';
+  setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true});
+  ws.getRow(1).getCell(totalCols).font=S.fB; ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+  ws.getRow(2).height=36; setCell(ws.getRow(2).getCell(1),'TỔNG HỢP SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\n'+bCfg.hkLabel,S.fT,null,S.aCC); ws.mergeCells(2,1,2,totalCols);
+  ws.getRow(3).height=26;
+  [['Số\nTT',1,1],['Họ và tên GV',1,1],['Môn được phân công giảng dạy',1,1]].forEach(function(v,i){ setCell(ws.getRow(3).getCell(1+i),v[0],S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,1+i,4,1+i); });
+  var mCol=4;
+  bCfg.months.forEach(function(x,mi){ setCell(ws.getRow(3).getCell(mCol),bCfg.labels[mi],S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,mCol,3,mCol+1); mCol+=2; });
+  setCell(ws.getRow(3).getCell(totalCols-1),'Tổng số tiết\nthực dạy HK I',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,totalCols-1,4,totalCols-1);
+  setCell(ws.getRow(3).getCell(totalCols),'Ghi chú',S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(3,totalCols,4,totalCols);
+  ws.getRow(4).height=22; mCol=4;
+  bCfg.months.forEach(function(){ setCell(ws.getRow(4).getCell(mCol),'Tổng số\nLớp',S.fHd,S.bgH2,S.aCC,S.bT); setCell(ws.getRow(4).getCell(mCol+1),'Tổng số tiết\nthực dạy',S.fHd,S.bgH2,S.aCC,S.bT); mCol+=2; });
+  ws.getRow(5).height=14; ['A','B','1'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); }); for(var n=4;n<=totalCols;n++) setCell(ws.getRow(5).getCell(n),String(n-3),S.fHd,S.bgH2,S.aCC,S.bT);
+  var ktCls=allClasses.filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!getKTMapByCls()[r]; }); var dataR=6; var colTotTiet=[]; bCfg.months.forEach(function(){ colTotTiet.push(0); }); var grandTot=0;
+  ktCls.forEach(function(cls,stt){ var xlsMon=cls.indexOf('||')>=0?cls.split('||')[1]:(CFG.subject||''); var row=ws.getRow(dataR+stt); row.height=16; setCell(row.getCell(1),stt+1,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),CFG.teacher,S.fM,null,S.aLC,S.bT); setCell(row.getCell(3),xlsMon,S.fM,null,S.aCC,S.bT); var rowTot=0; mCol=4; bCfg.months.forEach(function(x,mi){ var v=getTietThang(cls,x.m,x.y); setCell(row.getCell(mCol),1,S.fM,null,S.aCC,S.bT); setCell(row.getCell(mCol+1),v||null,S.fM,v>0?S.bgYe:null,S.aCC,S.bT); colTotTiet[mi]+=v; rowTot+=v; mCol+=2; }); setCell(row.getCell(totalCols-1),rowTot||null,S.fB,S.bgYe,S.aCC,S.bT); setCell(row.getCell(totalCols),null,S.fM,null,S.aCC,S.bT); grandTot+=rowTot; });
+  var sumR=dataR+ktCls.length; ws.mergeCells(sumR,1,sumR,3); setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC); mCol=4; bCfg.months.forEach(function(x,mi){ setCell(ws.getRow(sumR).getCell(mCol),ktCls.length,{name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(mCol+1),colTotTiet[mi]||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); mCol+=2; }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTot,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  var sRow=sumR+2,now=new Date(),mid=Math.floor(totalCols*0.6);
+  ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(sRow).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow,mid,sRow,totalCols);
+  ws.getRow(sRow+1).getCell(mid).value='Giáo viên bộ môn'; ws.getRow(sRow+1).getCell(mid).font=S.fB; ws.getRow(sRow+1).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
+  ws.getRow(sRow+4).getCell(mid).value=CFG.teacher; ws.getRow(sRow+4).getCell(mid).font=S.fB; ws.getRow(sRow+4).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+4,mid,sRow+4,totalCols);
+}
+
+async function _buildBieu1dSheet(wb) {
+  var ws = wb.addWorksheet('Biểu 1d');
+  var S = bieuStyles();
+  var luong=parseFloat((document.getElementById('b1d-luong')||{value:3.99}).value)||3.99;
+  var kv=parseFloat((document.getElementById('b1d-kv')||{value:0.5}).value)||0.5;
+  var uuai=parseFloat((document.getElementById('b1d-uuai')||{value:1.3965}).value)||1.3965;
+  var luongCS=parseFloat((document.getElementById('b1d-luongcs')||{value:2340000}).value)||2340000;
+  var chucvu=(document.getElementById('b1d-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+  var mucPC=parseFloat((document.getElementById('b1d-mucpc')||{value:0.2}).value)||0.2;
+  var tongCacPC=kv+uuai; var tongLuongThang=(luong+tongCacPC)*luongCS; var tienMotGiay=tongLuongThang/(luong*39.8); var muc1GiayPC=tienMotGiay*mucPC;
+  var tongTiet=0; allClasses.forEach(function(c){ tongTiet+=getTongTietCls(c); }); var tongTien=muc1GiayPC*tongTiet;
+  [4,22,8,8,8,8,10,8,8,8,8,8,8,14,14,10,14,18,10].forEach(function(w,i){ws.getColumn(i+1).width=w;}); var totalCols=19;
+  ws.mergeCells(1,1,1,5); setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true}); ws.getRow(1).getCell(totalCols).value='Biểu 1d'; ws.getRow(1).getCell(totalCols).font=S.fB; ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+  ws.getRow(2).height=36; setCell(ws.getRow(2).getCell(1),'DỰ TOÁN KINH PHÍ CHI TRẢ CHẾ ĐỘ DẠY HỌC SINH HỌC HOÀ NHẬP NĂM HỌC '+CFG.schoolYear,S.fT,null,S.aCC); ws.mergeCells(2,1,2,totalCols);
+  ws.getRow(3).height=16; setCell(ws.getRow(3).getCell(totalCols-2),'Đơn vị tính: đồng',{name:'Times New Roman',size:10,italic:true},null,{horizontal:'right',vertical:'middle'});
+  ws.getRow(4).height=28;
+  [[1,'Số\nTT',3,1],[2,'Họ và tên GV',3,1],[3,'Chức vụ',3,1],[4,'Hệ số lương\nhiện hưởng',3,1],[5,'Hệ số phụ cấp',1,9,13],[14,'Tổng tiền lương/tháng',3,1],[15,'Số tiền 1 giờ dạy',3,1],[16,'Mức phụ cấp',3,1],[17,'Tổng số tiết\nthực dạy',3,1],[18,'Phụ cấp ưu đãi\ngiảng dạy HSKT',3,1],[19,'Ghi chú',3,1]].forEach(function(v){ setCell(ws.getRow(4).getCell(v[0]),v[1],S.fHd,S.bgHd,S.aCC,S.bT); if(v[2]>1||v[3]>1) ws.mergeCells(4,v[0],4+v[2]-1,(v[4]||v[0]+v[3]-1)); });
+  ws.getRow(5).height=22; ['Khu vực','Chức vụ','PC ưu đãi','PC đặc biệt','PC thu hút','PC trách nhiệm','PC TNNG','PC Đảng','Cộng phụ cấp'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(5+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  ws.getRow(6).height=14; ['A','B','1','2'].forEach(function(v,i){ setCell(ws.getRow(6).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); }); for(var n=5;n<=totalCols;n++) setCell(ws.getRow(6).getCell(n),String(n-3),S.fHd,S.bgH2,S.aCC,S.bT);
+  ws.getRow(7).height=18; var r7=ws.getRow(7);
+  function dc7(col,val,fo){ setCell(r7.getCell(col),val,fo||S.fM,null,S.aCC,S.bT); }
+  dc7(1,1); dc7(2,CFG.teacher,S.fB); dc7(3,chucvu); dc7(4,luong); dc7(5,kv); dc7(6,0); dc7(7,uuai); dc7(8,0); dc7(9,0); dc7(10,0); dc7(11,0); dc7(12,0); dc7(13,tongCacPC,S.fB); dc7(14,Math.round(tongLuongThang),S.fB); dc7(15,Math.round(tienMotGiay)); dc7(16,Math.round(muc1GiayPC)); dc7(17,tongTiet,S.fB); dc7(18,Math.round(tongTien),{name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A6B34'}}); dc7(19,null);
+  ws.getRow(8).height=18; ws.mergeCells(8,1,8,3); setCell(ws.getRow(8).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC); for(var ci=4;ci<=totalCols;ci++) setCell(ws.getRow(8).getCell(ci),null,S.fHd,S.bgSm,S.aCC,S.bT); setCell(ws.getRow(8).getCell(17),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(8).getCell(18),Math.round(tongTien),{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  var sRow=10,now=new Date(),mid=Math.floor(totalCols*0.6);
+  ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(sRow).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow,mid,sRow,totalCols);
+  ws.getRow(sRow+1).getCell(mid).value='Giáo viên bộ môn'; ws.getRow(sRow+1).getCell(mid).font=S.fB; ws.getRow(sRow+1).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
+  ws.getRow(sRow+4).getCell(mid).value=CFG.teacher; ws.getRow(sRow+4).getCell(mid).font=S.fB; ws.getRow(sRow+4).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+4,mid,sRow+4,totalCols);
+}
+
+async function _buildBieu1eSheet(wb) {
+  var ws = wb.addWorksheet('Biểu 1e');
+  var S = bieuStyles();
+  var luongCS=parseFloat((document.getElementById('b1d-luongcs')||{value:2340000}).value)||2340000;
+  var luong=parseFloat((document.getElementById('b1d-luong')||{value:3.99}).value)||3.99;
+  var kv=parseFloat((document.getElementById('b1d-kv')||{value:0.5}).value)||0.5;
+  var uuai=parseFloat((document.getElementById('b1d-uuai')||{value:1.3965}).value)||1.3965;
+  var mucPC=parseFloat((document.getElementById('b1d-mucpc')||{value:0.2}).value)||0.2;
+  var chucvu=(document.getElementById('b1d-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+  var tongCacPC=kv+uuai; var tongLuong=(luong+tongCacPC)*luongCS; var tien1Gio=tongLuong/(luong*39.8); var tien1GioPC=tien1Gio*mucPC;
+  var tongTiet=0; allClasses.forEach(function(c){ tongTiet+=getTongTietCls(c); }); var tongTien=Math.round(tien1GioPC*tongTiet);
+  [4,22,20,14,10,14,16].forEach(function(w,i){ ws.getColumn(i+1).width=w; }); var totalCols=7;
+  ws.mergeCells(1,1,1,4); setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true}); ws.getRow(1).getCell(totalCols).value='Biểu 1e'; ws.getRow(1).getCell(totalCols).font=S.fB; ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
+  ws.getRow(2).height=36; setCell(ws.getRow(2).getCell(1),'DANH SÁCH VIÊN CHỨC ĐỀ NGHỊ HƯỞNG CHẾ ĐỘ PHỤ CẤP ƯU ĐÃI DẠY\nHỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP',S.fT,null,S.aCC); ws.mergeCells(2,1,2,totalCols);
+  var now=new Date(); ws.getRow(3).height=16; setCell(ws.getRow(3).getCell(1),'(Kèm theo văn bản số: .......... ngày '+now.getDate()+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear()+')',{name:'Times New Roman',size:10,italic:true},null,{horizontal:'left',vertical:'middle'}); ws.mergeCells(3,1,3,totalCols);
+  ws.getRow(4).height=4; ws.getRow(5).height=28;
+  ['Số\nTT','Họ và tên GV dạy ở lớp có học sinh học hoà nhập','Chức vụ, đơn vị công tác','Tổng số tiết thực dạy ở lớp có HSKT\nhọc hoà nhập','Mức phụ cấp','Số tiền/\n1 giờ dạy','Phụ cấp ưu đãi được hưởng'].forEach(function(v,i){ setCell(ws.getRow(5).getCell(1+i),v,S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(5,1+i,6,1+i); });
+  ws.getRow(7).height=14; ['A','B','1','2','3','4','5'].forEach(function(v,i){ setCell(ws.getRow(7).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  ws.getRow(8).height=18; var r8=ws.getRow(8);
+  setCell(r8.getCell(1),1,S.fM,null,S.aCC,S.bT); setCell(r8.getCell(2),CFG.teacher,S.fB,null,S.aLC,S.bT); setCell(r8.getCell(3),chucvu+' — '+CFG.school,S.fM,null,S.aLC,S.bT); setCell(r8.getCell(4),tongTiet,S.fB,S.bgYe,S.aCC,S.bT); setCell(r8.getCell(5),mucPC,S.fM,null,S.aCC,S.bT); setCell(r8.getCell(6),Math.round(tien1GioPC),S.fM,null,S.aCC,S.bT); setCell(r8.getCell(7),tongTien,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A6B34'}},S.bgYe,S.aCC,S.bT);
+  ws.getRow(9).height=18; ws.mergeCells(9,1,9,3); setCell(ws.getRow(9).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC); setCell(ws.getRow(9).getCell(4),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(9).getCell(5),mucPC,S.fHd,S.bgSm,S.aCC,S.bT); setCell(ws.getRow(9).getCell(6),Math.round(tien1GioPC),{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(9).getCell(7),tongTien,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  var sRow=11,mid=4;
+  ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(sRow).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow,mid,sRow,totalCols);
+  ws.getRow(sRow+1).getCell(1).value='Người lập biểu'; ws.getRow(sRow+1).getCell(1).font=S.fB; ws.getRow(sRow+1).getCell(1).alignment=S.aCC;
+  ws.getRow(sRow+1).getCell(mid).value='Hiệu trưởng'; ws.getRow(sRow+1).getCell(mid).font=S.fB; ws.getRow(sRow+1).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
+  ws.getRow(sRow+4).getCell(1).value=CFG.teacher; ws.getRow(sRow+4).getCell(1).font=S.fB; ws.getRow(sRow+4).getCell(1).alignment=S.aCC;
+  ws.getRow(sRow+4).getCell(mid).value=CFG.principal; ws.getRow(sRow+4).getCell(mid).font=S.fB; ws.getRow(sRow+4).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+4,mid,sRow+4,totalCols);
+}
+
+async function _buildBieuBienBanSheet(wb) {
+  var ws = wb.addWorksheet('Biểu Biên Bản');
+  var S = bieuStyles();
+  var ngayBB=(document.getElementById('bb-ngay')||{value:''}).value||'';
+  var trinhDo=(document.getElementById('bb-trinhdо')||{value:'Đại học'}).value||'Đại học';
+  var chucvu=(document.getElementById('bb-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+  var totruong=(document.getElementById('bb-totruong')||{value:''}).value||'';
+  [4,22,12,10,10,10,22,10,10,18,18].forEach(function(w,i){ ws.getColumn(i+1).width=w; }); var totalCols=11;
+  ws.getRow(1).height=30; setCell(ws.getRow(1).getCell(1),'BIỂU TỔNG HỢP SỐ TIẾT THỰC DẠY CỦA GIÁO VIÊN TẠI CÁC LỚP CÓ HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP',{name:'Times New Roman',size:12,bold:true},null,S.aCC); ws.mergeCells(1,1,1,totalCols);
+  ws.getRow(2).height=18; setCell(ws.getRow(2).getCell(1),'Kèm theo biên bản xét duyệt ngày '+ngayBB+' của Trường '+CFG.school+' — Năm học '+CFG.schoolYear,{name:'Times New Roman',size:10,italic:true},null,S.aCC); ws.mergeCells(2,1,2,totalCols);
+  ws.getRow(3).height=4; ws.getRow(4).height=36;
+  ['Số\nTT','Họ và tên GV dạy ở lớp có học sinh học hoà nhập','Trình độ\nchuyên môn','Chức vụ','Môn dạy','Lớp có học sinh\nkhuyết tật','Tên học sinh\nkhuyết tật','Số tiết\nthực dạy','Tổng số\ntiết dạy','Giáo viên dạy trực tiếp ký xác nhận\n(Ký ghi rõ họ tên)','Tổ trưởng chuyên môn ký xác nhận\n(Ký ghi rõ họ tên)'].forEach(function(v,i){ setCell(ws.getRow(4).getCell(1+i),v,S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(4,1+i,5,1+i); });
+  ws.getRow(6).height=14; ['A','B','1','2','3','4','5','6','7','8','9'].forEach(function(v,i){ setCell(ws.getRow(6).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
+  var ktMap2=getKTMapByCls(); var dataR=7; var stt=1; var grandTotal=0;
+  allClasses.forEach(function(cls){ var realCls=cls.indexOf('||')>=0?cls.split('||')[0]:cls; var xlsMon=cls.indexOf('||')>=0?cls.split('||')[1]:(CFG.subject||''); var hsInCls=ktMap2[realCls]||[]; var tiet=getTongTietCls(cls); if(tiet===0&&!hsInCls.length) return;
+    if(hsInCls.length===0){ var row=ws.getRow(dataR); row.height=16; setCell(row.getCell(1),stt++,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),CFG.teacher,S.fB,null,S.aLC,S.bT); setCell(row.getCell(3),trinhDo,S.fM,null,S.aCC,S.bT); setCell(row.getCell(4),chucvu,S.fM,null,S.aCC,S.bT); setCell(row.getCell(5),xlsMon,S.fM,null,S.aCC,S.bT); setCell(row.getCell(6),realCls,S.fB,null,S.aCC,S.bT); setCell(row.getCell(7),null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(8),tiet||null,S.fM,tiet>0?S.bgYe:null,S.aCC,S.bT); setCell(row.getCell(9),tiet||null,S.fB,S.bgYe,S.aCC,S.bT); setCell(row.getCell(10),null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(11),totruong||null,S.fM,null,S.aCC,S.bT); grandTotal+=tiet; dataR++;
+    } else { hsInCls.forEach(function(hs,hi){ var row=ws.getRow(dataR); row.height=16; setCell(row.getCell(1),hi===0?stt:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),hi===0?CFG.teacher:null,S.fB,null,S.aLC,S.bT); setCell(row.getCell(3),hi===0?trinhDo:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(4),hi===0?chucvu:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(5),hi===0?xlsMon:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(6),hi===0?realCls:null,S.fB,null,S.aCC,S.bT); setCell(row.getCell(7),hs.name||null,S.fM,null,S.aLC,S.bT); setCell(row.getCell(8),hi===0?tiet:null,S.fM,hi===0&&tiet>0?S.bgYe:null,S.aCC,S.bT); setCell(row.getCell(9),hi===0?tiet:null,S.fB,hi===0?S.bgYe:null,S.aCC,S.bT); setCell(row.getCell(10),null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(11),hi===0?(totruong||null):null,S.fM,null,S.aCC,S.bT); dataR++; }); stt++; grandTotal+=tiet; }
+  });
+  var sumR=dataR; ws.mergeCells(sumR,1,sumR,8); setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC); setCell(ws.getRow(sumR).getCell(9),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(10),null,S.fHd,S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(11),null,S.fHd,S.bgSm,S.aCC,S.bT);
+}
+
+// ──────────────────────────────────────────
+//  BIỂU KÈM BIÊN BẢN XÉT DUYỆT
+//  Cột: STT | HọTên GV | TrìnhĐộ | ChứcVụ | MônDạy | Lớp | TênHSKT | SốTiết | TổngTiết | KýGVDạy | KýTổTrưởng
+// ──────────────────────────────────────────
+async function exportBieuBienBan() {
+  var wb  = new ExcelJS.Workbook();
+  var ws  = wb.addWorksheet('Biểu kèm BB');
+  
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: CFG.orientation || 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    },
+    printTitlesRow: CFG.repeatRow !== false ? '4:6' : undefined
+  };
+  
+  // === PHẦN CÒN LẠI CỦA HÀM exportBieuBienBan CŨ GIỮ NGUYÊN ===
+  var S   = bieuStyles();
+
+  var ngayBB   = (document.getElementById('bb-ngay')||{value:''}).value||'';
+  var trinhDo  = (document.getElementById('bb-trinhdо')||{value:'Đại học'}).value||'Đại học';
+  var chucvu   = (document.getElementById('bb-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+  var totruong = (document.getElementById('bb-totruong')||{value:''}).value||'';
+
+  [4,22,12,10,10,10,22,10,10,18,18].forEach(function(w,i){ ws.getColumn(i+1).width=w; });
+  var totalCols = 11;
+
+  ws.getRow(1).height=30;
+  setCell(ws.getRow(1).getCell(1),
+    'BIỂU TỔNG HỢP SỐ TIẾT THỰC DẠY CỦA GIÁO VIÊN TẠI CÁC LỚP CÓ HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP',
+    {name:'Times New Roman',size:12,bold:true},null,S.aCC
+  );
+  ws.mergeCells(1,1,1,totalCols);
+
+  ws.getRow(2).height=18;
+  setCell(ws.getRow(2).getCell(1),
+    'Kèm theo biên bản xét duyệt ngày '+ngayBB+' của Trường '+CFG.school+' — Năm học '+CFG.schoolYear,
+    {name:'Times New Roman',size:10,italic:true},null,S.aCC
+  );
+  ws.mergeCells(2,1,2,totalCols);
+
+  ws.getRow(3).height=4;
+
+  ws.getRow(4).height=36;
+  [
+    'Số\nTT','Họ và tên GV dạy ở lớp có học sinh học hoà nhập',
+    'Trình độ\nchuyên môn','Chức vụ','Môn dạy',
+    'Lớp có học sinh\nkhuyết tật','Tên học sinh\nkhuyết tật',
+    'Số tiết\nthực dạy','Tổng số\ntiết dạy',
+    'Giáo viên dạy trực tiếp ký xác nhận\n(Ký ghi rõ họ tên)',
+    'Tổ trưởng chuyên môn ký xác nhận\n(Ký ghi rõ họ tên)'
+  ].forEach(function(v,i){
+    setCell(ws.getRow(4).getCell(1+i),v,S.fHd,S.bgHd,S.aCC,S.bT);
+    ws.mergeCells(4,1+i,5,1+i);
+  });
+
+  ws.getRow(5).height=14;
+  ws.getRow(6).height=14;
+  ['A','B','1','2','3','4','5','6','7','8','9'].forEach(function(v,i){
+    setCell(ws.getRow(6).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT);
+  });
+
+  var ktMap2 = getKTMapByCls();
+  var dataR = 7;
+  var stt = 1;
+  var grandTotal = 0;
+
+  allClasses.forEach(function(cls) {
+    var realCls = cls.indexOf('||')>=0 ? cls.split('||')[0] : cls;
+    var xlsMon  = cls.indexOf('||')>=0 ? cls.split('||')[1] : (CFG.subject||'');
+    var hsInCls = ktMap2[realCls] || [];
+    var tiet    = getTongTietCls(cls);
+    if (tiet === 0 && !hsInCls.length) return;
+
+    if (hsInCls.length === 0) {
+      var row = ws.getRow(dataR); row.height = 16;
+      setCell(row.getCell(1),  stt++,      S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(2),  CFG.teacher,S.fB, null, S.aLC, S.bT);
+      setCell(row.getCell(3),  trinhDo,    S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(4),  chucvu,     S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(5),  xlsMon,     S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(6),  realCls,    S.fB, null, S.aCC, S.bT);
+      setCell(row.getCell(7),  null,       S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(8),  tiet||null, S.fM, tiet>0?S.bgYe:null, S.aCC, S.bT);
+      setCell(row.getCell(9),  tiet||null, S.fB, S.bgYe, S.aCC, S.bT);
+      setCell(row.getCell(10), null,       S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(11), totruong||null,S.fM, null, S.aCC, S.bT);
+      grandTotal += tiet;
+      dataR++;
+    } else {
+      hsInCls.forEach(function(hs, hi) {
+        var row = ws.getRow(dataR); row.height = 16;
+        setCell(row.getCell(1),  hi===0?stt:null, S.fM, null, S.aCC, S.bT);
+        setCell(row.getCell(2),  hi===0?CFG.teacher:null, S.fB, null, S.aLC, S.bT);
+        setCell(row.getCell(3),  hi===0?trinhDo:null, S.fM, null, S.aCC, S.bT);
+        setCell(row.getCell(4),  hi===0?chucvu:null,  S.fM, null, S.aCC, S.bT);
+        setCell(row.getCell(5),  hi===0?xlsMon:null,  S.fM, null, S.aCC, S.bT);
+        setCell(row.getCell(6),  hi===0?realCls:null, S.fB, null, S.aCC, S.bT);
+        setCell(row.getCell(7),  hs.name||null, S.fM, null, S.aLC, S.bT);
+        setCell(row.getCell(8),  hi===0?tiet:null, S.fM, hi===0&&tiet>0?S.bgYe:null, S.aCC, S.bT);
+        setCell(row.getCell(9),  hi===0?tiet:null, S.fB, hi===0?S.bgYe:null, S.aCC, S.bT);
+        setCell(row.getCell(10), null, S.fM, null, S.aCC, S.bT);
+        setCell(row.getCell(11), hi===0?(totruong||null):null, S.fM, null, S.aCC, S.bT);
+        dataR++;
+      });
+      stt++;
+      grandTotal += tiet;
+    }
+  });
+
+  var sumR = dataR;
+  ws.mergeCells(sumR,1,sumR,8);
+  setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,S.aRC);
+  setCell(ws.getRow(sumR).getCell(9),grandTotal,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(sumR).getCell(10),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(sumR).getCell(11),null,S.fHd,S.bgSm,S.aCC,S.bT);
+
+  var prevDiv = document.getElementById('bbPreviewContent');
+  if (prevDiv) {
+    prevDiv.innerHTML = '<div style="font-size:11px;color:var(--navy);padding:8px">' +
+      '📋 Sẽ xuất <b>' + (dataR - 7) + ' dòng</b> — ' +
+      '<b>' + allClasses.filter(function(c){return getTongTietCls(c)>0;}).length + ' lớp</b> — ' +
+      'Tổng <b>' + grandTotal + ' tiết</b></div>';
+  }
+
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'BieuKemBienBan_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
+  toast('✅ Đã xuất Biểu kèm biên bản xét duyệt', 't-ok');
+}
+// ── End Biểu 1a–1e & Biên bản ──
+// ══ PREVIEW BIỂU 1a-1e & BIÊN BẢN ════════════════════
+function previewBieu(which) {
+  var cont = document.getElementById('b1PreviewContent');
+  if (!cont) return;
+  var mode = tkFilterMode || 'hk1';
+  var bCfg = getBieu1Config(mode);
+  var ktMap = getKTMapByCls();
+  var S_hd = 'background:var(--navy);color:#fff;padding:5px 7px;font-size:9.5px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.15)';
+  var S_h2 = 'background:var(--navy2);color:var(--gold2);padding:4px 5px;font-size:9px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.1)';
+  var S_td = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;text-align:center;color:var(--g5)';
+  var S_tdL = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;text-align:left;color:var(--g5)';
+  var S_tot = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;font-weight:700;background:#fffce6;text-align:center;color:var(--navy)';
+  var S_sm = 'background:var(--navy);color:var(--gold2);padding:5px 6px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.15)';
+  var now = new Date();
+  var dateStr = (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
+  var html = '';
+
+  if (which === '1a') {
+    var allKtCls = allClasses.filter(function(c){ var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r]; });
+    var tongLop = allKtCls.length, tongHS = studentList.length, tongTiet = 0;
+    allKtCls.forEach(function(c){ tongTiet += getTongTietCls(c); });
+
+    html += '<div style="text-align:center;padding:8px 0 4px"><b style="font-size:11px;color:var(--navy)">THỐNG KÊ SỐ LỚP VÀ SỐ TIẾT DẠY HSKT HỌC HOÀ NHẬP</b><br>';
+    html += '<span style="font-size:10px;color:var(--g4)">' + bCfg.hkLabel + '</span></div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+    html += '<tr><th style="'+S_hd+'" rowspan="2">TT</th><th style="'+S_hd+'" rowspan="2">Họ và tên GV</th>';
+    html += '<th style="'+S_hd+'" colspan="3">Tổng số</th>';
+    TIEU_HOC_KHOI.forEach(function(k){ html += '<th style="'+S_hd+'" colspan="4">Khối '+k+'</th>'; });
+    html += '<th style="'+S_hd+'" rowspan="2">Ghi chú</th></tr>';
+    html += '<tr><th style="'+S_h2+'">Lớp</th><th style="'+S_h2+'">Số HSKT</th><th style="'+S_h2+'">Tiết</th>';
+    TIEU_HOC_KHOI.forEach(function(){ html += '<th style="'+S_h2+'">Số lớp</th><th style="'+S_h2+'">Tên lớp</th><th style="'+S_h2+'">Môn</th><th style="'+S_h2+'">Tiết</th>'; });
+    html += '</tr>';
+    html += '<tr><td style="'+S_td+'">1</td><td style="'+S_tdL+'">'+esc(CFG.teacher)+'</td>';
+    html += '<td style="'+S_tot+'">'+tongLop+'</td><td style="'+S_td+'">'+tongHS+'</td><td style="'+S_tot+'">'+tongTiet+'</td>';
+    TIEU_HOC_KHOI.forEach(function(k){
+      var clsKhoi=getClsByKhoi(k).filter(function(c){var r=c.indexOf('||')>=0?c.split('||')[0]:c;return !!ktMap[r];});
+      var kTiet=0; clsKhoi.forEach(function(c){kTiet+=getTongTietCls(c);});
+      var kNames=clsKhoi.map(function(c){return c.indexOf('||')>=0?c.split('||')[0]:c;}).join(', ');
+      html += '<td style="'+S_td+'">'+clsKhoi.length+'</td><td style="'+S_tdL+'">'+esc(kNames)+'</td><td style="'+S_td+'">'+esc(CFG.subject||'')+'</td><td style="'+S_tot+'">'+kTiet+'</td>';
+    });
+    html += '<td style="'+S_td+'"></td></tr>';
+    html += '<tr><td colspan="2" style="'+S_sm+';text-align:right">Tổng số</td>';
+    html += '<td style="'+S_sm+'">'+tongLop+'</td><td style="'+S_sm+'">'+tongHS+'</td><td style="'+S_sm+'">'+tongTiet+'</td>';
+    for(var i=0;i<TIEU_HOC_KHOI.length*4+1;i++) html+='<td style="'+S_sm+'"></td>';
+    html += '</tr></table></div>';
+
+  } else if (which === '1b') {
+    var ktCls = allClasses.filter(function(c){var r=c.indexOf('||')>=0?c.split('||')[0]:c;return !!ktMap[r];});
+    html += '<div style="text-align:center;padding:8px 0 4px"><b style="font-size:11px;color:var(--navy)">TỔNG HỢP SỐ TIẾT THỰC DẠY THEO TUẦN</b><br>';
+    html += '<span style="font-size:10px;color:var(--g4)">' + bCfg.hkLabel + '</span></div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+    html += '<tr><th style="'+S_hd+'" rowspan="2">TT</th><th style="'+S_hd+'" rowspan="2">Họ và tên GV</th><th style="'+S_hd+'" rowspan="2">Lớp</th>';
+    bCfg.months.forEach(function(x,mi){ html += '<th style="'+S_hd+'" colspan="5">'+bCfg.labels[mi]+'</th>'; });
+    html += '<th style="'+S_hd+'" rowspan="2">Tổng tiết</th></tr>';
+    html += '<tr>';
+    bCfg.months.forEach(function(){ for(var w=1;w<=5;w++) html+='<th style="'+S_h2+'">T'+w+'</th>'; });
+    html += '</tr>';
+    var grandTotal=0, colTots=[];
+    for(var i=0;i<bCfg.months.length*5;i++) colTots.push(0);
+    ktCls.forEach(function(cls,si){
+      var realCls=cls.indexOf('||')>=0?cls.split('||')[0]:cls;
+      html+='<tr><td style="'+S_td+'">'+( si+1)+'</td><td style="'+S_tdL+'">'+esc(CFG.teacher)+'</td><td style="'+S_td+'">'+esc(realCls)+'</td>';
+      var rowTot=0;
+      bCfg.months.forEach(function(x,mi){
+        var key=mk(x.m,x.y); var mD=(lessonData[key]||{})[cls]||{}; var mE=(manualEdits[key]||{})[cls]||{}; var days=mDays(x.m,x.y);
+        for(var w=0;w<5;w++){
+          var startD=w*7+1,endD=Math.min((w+1)*7,days); var wT=0;
+          for(var d=startD;d<=endD;d++) wT+=mE[d]!==undefined?mE[d]:(mD[d]||0);
+          html+='<td style="'+(wT>0?S_tot:S_td)+'">'+(wT||'')+'</td>';
+          colTots[mi*5+w]+=wT; rowTot+=wT;
+        }
+      });
+      grandTotal+=rowTot;
+      html+='<td style="'+S_tot+'">'+rowTot+'</td></tr>';
+    });
+    html+='<tr><td colspan="3" style="'+S_sm+';text-align:right">Tổng</td>';
+    colTots.forEach(function(v){ html+='<td style="'+S_sm+'">'+(v||'')+'</td>'; });
+    html+='<td style="'+S_sm+'">'+grandTotal+'</td></tr>';
+    html+='</table></div>';
+
+  } else if (which === '1c') {
+    var ktCls = allClasses.filter(function(c){var r=c.indexOf('||')>=0?c.split('||')[0]:c;return !!ktMap[r];});
+    html += '<div style="text-align:center;padding:8px 0 4px"><b style="font-size:11px;color:var(--navy)">TỔNG HỢP SỐ TIẾT DẠY THEO THÁNG</b><br>';
+    html += '<span style="font-size:10px;color:var(--g4)">' + bCfg.hkLabel + '</span></div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+    html += '<tr><th style="'+S_hd+'" rowspan="2">TT</th><th style="'+S_hd+'" rowspan="2">GV</th><th style="'+S_hd+'" rowspan="2">Môn</th>';
+    bCfg.months.forEach(function(x,mi){ html+='<th style="'+S_hd+'" colspan="2">'+bCfg.labels[mi]+'</th>'; });
+    html += '<th style="'+S_hd+'" rowspan="2">Tổng tiết</th></tr>';
+    html += '<tr>';
+    bCfg.months.forEach(function(){ html+='<th style="'+S_h2+'">Lớp</th><th style="'+S_h2+'">Tiết</th>'; });
+    html += '</tr>';
+    var grandTot=0, colTT=[];
+    bCfg.months.forEach(function(){colTT.push(0);});
+    ktCls.forEach(function(cls,si){
+      var xlsMon=cls.indexOf('||')>=0?cls.split('||')[1]:(CFG.subject||'');
+      html+='<tr><td style="'+S_td+'">'+(si+1)+'</td><td style="'+S_tdL+'">'+esc(CFG.teacher)+'</td><td style="'+S_td+'">'+esc(xlsMon)+'</td>';
+      var rowTot=0;
+      bCfg.months.forEach(function(x,mi){
+        var v=getTietThang(cls,x.m,x.y);
+        html+='<td style="'+S_td+'">1</td><td style="'+(v>0?S_tot:S_td)+'">'+(v||'')+'</td>';
+        colTT[mi]+=v; rowTot+=v;
+      });
+      grandTot+=rowTot;
+      html+='<td style="'+S_tot+'">'+rowTot+'</td></tr>';
+    });
+    html+='<tr><td colspan="3" style="'+S_sm+';text-align:right">Tổng</td>';
+    bCfg.months.forEach(function(x,mi){ html+='<td style="'+S_sm+'">'+ktCls.length+'</td><td style="'+S_sm+'">'+(colTT[mi]||'')+'</td>'; });
+    html+='<td style="'+S_sm+'">'+grandTot+'</td></tr></table></div>';
+
+  } else if (which === '1d') {
+    var luong=parseFloat((document.getElementById('b1d-luong')||{value:3.99}).value)||3.99;
+    var kv=parseFloat((document.getElementById('b1d-kv')||{value:0.5}).value)||0.5;
+    var uuai=parseFloat((document.getElementById('b1d-uuai')||{value:1.3965}).value)||1.3965;
+    var luongCS=parseFloat((document.getElementById('b1d-luongcs')||{value:2340000}).value)||2340000;
+    var chucvu=(document.getElementById('b1d-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+    var mucPC=parseFloat((document.getElementById('b1d-mucpc')||{value:0.2}).value)||0.2;
+    var tongCacPC=kv+uuai;
+    var tongLuongThang=(luong+tongCacPC)*luongCS;
+    var tienMotGiay=tongLuongThang/(luong*39.8);
+    var muc1GiayPC=tienMotGiay*mucPC;
+    var tongTiet=0; allClasses.forEach(function(c){tongTiet+=getTongTietCls(c);});
+    var tongTien=Math.round(muc1GiayPC*tongTiet);
+
+    html += '<div style="text-align:center;padding:8px 0 4px"><b style="font-size:11px;color:var(--navy)">DỰ TOÁN KINH PHÍ CHI TRẢ CHẾ ĐỘ DẠY HSKT HỌC HOÀ NHẬP</b><br>';
+    html += '<span style="font-size:10px;color:var(--g4)">Năm học ' + CFG.schoolYear + ' — Đơn vị: đồng</span></div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+    html += '<tr><th style="'+S_hd+'">TT</th><th style="'+S_hd+'">Họ và tên GV</th><th style="'+S_hd+'">Chức vụ</th>';
+    html += '<th style="'+S_hd+'">Hệ số lương</th><th style="'+S_hd+'">PC khu vực</th><th style="'+S_hd+'">PC ưu đãi</th>';
+    html += '<th style="'+S_hd+'">Cộng PC</th><th style="'+S_hd+'">Tổng lương/tháng</th>';
+    html += '<th style="'+S_hd+'">Tiền 1 giờ</th><th style="'+S_hd+'">Mức PC</th>';
+    html += '<th style="'+S_hd+'">Tổng tiết</th><th style="'+S_hd+'">PC ưu đãi được hưởng</th></tr>';
+    html += '<tr>';
+    html += '<td style="'+S_td+'">1</td>';
+    html += '<td style="'+S_tdL+'">'+esc(CFG.teacher)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(chucvu)+'</td>';
+    html += '<td style="'+S_td+'">'+luong+'</td>';
+    html += '<td style="'+S_td+'">'+kv+'</td>';
+    html += '<td style="'+S_td+'">'+uuai+'</td>';
+    html += '<td style="'+S_td+'">'+tongCacPC.toFixed(4)+'</td>';
+    html += '<td style="'+S_td+'">'+Math.round(tongLuongThang).toLocaleString('vi-VN')+'</td>';
+    html += '<td style="'+S_td+'">'+Math.round(tienMotGiay).toLocaleString('vi-VN')+'</td>';
+    html += '<td style="'+S_td+'">'+(mucPC*100)+'%</td>';
+    html += '<td style="'+S_tot+'">'+tongTiet+'</td>';
+    html += '<td style="'+S_tot+';color:var(--green);font-size:11px">'+tongTien.toLocaleString('vi-VN')+'</td>';
+    html += '</tr>';
+    html += '<tr><td colspan="10" style="'+S_sm+';text-align:right">Tổng</td>';
+    html += '<td style="'+S_sm+'">'+tongTiet+'</td><td style="'+S_sm+'">'+tongTien.toLocaleString('vi-VN')+'</td></tr>';
+    html += '</table></div>';
+    html += '<div style="margin-top:8px;padding:8px;background:var(--sky2);border-radius:var(--r);font-size:10px;color:var(--sky)">';
+    html += '💡 Công thức: Tiền 1 giờ = Tổng lương tháng ÷ (Hệ số lương × 39.8) × Mức PC (' + (mucPC*100) + '%)';
+    html += '</div>';
+
+  } else if (which === '1e') {
+    var luongCS=parseFloat((document.getElementById('b1d-luongcs')||{value:2340000}).value)||2340000;
+    var luong=parseFloat((document.getElementById('b1d-luong')||{value:3.99}).value)||3.99;
+    var kv=parseFloat((document.getElementById('b1d-kv')||{value:0.5}).value)||0.5;
+    var uuai=parseFloat((document.getElementById('b1d-uuai')||{value:1.3965}).value)||1.3965;
+    var mucPC=parseFloat((document.getElementById('b1d-mucpc')||{value:0.2}).value)||0.2;
+    var chucvu=(document.getElementById('b1d-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+    var tongCacPC=kv+uuai;
+    var tongLuong=(luong+tongCacPC)*luongCS;
+    var tien1Gio=tongLuong/(luong*39.8);
+    var tien1GioPC=tien1Gio*mucPC;
+    var tongTiet=0; allClasses.forEach(function(c){tongTiet+=getTongTietCls(c);});
+    var tongTien=Math.round(tien1GioPC*tongTiet);
+
+    html += '<div style="text-align:center;padding:8px 0 4px"><b style="font-size:11px;color:var(--navy)">DANH SÁCH VIÊN CHỨC ĐỀ NGHỊ HƯỞNG PHỤ CẤP ƯU ĐÃI</b><br>';
+    html += '<span style="font-size:10px;color:var(--g4)">Dạy học sinh khuyết tật học hoà nhập</span></div>';
+    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+    html += '<tr><th style="'+S_hd+'">TT</th><th style="'+S_hd+'">Họ và tên GV</th><th style="'+S_hd+'">Chức vụ, đơn vị</th>';
+    html += '<th style="'+S_hd+'">Tổng tiết thực dạy ở lớp có HSKT</th><th style="'+S_hd+'">Mức phụ cấp</th>';
+    html += '<th style="'+S_hd+'">Tiền/1 giờ dạy</th><th style="'+S_hd+'">Phụ cấp ưu đãi được hưởng</th></tr>';
+    html += '<tr>';
+    html += '<td style="'+S_td+'">1</td>';
+    html += '<td style="'+S_tdL+'">'+esc(CFG.teacher)+'</td>';
+    html += '<td style="'+S_tdL+'">'+esc(chucvu)+' — '+esc(CFG.school)+'</td>';
+    html += '<td style="'+S_tot+'">'+tongTiet+'</td>';
+    html += '<td style="'+S_td+'">'+(mucPC*100)+'%</td>';
+    html += '<td style="'+S_td+'">'+Math.round(tien1GioPC).toLocaleString('vi-VN')+'</td>';
+    html += '<td style="'+S_tot+';color:var(--green);font-size:11px">'+tongTien.toLocaleString('vi-VN')+'</td>';
+    html += '</tr>';
+    html += '<tr><td colspan="3" style="'+S_sm+';text-align:right">Tổng số</td>';
+    html += '<td style="'+S_sm+'">'+tongTiet+'</td>';
+    html += '<td style="'+S_sm+'">'+(mucPC*100)+'%</td>';
+    html += '<td style="'+S_sm+'">'+Math.round(tien1GioPC).toLocaleString('vi-VN')+'</td>';
+    html += '<td style="'+S_sm+'">'+tongTien.toLocaleString('vi-VN')+'</td></tr>';
+    html += '</table></div>';
+  }
+
+  // Dòng ký tên chung
+  html += '<div style="display:flex;justify-content:flex-end;padding:12px 8px 4px">';
+  html += '<div style="text-align:center;min-width:180px">';
+  html += '<div style="font-size:10px;font-style:italic;color:var(--g4);margin-bottom:4px">'+dateStr+'</div>';
+  html += '<div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:28px">Giáo viên bộ môn</div>';
+  html += '<div style="font-size:11px;font-weight:700;color:var(--navy)">'+esc(CFG.teacher)+'</div>';
+  html += '</div></div>';
+
+  cont.innerHTML = html;
+  // Cuộn xuống để xem preview
+  cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function previewBieuBienBan() {
+  var cont = document.getElementById('bbPreviewContent');
+  if (!cont) return;
+  var ktMap2 = getKTMapByCls();
+  var S_hd = 'background:var(--navy);color:#fff;padding:5px 7px;font-size:9px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.15)';
+  var S_td = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;text-align:center;color:var(--g5)';
+  var S_tdL = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;text-align:left;color:var(--g5)';
+  var S_tot = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;font-weight:700;background:#fffce6;text-align:center;color:var(--navy)';
+  var S_sm = 'background:var(--navy);color:var(--gold2);padding:5px 6px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.15)';
+  var trinhDo=(document.getElementById('bb-trinhdо')||{value:'Đại học'}).value||'Đại học';
+  var chucvu=(document.getElementById('bb-chucvu')||{value:'Giáo viên'}).value||'Giáo viên';
+  var totruong=(document.getElementById('bb-totruong')||{value:''}).value||'';
+  var ngayBB=(document.getElementById('bb-ngay')||{value:''}).value||'';
+
+  var html = '';
+  html += '<div style="text-align:center;padding:8px 0 4px">';
+  html += '<b style="font-size:11px;color:var(--navy)">BIỂU TỔNG HỢP SỐ TIẾT THỰC DẠY TẠI CÁC LỚP CÓ HSKT HỌC HOÀ NHẬP</b><br>';
+  html += '<span style="font-size:10px;color:var(--g4)">Kèm biên bản xét duyệt ngày ' + esc(ngayBB) + ' — ' + esc(CFG.school) + ' — Năm học ' + CFG.schoolYear + '</span>';
+  html += '</div>';
+  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+  html += '<tr>';
+  html += '<th style="'+S_hd+'">TT</th>';
+  html += '<th style="'+S_hd+'">Họ và tên GV</th>';
+  html += '<th style="'+S_hd+'">Trình độ CM</th>';
+  html += '<th style="'+S_hd+'">Chức vụ</th>';
+  html += '<th style="'+S_hd+'">Môn dạy</th>';
+  html += '<th style="'+S_hd+'">Lớp</th>';
+  html += '<th style="'+S_hd+'">Tên HSKT</th>';
+  html += '<th style="'+S_hd+'">Số tiết</th>';
+  html += '<th style="'+S_hd+'">Tổng tiết</th>';
+  html += '<th style="'+S_hd+'">Ký GV</th>';
+  html += '<th style="'+S_hd+'">Ký Tổ trưởng</th>';
+  html += '</tr>';
+
+  var stt=1, grandTotal=0, rowCount=0;
+  allClasses.forEach(function(cls){
+    var realCls=cls.indexOf('||')>=0?cls.split('||')[0]:cls;
+    var xlsMon=cls.indexOf('||')>=0?cls.split('||')[1]:(CFG.subject||'');
+    var hsInCls=ktMap2[realCls]||[];
+    var tiet=getTongTietCls(cls);
+    if(tiet===0&&!hsInCls.length) return;
+
+    if(hsInCls.length===0){
+      html+='<tr>';
+      html+='<td style="'+S_td+'">'+stt+'</td>';
+      html+='<td style="'+S_tdL+'">'+esc(CFG.teacher)+'</td>';
+      html+='<td style="'+S_td+'">'+esc(trinhDo)+'</td>';
+      html+='<td style="'+S_td+'">'+esc(chucvu)+'</td>';
+      html+='<td style="'+S_td+'">'+esc(xlsMon)+'</td>';
+      html+='<td style="'+S_td+';font-weight:700;color:var(--navy2)">'+esc(realCls)+'</td>';
+      html+='<td style="'+S_td+'"></td>';
+      html+='<td style="'+(tiet>0?S_tot:S_td)+'">'+(tiet||'')+'</td>';
+      html+='<td style="'+S_tot+'">'+(tiet||'')+'</td>';
+      html+='<td style="'+S_td+'"></td>';
+      html+='<td style="'+S_td+'">'+esc(totruong)+'</td>';
+      html+='</tr>';
+      grandTotal+=tiet; stt++; rowCount++;
+    } else {
+      hsInCls.forEach(function(hs,hi){
+        html+='<tr>';
+        html+='<td style="'+S_td+'">'+(hi===0?stt:'')+'</td>';
+        html+='<td style="'+S_tdL+'">'+(hi===0?esc(CFG.teacher):'')+'</td>';
+        html+='<td style="'+S_td+'">'+(hi===0?esc(trinhDo):'')+'</td>';
+        html+='<td style="'+S_td+'">'+(hi===0?esc(chucvu):'')+'</td>';
+        html+='<td style="'+S_td+'">'+(hi===0?esc(xlsMon):'')+'</td>';
+        html+='<td style="'+S_td+';font-weight:700;color:var(--navy2)">'+(hi===0?esc(realCls):'')+'</td>';
+        html+='<td style="'+S_tdL+'">'+esc(hs.name||'')+'</td>';
+        html+='<td style="'+(hi===0&&tiet>0?S_tot:S_td)+'">'+(hi===0?tiet||'':'')+'</td>';
+        html+='<td style="'+(hi===0?S_tot:S_td)+'">'+(hi===0?tiet||'':'')+'</td>';
+        html+='<td style="'+S_td+'"></td>';
+        html+='<td style="'+S_td+'">'+(hi===0?esc(totruong):'')+'</td>';
+        html+='</tr>';
+        rowCount++;
+      });
+      grandTotal+=tiet; stt++;
+    }
+  });
+
+  html+='<tr><td colspan="8" style="'+S_sm+';text-align:right">Tổng số</td>';
+  html+='<td style="'+S_sm+'">'+grandTotal+'</td><td style="'+S_sm+'"></td><td style="'+S_sm+'"></td></tr>';
+  html+='</table></div>';
+  html+='<div style="margin-top:6px;font-size:10px;color:var(--g3);padding:4px 0">📋 Tổng: <b>'+rowCount+' dòng</b> — <b>'+grandTotal+' tiết</b></div>';
+
+  cont.innerHTML = html;
+  cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+// ══════════════════════════════════════════
+//  BIỂU MẪU SỐ 1: Danh sách HSKT chi tiết (đúng mẫu)
+// ══════════════════════════════════════════
+function getBieuMau1Data() {
+  // Lấy dữ liệu từ studentList, cấu trúc đúng với mẫu
+  return studentList.map(function(s, idx) {
+    // Xử lý giới tính: Nam/Nữ
+    var gioiTinhNam = (s.gioiTinh === 'Nam') ? '✓' : '';
+    var gioiTinhNu = (s.gioiTinh === 'Nữ') ? '✓' : '';
+    
+    // Xử lý mức độ khuyết tật (có thể lấy từ ghiChu hoặc để trống)
+    var mucDo = '';
+    if (s.ghiChu) {
+      if (s.ghiChu.toLowerCase().includes('nặng')) mucDo = 'Nặng';
+      else if (s.ghiChu.toLowerCase().includes('nhẹ')) mucDo = 'Nhẹ';
+    }
+    
+    return {
+      stt: idx + 1,
+      hoTen: s.name || '',
+      ngaySinh: s.dob || '',
+      gioiTinhNam: gioiTinhNam,
+      gioiTinhNu: gioiTinhNu,
+      lop: s.cls || '',
+      dangKT: s.ktt || '',
+      mucDoKT: mucDo,
+      soGCN: '',      // Có thể mở rộng thêm field trong studentList
+      thoiGianCap: '', // Có thể mở rộng thêm field trong studentList
+      ghiChu: s.ghiChu || ''
+    };
+  }).filter(function(item) { return item.hoTen; });
+}
+
+function previewBieuMau1() {
+  var cont = document.getElementById('bMau1PreviewContent');
+  if (!cont) return;
+  
+  var data = getBieuMau1Data();
+  if (!data.length) {
+    cont.innerHTML = '<div class="ck-empty">⚠️ Chưa có dữ liệu học sinh khuyết tật. Vào tab "DS Học Sinh KT" để thêm.</div>';
+    return;
+  }
+  
+  var S_hd = 'background:var(--navy);color:#fff;padding:6px 8px;font-size:9.5px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,.15)';
+  var S_td = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;text-align:center;color:var(--g5)';
+  var S_tdL = 'padding:5px 6px;border:1px solid var(--g1);font-size:10px;text-align:left;color:var(--g5)';
+  
+  var html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">';
+  html += '<thead>';
+  html += '<tr>';
+  html += '<th rowspan="2" style="'+S_hd+'">TT</th>';
+  html += '<th rowspan="2" style="'+S_hd+'">Họ và tên</th>';
+  html += '<th colspan="2" style="'+S_hd+'">Ngày tháng năm sinh</th>';
+  html += '<th rowspan="2" style="'+S_hd+'">Lớp</th>';
+  html += '<th rowspan="2" style="'+S_hd+'">Dạng khuyết tật</th>';
+  html += '<th rowspan="2" style="'+S_hd+'">Mức độ khuyết tật/điện</th>';
+  html += '<th colspan="2" style="'+S_hd+'">GCN khuyết tật</th>';
+  html += '<th rowspan="2" style="'+S_hd+'">Ghi chú (Mô tả biểu hiện khuyết tật)</th>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<th style="'+S_hd+'">Nam</th>';
+  html += '<th style="'+S_hd+'">Nữ</th>';
+  html += '<th style="'+S_hd+'">Số</th>';
+  html += '<th style="'+S_hd+'">Thời gian cấp</th>';
+  html += '</tr>';
+  html += '</thead><tbody>';
+  
+  data.forEach(function(item) {
+    html += '<tr>';
+    html += '<td style="'+S_td+'">'+item.stt+'</td>';
+    html += '<td style="'+S_tdL+'">'+esc(item.hoTen)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(item.gioiTinhNam)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(item.gioiTinhNu)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(item.lop)+'</td>';
+    html += '<td style="'+S_tdL+'">'+esc(item.dangKT)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(item.mucDoKT)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(item.soGCN)+'</td>';
+    html += '<td style="'+S_td+'">'+esc(item.thoiGianCap)+'</td>';
+    html += '<td style="'+S_tdL+'">'+esc(item.ghiChu)+'</td>';
+    html += '</tr>';
+  });
+  
+  html += '</tbody></table></div>';
+  cont.innerHTML = html;
+}
+
+async function exportBieuMau1() {
+  var wb = new ExcelJS.Workbook();
+  var ws = wb.addWorksheet('Bieu_mau_1');
+  
+  // Cấu hình trang in
+  ws.pageSetup = {
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:   CFG.mgLeft  / 2.54,
+      right:  CFG.mgRight / 2.54,
+      top:    CFG.mgTop   / 2.54,
+      bottom: CFG.mgBot   / 2.54,
+      header: CFG.mgHd    / 2.54,
+      footer: CFG.mgFt    / 2.54
+    }
+  };
+  
+  var data = getBieuMau1Data();
+  if (!data.length) {
+    toast('⚠️ Chưa có dữ liệu học sinh khuyết tật để xuất', 't-warn');
+    return;
+  }
+  
+  // Độ rộng cột
+  [5, 25, 8, 8, 7, 18, 14, 12, 14, 25].forEach(function(w, i) {
+    ws.getColumn(i + 1).width = w;
+  });
+  
+  // Dòng 1: SỞ GIÁO DỤC VÀ ĐÀO TẠO
+  ws.mergeCells(1, 1, 1, 10);
+  ws.getRow(1).getCell(1).value = 'SỞ GIÁO DỤC VÀ ĐÀO TẠO';
+  ws.getRow(1).getCell(1).font = { name: 'Times New Roman', size: 12, bold: true };
+  ws.getRow(1).getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+  
+  // Dòng 2: Trường
+  ws.mergeCells(2, 1, 2, 10);
+  ws.getRow(2).getCell(1).value = CFG.school.toUpperCase();
+  ws.getRow(2).getCell(1).font = { name: 'Times New Roman', size: 12, bold: true };
+  ws.getRow(2).getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+  
+  // Dòng 3: DANH SÁCH...
+  ws.mergeCells(3, 1, 3, 10);
+  ws.getRow(3).getCell(1).value = 'DANH SÁCH HỌC SINH KHUYẾT TẬT HỌC HÒA NHẬP';
+  ws.getRow(3).getCell(1).font = { name: 'Times New Roman', size: 14, bold: true };
+  ws.getRow(3).getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+  
+  // Dòng 4: HỌC KỲ ...., NĂM HỌC .....
+  ws.mergeCells(4, 1, 4, 10);
+  ws.getRow(4).getCell(1).value = 'HỌC KỲ I, NĂM HỌC ' + CFG.schoolYear;
+  ws.getRow(4).getCell(1).font = { name: 'Times New Roman', size: 11, italic: true };
+  ws.getRow(4).getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+  
+  // Header bảng (dòng 6 - có merge)
+  var headerRow1 = ws.getRow(6);
+  headerRow1.height = 32;
+  var headerRow2 = ws.getRow(7);
+  headerRow2.height = 24;
+  
+  var fHd = { name: 'Times New Roman', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+  var bgHd = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D1B3E' } };
+  var bT = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+  var aCC = { horizontal: 'center', vertical: 'middle', wrapText: true };
+  var aLC = { horizontal: 'left', vertical: 'middle', wrapText: true };
+  
+  // Hàng 6: các ô merge
+  function setHeader1(col, val, colspan) {
+    var cell = headerRow1.getCell(col);
+    cell.value = val;
+    cell.font = fHd;
+    cell.fill = bgHd;
+    cell.alignment = aCC;
+    cell.border = bT;
+    if (colspan > 1) ws.mergeCells(6, col, 6, col + colspan - 1);
+  }
+  
+  setHeader1(1, 'TT', 1);
+  setHeader1(2, 'Họ và tên', 1);
+  setHeader1(3, 'Ngày tháng năm sinh', 2);
+  setHeader1(5, 'Lớp', 1);
+  setHeader1(6, 'Dạng khuyết tật', 1);
+  setHeader1(7, 'Mức độ khuyết tật/điện', 1);
+  setHeader1(8, 'GCN khuyết tật', 2);
+  setHeader1(10, 'Ghi chú (Mô tả biểu hiện khuyết tật)', 1);
+  
+  // Hàng 7: các ô con
+  function setHeader2(col, val) {
+    var cell = headerRow2.getCell(col);
+    cell.value = val;
+    cell.font = fHd;
+    cell.fill = bgHd;
+    cell.alignment = aCC;
+    cell.border = bT;
+  }
+  setHeader2(3, 'Nam');
+  setHeader2(4, 'Nữ');
+  setHeader2(8, 'Số');
+  setHeader2(9, 'Thời gian cấp');
+  
+  // Dữ liệu
+  data.forEach(function(item, idx) {
+    var row = ws.getRow(8 + idx);
+    row.height = 18;
+    var cells = [
+      item.stt, item.hoTen, item.gioiTinhNam, item.gioiTinhNu,
+      item.lop, item.dangKT, item.mucDoKT, item.soGCN, item.thoiGianCap, item.ghiChu
+    ];
+    cells.forEach(function(val, ci) {
+      var cell = row.getCell(ci + 1);
+      cell.value = val || '';
+      cell.font = { name: 'Times New Roman', size: 10 };
+      cell.alignment = (ci === 1 || ci === 5 || ci === 9) ? aLC : aCC;
+      cell.border = bT;
+    });
+  });
+  
+  // Dòng ký tên
+  var signRow = 8 + data.length + 2;
+  var now = new Date();
+  var dateStr = (CFG.location || '') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth() + 1) + ' năm ' + now.getFullYear();
+  
+  ws.mergeCells(signRow, 6, signRow, 10);
+  ws.getRow(signRow).getCell(6).value = dateStr;
+  ws.getRow(signRow).getCell(6).font = { name: 'Times New Roman', size: 10, italic: true };
+  ws.getRow(signRow).getCell(6).alignment = aCC;
+  
+  ws.mergeCells(signRow + 1, 1, signRow + 1, 3);
+  ws.getRow(signRow + 1).getCell(1).value = 'Người lập biểu';
+  ws.getRow(signRow + 1).getCell(1).font = { name: 'Times New Roman', size: 10, bold: true };
+  ws.getRow(signRow + 1).getCell(1).alignment = aCC;
+  
+  ws.mergeCells(signRow + 1, 8, signRow + 1, 10);
+  ws.getRow(signRow + 1).getCell(8).value = 'Hiệu trưởng';
+  ws.getRow(signRow + 1).getCell(8).font = { name: 'Times New Roman', size: 10, bold: true };
+  ws.getRow(signRow + 1).getCell(8).alignment = aCC;
+  
+  ws.mergeCells(signRow + 4, 1, signRow + 4, 3);
+  ws.getRow(signRow + 4).getCell(1).value = CFG.teacher;
+  ws.getRow(signRow + 4).getCell(1).font = { name: 'Times New Roman', size: 10, bold: true };
+  ws.getRow(signRow + 4).getCell(1).alignment = aCC;
+  
+  ws.mergeCells(signRow + 4, 8, signRow + 4, 10);
+  ws.getRow(signRow + 4).getCell(8).value = CFG.principal;
+  ws.getRow(signRow + 4).getCell(8).font = { name: 'Times New Roman', size: 10, bold: true };
+  ws.getRow(signRow + 4).getCell(8).alignment = aCC;
+  
+  var buf = await wb.xlsx.writeBuffer();
+  dlBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+    'Bieu_mau_1_HSKT_' + CFG.schoolYear.replace(/ /g, '').replace(/-/g, '_') + '.xlsx');
+  toast('✅ Đã xuất Biểu mẫu số 1', 't-ok');
+}
 var hideWeekend = false;
 function toggleHideWeekend() {
   hideWeekend = !hideWeekend;
