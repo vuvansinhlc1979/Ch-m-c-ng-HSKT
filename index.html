@@ -7362,14 +7362,27 @@ async function _buildBieu1MainSheet(wb) {
 </div>
 
 <script>
-var _API = 'https://script.google.com/macros/s/AKfycbzM0o3ClHcCnA61XagHQPUv-zAfs_W1mwT4tYYRWTjH54CKWFUWH-ylEk3t-Z_X0yyChw/exec';
+// ══ AUTH — Phân quyền qua Gmail ══════════════════════
+// ⚠️ Thay URL bên dưới bằng URL Apps Script mới sau khi deploy
+var _API = 'https://script.google.com/macros/s/AKfycbyczIfHs6lxLQY-fuTTpuAWaMp_8w5a9HnQhoSb4t3A-d-P-2T1hethfuHsEoh1zeGnbw/exec';
+
+// Danh sách email dự phòng (dùng khi Apps Script không phản hồi)
+var _LOCAL_WHITELIST = [
+  'vuvansinh1c1979@gmail.com',
+  'nguachien7979@gmail.com'
+  // Thêm email khác nếu cần
+];
+
+var _authTimer = null;
+var _authCBName = null;
 
 function doAuth() {
-  var email = document.getElementById('auth-email').value.trim();
+  var email = (document.getElementById('auth-email').value || '').trim().toLowerCase();
   var msg   = document.getElementById('auth-msg');
   var btn   = document.getElementById('auth-btn');
 
-  if (!email || !email.includes('@')) {
+  // Validate email
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     msg.style.color = '#ef9a9a';
     msg.textContent = '⚠️ Vui lòng nhập đúng địa chỉ Gmail!';
     return;
@@ -7377,48 +7390,96 @@ function doAuth() {
 
   btn.disabled    = true;
   btn.textContent = '⏳ Đang kiểm tra...';
-  msg.style.color = 'rgba(255,255,255,.6)';
+  msg.style.color = 'rgba(255,255,255,.55)';
   msg.textContent = 'Đang xác thực...';
 
-  /* Dùng JSONP để tránh lỗi CORS với Apps Script */
-  var cbName = '_authCB_' + Date.now();
-  var script  = document.createElement('script');
+  // Dọn script JSONP cũ nếu còn
+  _cleanupAuth();
 
+  var cbName = '_authCB_' + Date.now();
+  _authCBName = cbName;
+
+  // Hàm xử lý kết quả
   window[cbName] = function(data) {
-    delete window[cbName];
-    document.body.removeChild(script);
-    if (data.allowed) {
-      msg.style.color = '#a5d6a7';
-      msg.textContent = '✅ Xác thực thành công!';
-      setTimeout(function() {
-        var s = document.getElementById('auth-screen');
-        s.style.transition = 'opacity .5s';
-        s.style.opacity = '0';
-        setTimeout(function() { s.remove(); }, 500);
-      }, 800);
+    _cleanupAuth();
+    if (data && data.allowed) {
+      _grantAccess();
     } else {
-      msg.style.color = '#ef9a9a';
-      msg.textContent = '❌ ' + email + ' chưa được cấp quyền!';
-      btn.disabled    = false;
-      btn.textContent = '🔑 Đăng nhập';
+      _denyAccess(email, msg, btn);
     }
   };
 
+  // Tạo script tag JSONP
+  var script = document.createElement('script');
+  script.id  = 'authScript';
+  script.src = _API + '?email=' + encodeURIComponent(email) + '&callback=' + cbName + '&t=' + Date.now();
+
   script.onerror = function() {
-    delete window[cbName];
-    document.body.removeChild(script);
-    msg.style.color = '#ffcc80';
-    msg.textContent = '⚠️ Lỗi kết nối, thử lại sau!';
-    btn.disabled    = false;
-    btn.textContent = '🔑 Đăng nhập';
+    _cleanupAuth();
+    console.warn('[Auth] Apps Script không phản hồi, thử whitelist nội bộ...');
+    _tryLocalAuth(email, msg, btn);
   };
 
-  script.src = _API + '?email=' + encodeURIComponent(email) + '&callback=' + cbName;
+  // Timeout 8 giây
+  _authTimer = setTimeout(function() {
+    _cleanupAuth();
+    console.warn('[Auth] Timeout sau 8s, thử whitelist nội bộ...');
+    _tryLocalAuth(email, msg, btn);
+  }, 8000);
+
   document.body.appendChild(script);
 }
 
-document.getElementById('auth-email').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') doAuth();
+// Kiểm tra whitelist cục bộ (fallback)
+function _tryLocalAuth(email, msg, btn) {
+  var allowed = _LOCAL_WHITELIST.some(function(m) {
+    return m.toLowerCase().trim() === email;
+  });
+
+  if (allowed) {
+    msg.style.color = '#ffe082';
+    msg.textContent = '⚠️ Xác thực ngoại tuyến (Apps Script offline)';
+    setTimeout(_grantAccess, 1200);
+  } else {
+    _denyAccess(email, msg, btn);
+  }
+}
+
+function _grantAccess() {
+  var msg = document.getElementById('auth-msg');
+  var s   = document.getElementById('auth-screen');
+  msg.style.color = '#a5d6a7';
+  msg.textContent = '✅ Xác thực thành công!';
+  setTimeout(function() {
+    if (!s) return;
+    s.style.transition = 'opacity .5s';
+    s.style.opacity    = '0';
+    setTimeout(function() { if (s) s.remove(); }, 500);
+  }, 700);
+}
+
+function _denyAccess(email, msg, btn) {
+  msg.style.color = '#ef9a9a';
+  msg.textContent = '❌ ' + email + ' chưa được cấp quyền!';
+  btn.disabled    = false;
+  btn.textContent = '🔑 Đăng nhập';
+}
+
+function _cleanupAuth() {
+  // Xóa timer
+  if (_authTimer) { clearTimeout(_authTimer); _authTimer = null; }
+  // Xóa callback
+  if (_authCBName) { delete window[_authCBName]; _authCBName = null; }
+  // Xóa script tag
+  var old = document.getElementById('authScript');
+  if (old && old.parentNode) old.parentNode.removeChild(old);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var inp = document.getElementById('auth-email');
+  if (inp) inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doAuth();
+  });
 });
 </script>
 
