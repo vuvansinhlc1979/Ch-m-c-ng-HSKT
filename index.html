@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
+ <style>
+#auth-screen{position:fixed;inset:0;background:#0d1b3e;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;gap:16px}
+#auth-box{background:rgba(255,255,255,.06);border:1px solid rgba(200,151,58,.3);border-radius:14px;padding:36px 40px;text-align:center;min-width:320px}
+#auth-email{width:100%;padding:9px 13px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:13px;outline:none;margin-bottom:10px;box-sizing:border-box}
+#auth-email:focus{border-color:#c8973a}
+#auth-btn{width:100%;padding:10px;background:#c8973a;color:#0d1b3e;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+#auth-btn:hover{background:#e0b84e}
+#auth-msg{font-size:12px;min-height:18px;margin-top:8px}
+</style> 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7339,5 +7348,65 @@ async function _buildBieu1MainSheet(wb) {
   setCell(ws.getRow(sumR).getCell(1), 'Tổng số: ' + studentList.length + ' học sinh', {name:'Times New Roman',size:10,bold:true}, {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}}, {horizontal:'left',vertical:'middle'});
 }
 </script>
-</body>
+</body> <div id="auth-screen">
+  <div id="auth-box">
+    <div style="font-size:40px;margin-bottom:8px">📋</div>
+    <div style="color:#c8973a;font-size:18px;font-weight:700;font-family:serif;margin-bottom:4px">Hệ Thống Chấm Công HSKT</div>
+    <div style="color:rgba(255,255,255,.5);font-size:11px;margin-bottom:20px">Trường TH Số 2 Gia Phú</div>
+    <input id="auth-email" type="email" placeholder="Nhập Gmail của bạn...">
+    <button id="auth-btn" onclick="doAuth()">🔑 Đăng nhập</button>
+    <div id="auth-msg"></div>
+  </div>
+</div>
+
+<script>
+const _API = 'https://script.google.com/macros/s/AKfycbwEeGeQbVncyhDbunaSrzOjaoAiTqXP7Xtgtg1F0u65NHYvt4CsDijW4m-ZkBd3SZ5tcg/exec';
+
+async function doAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const msg = document.getElementById('auth-msg');
+  const btn = document.getElementById('auth-btn');
+  
+  if (!email || !email.includes('@')) {
+    msg.style.color = '#ef9a9a';
+    msg.textContent = '⚠️ Vui lòng nhập đúng địa chỉ Gmail!';
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang kiểm tra...';
+  msg.style.color = 'rgba(255,255,255,.6)';
+  msg.textContent = 'Đang xác thực...';
+  
+  try {
+    const res = await fetch(_API + '?email=' + encodeURIComponent(email));
+    const data = await res.json();
+    
+    if (data.allowed) {
+      msg.style.color = '#a5d6a7';
+      msg.textContent = '✅ Xác thực thành công!';
+      setTimeout(() => {
+        const s = document.getElementById('auth-screen');
+        s.style.transition = 'opacity .5s';
+        s.style.opacity = '0';
+        setTimeout(() => s.remove(), 500);
+      }, 800);
+    } else {
+      msg.style.color = '#ef9a9a';
+      msg.textContent = '❌ ' + email + ' chưa được cấp quyền!';
+      btn.disabled = false;
+      btn.textContent = '🔑 Đăng nhập';
+    }
+  } catch(e) {
+    msg.style.color = '#ffcc80';
+    msg.textContent = '⚠️ Lỗi kết nối, thử lại sau!';
+    btn.disabled = false;
+    btn.textContent = '🔑 Đăng nhập';
+  }
+}
+
+document.getElementById('auth-email').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doAuth();
+});
+</script>
 </html>
