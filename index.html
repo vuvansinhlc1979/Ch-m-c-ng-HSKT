@@ -755,50 +755,53 @@ tr.row-kt td.td-cls{color:var(--red)}
         <div class="form-row">
           <div class="form-group">
             <label>Hệ số lương</label>
-            <input type="number" step="0.01" id="b1d-luong" class="hs-input" value="4.32" style="width:100%" onchange="saveLuongCFG()">
+            <input type="number" step="0.01" id="b1d-luong" class="hs-input" value="" placeholder="vd: 3.99" style="width:100%" onchange="saveLuongCFG()">
           </div>
           <div class="form-group">
             <label>Hệ số PC khu vực</label>
-            <input type="number" step="0.01" id="b1d-kv" class="hs-input" value="0.5" style="width:100%" onchange="saveLuongCFG()">
+            <input type="number" step="0.01" id="b1d-kv" class="hs-input" value="" placeholder="vd: 0.5" style="width:100%" onchange="saveLuongCFG()">
+<div class="form-hint">💡 Để trống → tự động điền 0.5 khi có hệ số lương</div>
           </div>
           <div class="form-group">
-            <label>Hệ số PC ưu đãi</label>
-            <input type="number" step="0.001" id="b1d-uuai" class="hs-input" value="1.512" style="width:100%" onchange="saveLuongCFG()">
+            <label>PC ưu đãi (% — vd: 0.35 = 35%)</label>
+<input type="number" step="0.001" id="b1d-uuai" class="hs-input" value="" placeholder="vd: 0.35 = 35%" style="width:100%" onchange="saveLuongCFG()">
+<div class="form-hint">💡 Để trống → tự động điền 0.35 (35%). Tính = (Lương + Chức vụ) × %</div>
           </div>
           <div class="form-group">
             <label>Mức lương cơ sở (đồng)</label>
-            <input type="number" id="b1d-luongcs" class="hs-input" value="2340000" style="width:100%" onchange="saveLuongCFG()">
+            <input type="number" id="b1d-luongcs" class="hs-input" value="" placeholder="vd: 2340000" style="width:100%" onchange="saveLuongCFG()">
           </div>
           <div class="form-group">
             <label>Hệ số chức vụ</label>
-<input type="number" step="0.01" id="b1d-chucvu" class="hs-input" value="0" style="width:100%" onchange="saveLuongCFG()">
+<input type="number" step="0.01" id="b1d-chucvu" class="hs-input" value="" placeholder="vd: 0.1" style="width:100%" onchange="saveLuongCFG()">
           </div>
           <div class="form-group">
-            <label>Mức phụ cấp ưu đãi (vd: 0.2 = 20%)</label>
-            <input type="number" step="0.01" id="b1d-mucpc" class="hs-input" value="0.2" style="width:100%" onchange="saveLuongCFG()">
+            <label>Mức % PC ưu đãi thực nhận (vd: 0.2 = 20%)</label>
+            <input type="number" step="0.01" id="b1d-mucpc" class="hs-input" value="" placeholder="vd: 0.2 = 20%" style="width:100%" onchange="saveLuongCFG()">
+<div class="form-hint">💡 Để trống → tự động điền 0.2 (20%). Tính = Tiền 1 giờ × % × Số tiết</div>
           </div>
         </div>
         <!-- Các thông số tính toán cho Biểu 1d (có thể nhập tay) -->
 <div class="ss-title" style="margin-top:12px">💰 Thông số tính lương & phụ cấp (Biểu 1d)</div>
 <div class="form-row">
   <div class="form-group">
-    <label>Tổng tiền lương/tháng (đồng)</label>
-    <input type="number" id="b1d-tongluong" class="hs-input" value="16838640" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
+    <label>Tổng tiền lương/tháng (đồng) <button onclick="resetManual('b1d-tongluong')" style="font-size:10px;padding:1px 6px;border:1px solid var(--g2);border-radius:4px;background:var(--g0);cursor:pointer;color:var(--g4)" title="Xóa nhập tay, tự động tính lại">↺ tự động</button></label>
+    <input type="number" id="b1d-tongluong" class="hs-input" value="" oninput="this.dataset.manual='true'" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
     <div class="form-hint">💡 Có thể nhập tay hoặc để trống để tự động tính từ hệ số lương</div>
   </div>
   <div class="form-group">
     <label>Số tiền 1 giờ dạy (đồng)</label>
-    <input type="number" id="b1d-tien1gio" class="hs-input" value="228579" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
+    <input type="number" id="b1d-tien1gio" class="hs-input" value="" oninput="this.dataset.manual='true'" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
     <div class="form-hint">💡 Có thể nhập tay hoặc để trống để tự động tính</div>
   </div>
   <div class="form-group">
     <label>Tổng số tiết thực dạy</label>
-    <input type="number" id="b1d-tongtiet" class="hs-input" value="73" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
+    <input type="number" id="b1d-tongtiet" class="hs-input" value="" oninput="this.dataset.manual='true'" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
     <div class="form-hint">💡 Có thể nhập tay hoặc để trống để tự động tính từ LBG</div>
   </div>
   <div class="form-group">
     <label>Phụ cấp ưu đãi được hưởng (đồng)</label>
-    <input type="number" id="b1d-phucap" class="hs-input" value="0" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
+    <input type="number" id="b1d-phucap" class="hs-input" value="" oninput="this.dataset.manual='true'" style="width:100%" placeholder="Nhập hoặc để tự động tính" onchange="saveLuongCFG()">
     <div class="form-hint">💡 Có thể nhập tay hoặc để trống để tự động tính = Tiền 1 giờ × Mức PC × Số tiết</div>
   </div>
 </div>
@@ -817,12 +820,13 @@ tr.row-kt td.td-cls{color:var(--red)}
           </div>
           <div class="form-group">
             <label>PC trách nhiệm</label>
-            <input type="number" step="0.001" id="b1d-pctn" class="hs-input" value="0" style="width:100%" onchange="saveLuongCFG()">
+            <input type="number" step="0.001" id="b1d-pctn" class="hs-input" value="" placeholder="vd: 0.1" style="width:100%" onchange="saveLuongCFG()">
             <div class="form-hint">Hệ số phụ cấp trách nhiệm</div>
           </div>
           <div class="form-group">
             <label>PC TNNG</label>
-            <input type="number" step="0.001" id="b1d-pctnng" class="hs-input" value="0.864" style="width:100%" onchange="saveLuongCFG()">
+            <input type="number" step="0.001" id="b1d-pctnng" class="hs-input" value="" placeholder="vd: 0.864" style="width:100%" onchange="saveLuongCFG()">
+<div class="form-hint">💡 Để trống → tự động điền 0.864. Dùng tính tổng lương/tháng</div>
             <div class="form-hint">Hệ số phụ cấp TNNG</div>
           </div>
           <div class="form-group">
@@ -1288,22 +1292,22 @@ fitPage:true, repeatRow:true,
   promptSave:false, maxDayLessons:5, onlyKTCls:false,
 hk1Start:'05/09/2025', hk1End:'17/01/2026',
 hk2Start:'20/01/2026', hk2End:'31/05/2026',
-'b1d-luong':4.32,
-'b1d-kv':0.5,
-'b1d-uuai':1.512,
-'b1d-luongcs':2340000,
-'b1d-chucvu':0,
-'b1d-mucpc':0.2,
-'b1d-pcdb':0,
-'b1d-pcth':0,
-'b1d-pctn':0,
-'b1d-pctnng':0.864,
-'b1d-pcdang':0,
+'b1d-luong':'',
+'b1d-kv':'',
+'b1d-uuai':'',
+'b1d-luongcs':'',
+'b1d-chucvu':'',
+'b1d-mucpc':'',
+'b1d-pcdb':'',
+'b1d-pcth':'',
+'b1d-pctn':'',
+'b1d-pctnng':'',
+'b1d-pcdang':'',
 colorHeaderText:'#ffffff',
-'b1d-tongluong':0,
-'b1d-tien1gio':0,
-'b1d-tongtiet':0,
-'b1d-phucap':0
+'b1d-tongluong':'',
+'b1d-tien1gio':'',
+'b1d-tongtiet':'',
+'b1d-phucap':''
 };
 
 // ── STATE ──
@@ -1581,8 +1585,25 @@ function parseSheets(wb, fname) {
     var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
     if (rows.length < 5) return;
 
-    // Tự động đọc tên giáo viên từ D2 (index dòng 1, cột 3)
-    var autoTeacher = String((rows[1] && rows[1][3]) || '').trim();
+    // Tự động đọc tên giáo viên từ dòng 2 — tìm ô nào sau "Giáo viên:" hoặc "Giáo viên"
+    var autoTeacher = '';
+    if (rows[1]) {
+      // Tìm ô có chứa "giáo viên" rồi lấy ô liền sau (hoặc cách 1-3 ô)
+      var r1 = rows[1];
+      for (var _ci = 0; _ci < r1.length - 1; _ci++) {
+        var _cv = String(r1[_ci] || '').toLowerCase().replace(/\s+/g,' ').trim();
+        if (_cv.indexOf('giáo viên') >= 0 || _cv.indexOf('giao vien') >= 0) {
+          // Lấy ô không rỗng đầu tiên sau ô label
+          for (var _cj = _ci + 1; _cj < Math.min(_ci + 6, r1.length); _cj++) {
+            var _val = String(r1[_cj] || '').trim();
+            if (_val && _val.length > 1) { autoTeacher = _val; break; }
+          }
+          break;
+        }
+      }
+      // Fallback: thử index 3 rồi 4 nếu chưa tìm được
+      if (!autoTeacher) autoTeacher = String(r1[3] || r1[4] || '').trim();
+    }
     if (autoTeacher && !tmpTeacher) tmpTeacher = autoTeacher;
 
     rows.forEach(function(row) {
@@ -2012,6 +2033,9 @@ var noteCell = showNote ? '<td class="td-note" data-key="' + key + '" data-cls="
   if (cb) cb.style.display = (manualEdits[key] && Object.keys(manualEdits[key]).length) ? 'inline-flex' : 'none';
   var gc = G('gClearEdit');
   if (gc) gc.style.display = (manualEdits[key] && Object.keys(manualEdits[key]).length) ? 'inline-flex' : 'none';
+  
+  // Tự động cập nhật tổng tiết và phụ cấp mỗi khi bảng thay đổi
+  autoCalcLuong();
 }
 
 function renderCurrent() { if (activeMonth) renderTable(activeMonth); }
@@ -2946,10 +2970,11 @@ for (var ci = CD1; ci <= CDN; ci++) ws.getColumn(ci).width = _dayColW;
   });
 
   var stt = 1, exR = 9;
-  var _pageH2 = CFG.pageSize === 'A3' ? 419 : 595;
+  var _pageH2 = CFG.pageSize === 'A3' ? 842 : 595;
 var _marginPt2 = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
-var _fixedPt2 = 71 + 48 + 15 + 70;
-var _dataRowH2 = Math.min(30, Math.max(14, (_pageH2 - _marginPt2 - _fixedPt2) / (dispCls.length + 1)));
+var _fixedPt2 = 15 + 17 + 4 + 25 + 12 + 11 + 16 + 18 + 40;
+var _availH2 = _pageH2 - _marginPt2 - _fixedPt2;
+var _dataRowH2 = Math.min(40, Math.max(16, _availH2 / Math.max(1, dispCls.length + 2)));
   var dTot = [];
   for (var i = 0; i < days; i++) dTot.push(0);
 
@@ -4156,10 +4181,13 @@ ws.mergeCells(2,1,2,Math.floor(totalCols*0.45));
     var colTotals = {};
     months.forEach(function(x){ colTotals[mk(x.m,x.y)] = 0; });
     var totalLessons = 0;
-    var _pageH = CFG.pageSize === 'A3' ? 419 : 595;
+    var _pageH = CFG.pageSize === 'A3' ? 842 : 595;
+var _fixedRows = 20 + 32 + 40 + 18 + 14 + 18 + 40;
+var _rowH = Math.min(28, Math.max(16, (_pageH - (CFG.mgTop+CFG.mgBot)/2.54*72 - _fixedRows) / Math.max(1, studentList.length + 1)));
+var _fixedPt = 20 + 22 + 20 + 15 + 4 + 30 + 22 + 14 + 18 + 40;
 var _marginPt = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
-var _fixedPt = 89 + 52 + 16 + 80;
-var _dataRowH = Math.min(30, Math.max(14, (_pageH - _marginPt - _fixedPt) / (dispCls.length + 1)));
+var _availH = _pageH - _marginPt - _fixedPt;
+var _dataRowH = Math.min(40, Math.max(16, _availH / Math.max(1, dispCls.length + 2)));
 
     dispCls.forEach(function(cls, i) {
       var row = ws.getRow(9 + i); row.height = _dataRowH;
@@ -4618,155 +4646,263 @@ function addBieuHeader(ws, tieuDe, bieu) {
 //  BIỂU 1a: Thống kê số lớp & tiết dạy HSKT
 //  (Tiểu học: khối 1-5, mỗi khối 4 cột)
 // ──────────────────────────────────────────
+function getKhoiMonRows(k, ktMap, bCfg) {
+  var clsKhoi = allClasses.filter(function(c) {
+    var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
+    return r[0] === String(k) && !!ktMap[r];
+  });
+  var monMap = {};
+  clsKhoi.forEach(function(c) {
+    var mon = c.indexOf('||') >= 0 ? c.split('||')[1] : (CFG.subject || '');
+    mon = (mon || CFG.subject || '').trim();
+    if (!monMap[mon]) monMap[mon] = [];
+    monMap[mon].push(c);
+  });
+  var rows = [];
+  Object.keys(monMap).sort().forEach(function(mon) {
+    var list = monMap[mon];
+    var kLop  = list.length;
+    var kTiet = 0;
+    list.forEach(function(c) { kTiet += getTongTietClsInMonths(c, bCfg.months); });
+    var kNames = list.map(function(c) {
+      return c.indexOf('||') >= 0 ? c.split('||')[0] : c;
+    }).join(', ');
+    rows.push({ mon: mon, clsList: list, kLop: kLop, kTiet: kTiet, kNames: kNames });
+  });
+  return rows;
+}
 async function exportBieu1a() {
-  var wb = new ExcelJS.Workbook();
-  var ws = wb.addWorksheet('Biểu 1a');
-  var S = bieuStyles();
+  var bCfg = getBieu1Config(tkFilterMode || 'hk1');
+  var wb   = new ExcelJS.Workbook();
+  var ws   = wb.addWorksheet('Biểu 1a');
+  var S    = bieuStyles();
+  var KHOI_LIST = [1, 2, 3, 4, 5];
+
   ws.pageSetup = {
-  paperSize: CFG.pageSize === 'A3' ? 8 : 9,
-  orientation: CFG.orientation || 'landscape',
-  fitToPage: true, fitToWidth: 1, fitToHeight: 0,
-  margins: {
-    left: (CFG.mgLeft||1)/2.54, right: (CFG.mgRight||0.5)/2.54,
-    top: (CFG.mgTop||1)/2.54, bottom: (CFG.mgBot||1)/2.54,
-    header: (CFG.mgHd||0.5)/2.54, footer: (CFG.mgFt||0.5)/2.54
-  }
-};
-
-  // Độ rộng cột: STT(4), HọTên(18), TổngLớp(6), SốHSKT(8), SốTiết(8), [khối1-5: Sốlớp(5), Liệtkê(14), TênMôn(12), TổngTiết(8)] x5, GhiChú(10)
-  // Code MỚI cho Biểu 1a
-var colWidths = [4,18,6,8,8];
-TIEU_HOC_KHOI.forEach(function(){ colWidths.push(5,14,12,8); });
-colWidths.push(10);
-autoFitColumns(ws, colWidths);
-  var totalCols = cols.length;
-
-  // Dòng 1: Header trường
-  ws.mergeCells(1,1,1,5);
-  ws.mergeCells(1,totalCols,1,totalCols);
-  addBieuHeader(ws, '', 'Biểu 1a');
-
-  // Dòng 2: Tiêu đề bảng
-  ws.getRow(2).height = 36;
-  setCell(ws.getRow(2).getCell(1),
-    'THỐNG KÊ SỐ LỚP VÀ SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\n' +
-    'Học kỳ I, năm học ' + CFG.schoolYear,
-    S.fT, null, S.aCC
-  );
-  ws.mergeCells(2,1,2,totalCols);
-
-  // Dòng 3: Header nhóm cột
-  ws.getRow(3).height = 40;
-  function hd3(col, val, rs, cs, endCol) {
-    setCell(ws.getRow(3).getCell(col), val, S.fHd, S.bgHd, S.aCC, S.bT);
-    if (rs > 1 || cs > 1) ws.mergeCells(3,col,3+rs-1,endCol||col+cs-1);
-  }
-  hd3(1,'Số\nTT',3,1);
-  hd3(2,'Họ và tên GV dạy ở lớp\ncó học sinh học hoà nhập',3,1);
-  hd3(3,'Tổng số',1,3,5);
-  var kCol = 6;
-  TIEU_HOC_KHOI.forEach(function(k) {
-    hd3(kCol, 'Khối ' + k, 1, 4, kCol+3);
-    kCol += 4;
-  });
-  hd3(totalCols,'Ghi chú',3,1);
-
-  // Dòng 4: sub-header "Tổng số"
-  ws.getRow(4).height = 28;
-  ['Lớp','Số HSKT\nhọc hoà nhập','Số tiết\nthực dạy/tuần'].forEach(function(v,i){
-    setCell(ws.getRow(4).getCell(3+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
-  });
-  kCol = 6;
-  TIEU_HOC_KHOI.forEach(function() {
-    ['Số\nlớp','Liệt kê\ntên lớp','Tên môn dạy','Tổng số tiết\nthực dạy/tuần'].forEach(function(v,i){
-      setCell(ws.getRow(4).getCell(kCol+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
-    });
-    kCol += 4;
-  });
-
-  // Dòng 5: STT cột (A, B, 1, 2, ...)
-  ws.getRow(5).height = 16;
-  ['A','B','1','2','3'].forEach(function(v,i){
-    setCell(ws.getRow(5).getCell(1+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
-  });
-  var sttN = 4;
-  TIEU_HOC_KHOI.forEach(function() {
-    for (var j=0;j<4;j++) {
-      setCell(ws.getRow(5).getCell(5+sttN+j-4), String(sttN+j-3), S.fHd, S.bgH2, S.aCC, S.bT);
+    paperSize: CFG.pageSize === 'A3' ? 8 : 9,
+    orientation: CFG.orientation || 'landscape',
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+    margins: {
+      left:  (CFG.mgLeft  || 1)   / 2.54,
+      right: (CFG.mgRight || 0.5) / 2.54,
+      top:   (CFG.mgTop   || 1)   / 2.54,
+      bottom:(CFG.mgBot   || 1)   / 2.54,
+      header:(CFG.mgHd    || 0.5) / 2.54,
+      footer:(CFG.mgFt    || 0.5) / 2.54
     }
-    sttN+=4;
+  };
+
+  var fixedCols   = 5;
+  var colsPerKhoi = 4;
+  var totalCols   = fixedCols + KHOI_LIST.length * colsPerKhoi + 1;
+
+  ws.getColumn(1).width = 5;
+  ws.getColumn(2).width = 20;
+  ws.getColumn(3).width = 6;
+  ws.getColumn(4).width = 9;
+  ws.getColumn(5).width = 9;
+  KHOI_LIST.forEach(function(k, ki) {
+    var base = fixedCols + ki * colsPerKhoi;
+    ws.getColumn(base + 1).width = 5;
+    ws.getColumn(base + 2).width = 16;
+    ws.getColumn(base + 3).width = 14;
+    ws.getColumn(base + 4).width = 11;
   });
-  setCell(ws.getRow(5).getCell(totalCols), String(sttN-3), S.fHd, S.bgH2, S.aCC, S.bT);
+  ws.getColumn(totalCols).width = 10;
 
-  // Dòng dữ liệu: 1 GV (chỉ 1 GV trong app này)
-  var ktMap = getKTMapByCls();
-  var dataRow = 6;
-  ws.getRow(dataRow).height = 18;
-  var row = ws.getRow(dataRow);
-  setCell(row.getCell(1), 1, S.fM, null, S.aCC, S.bT);
-  setCell(row.getCell(2), CFG.teacher, S.fM, null, S.aLC, S.bT);
+  ws.getRow(1).height = 28;
+  ws.mergeCells(1, 1, 1, 4);
+  setCell(ws.getRow(1).getCell(1),
+    'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
+    {name:'Times New Roman',size:10,bold:true}, null,
+    {horizontal:'left',vertical:'middle',wrapText:true}
+  );
+  ws.getRow(1).getCell(totalCols).value     = 'Biểu 1a';
+  ws.getRow(1).getCell(totalCols).font      = S.fB;
+  ws.getRow(1).getCell(totalCols).alignment = {horizontal:'right',vertical:'middle'};
 
-  // Tổng số lớp, HSKT, tiết
+  ws.getRow(2).height = 22;
+  setCell(ws.getRow(2).getCell(1), 'THỐNG KÊ',
+    {name:'Times New Roman',size:13,bold:true}, null, S.aCC);
+  ws.mergeCells(2, 1, 2, totalCols);
+
+  ws.getRow(3).height = 20;
+  setCell(ws.getRow(3).getCell(1),
+    'SỐ LỚP VÀ SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP\n' + bCfg.hkLabel,
+    {name:'Times New Roman',size:12,bold:true}, null, S.aCC);
+  ws.mergeCells(3, 1, 3, totalCols);
+
+  ws.getRow(4).height = 18;
+  setCell(ws.getRow(4).getCell(1), bCfg.hkLabel,
+    {name:'Times New Roman',size:11,italic:true}, null, S.aCC);
+  ws.mergeCells(4, 1, 4, totalCols);
+
+  ws.getRow(5).height = 22;
+  ws.getRow(6).height = 22;
+  ws.getRow(7).height = 38;
+  ws.getRow(8).height = 16;
+
+  setCell(ws.getRow(5).getCell(1), 'Số\nTT', S.fHd, S.bgHd, S.aCC, S.bT);
+  ws.mergeCells(5, 1, 7, 1);
+  setCell(ws.getRow(8).getCell(1), 'A', S.fHd, S.bgH2, S.aCC, S.bT);
+
+  setCell(ws.getRow(5).getCell(2),
+    'Họ và tên GV dạy ở lớp có học sinh học hoà nhập',
+    S.fHd, S.bgHd, S.aCC, S.bT);
+  ws.mergeCells(5, 2, 7, 2);
+  setCell(ws.getRow(8).getCell(2), 'B', S.fHd, S.bgH2, S.aCC, S.bT);
+
+  setCell(ws.getRow(5).getCell(3), 'Tổng số', S.fHd, S.bgHd, S.aCC, S.bT);
+  ws.mergeCells(5, 3, 5, 5);
+
+  setCell(ws.getRow(6).getCell(3), 'Lớp', S.fHd, S.bgH2, S.aCC, S.bT);
+  ws.mergeCells(6, 3, 7, 3);
+  setCell(ws.getRow(8).getCell(3), '1', S.fHd, S.bgH2, S.aCC, S.bT);
+
+  setCell(ws.getRow(6).getCell(4),
+    'Số học sinh khuyết tật học hoà nhập',
+    S.fHd, S.bgH2, S.aCC, S.bT);
+  ws.mergeCells(6, 4, 7, 4);
+  setCell(ws.getRow(8).getCell(4), '2', S.fHd, S.bgH2, S.aCC, S.bT);
+
+  setCell(ws.getRow(6).getCell(5), 'Số tiết thực dạy/\ntuần', S.fHd, S.bgH2, S.aCC, S.bT);
+  ws.mergeCells(6, 5, 7, 5);
+  setCell(ws.getRow(8).getCell(5), '3', S.fHd, S.bgH2, S.aCC, S.bT);
+
+  setCell(ws.getRow(5).getCell(fixedCols + 1),
+    'Số lớp/ số tiết thực dạy/tuần đối với học sinh học hoà nhập',
+    S.fHd, S.bgHd, S.aCC, S.bT);
+  ws.mergeCells(5, fixedCols + 1, 5, fixedCols + KHOI_LIST.length * colsPerKhoi);
+
+  setCell(ws.getRow(5).getCell(totalCols), 'Ghi chú', S.fHd, S.bgHd, S.aCC, S.bT);
+  ws.mergeCells(5, totalCols, 7, totalCols);
+  setCell(ws.getRow(8).getCell(totalCols), '23', S.fHd, S.bgH2, S.aCC, S.bT);
+
+  var sttCol = 3;
+  KHOI_LIST.forEach(function(k, ki) {
+    var base = fixedCols + ki * colsPerKhoi;
+    setCell(ws.getRow(6).getCell(base + 1), 'Lớp ' + k, S.fHd, S.bgHd, S.aCC, S.bT);
+    ws.mergeCells(6, base + 1, 6, base + colsPerKhoi);
+    ['Số\nlớp', 'Liệt kê\ntên lớp', 'Tên môn\ndạy', 'Tổng số tiết\nthực dạy\ntrong tuần'].forEach(function(v, i) {
+      setCell(ws.getRow(7).getCell(base + 1 + i), v, S.fHd, S.bgH2, S.aCC, S.bT);
+    });
+    for (var i = 0; i < colsPerKhoi; i++) {
+      sttCol++;
+      setCell(ws.getRow(8).getCell(base + 1 + i), String(sttCol), S.fHd, S.bgH2, S.aCC, S.bT);
+    }
+  });
+
+  var ktMap    = getKTMapByCls();
   var allKtCls = allClasses.filter(function(c) {
-    var r = c.indexOf('||')>=0?c.split('||')[0]:c;
+    var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
     return !!ktMap[r];
   });
-  var tongLop = allKtCls.length;
-  var tongHS  = studentList.length;
+  var tongLop  = allKtCls.length;
+  var tongHS   = studentList.length;
   var tongTiet = 0;
-  allKtCls.forEach(function(c){ tongTiet += getTongTietClsInMonths(c, bCfg.months); });
-  setCell(row.getCell(3), tongLop,  S.fB, S.bgYe, S.aCC, S.bT);
-  setCell(row.getCell(4), tongHS,   S.fM, null, S.aCC, S.bT);
-  setCell(row.getCell(5), tongTiet, S.fB, S.bgYe, S.aCC, S.bT);
+  allKtCls.forEach(function(c) { tongTiet += getTongTietClsInMonths(c, bCfg.months); });
 
-  kCol = 6;
-  TIEU_HOC_KHOI.forEach(function(k) {
-    var clsKhoi = getClsByKhoi(k).filter(function(c){
-      var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r];
-    });
-    var kLop  = clsKhoi.length;
-    var kTiet = 0; clsKhoi.forEach(function(c){ kTiet += getTongTietClsInMonths(c, bCfg.months); });
-    var kNames = clsKhoi.map(function(c){return c.indexOf('||')>=0?c.split('||')[0]:c;}).join(', ');
-    var kMon   = CFG.subject || '';
-    setCell(row.getCell(kCol),   kLop||null,  S.fM, null, S.aCC, S.bT);
-    setCell(row.getCell(kCol+1), kNames||null,S.fM, null, S.aLC, S.bT);
-    setCell(row.getCell(kCol+2), kMon||null,  S.fM, null, S.aCC, S.bT);
-    setCell(row.getCell(kCol+3), kTiet||null, S.fB, S.bgYe, S.aCC, S.bT);
-    kCol += 4;
+  var khoiData = {};
+  KHOI_LIST.forEach(function(k) {
+    khoiData[k] = getKhoiMonRows(k, ktMap, bCfg);
   });
-  setCell(row.getCell(totalCols), null, S.fM, null, S.aCC, S.bT);
+  var maxRows = 1;
+  KHOI_LIST.forEach(function(k) {
+    if (khoiData[k].length > maxRows) maxRows = khoiData[k].length;
+  });
 
-  // Dòng Tổng số
-  dataRow++;
-  var sumRow = ws.getRow(dataRow); sumRow.height = 18;
-  ws.mergeCells(dataRow,1,dataRow,2);
-  setCell(sumRow.getCell(1),'Tổng số', S.fB, S.bgSm, S.aRC);
-  setCell(sumRow.getCell(3), tongLop, {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
-  setCell(sumRow.getCell(4), tongHS,  {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
-  setCell(sumRow.getCell(5), tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+  var startRow = 9;
+  for (var ri = 0; ri < maxRows; ri++) {
+    var rowNum = startRow + ri;
+    ws.getRow(rowNum).height = 16;
+    var row = ws.getRow(rowNum);
 
-  // Ký tên
-  var signR = dataRow + 2;
-  var now = new Date();
-  var dateStr = (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
-  var midC = Math.floor(totalCols * 0.65);
-  ws.getRow(signR).getCell(midC).value = dateStr;
-  ws.getRow(signR).getCell(midC).font = {name:'Times New Roman',size:10,italic:true};
-  ws.getRow(signR).getCell(midC).alignment = S.aCC;
-  ws.mergeCells(signR, midC, signR, totalCols);
-  ws.getRow(signR+1).getCell(midC).value = 'Giáo viên bộ môn';
-  ws.getRow(signR+1).getCell(midC).font = S.fB;
-  ws.getRow(signR+1).getCell(midC).alignment = S.aCC;
-  ws.mergeCells(signR+1,midC,signR+1,totalCols);
-  ws.getRow(signR+4).getCell(midC).value = CFG.teacher;
-  ws.getRow(signR+4).getCell(midC).font = S.fB;
-  ws.getRow(signR+4).getCell(midC).alignment = S.aCC;
-  ws.mergeCells(signR+4,midC,signR+4,totalCols);
+    if (ri === 0) {
+      setCell(row.getCell(1), 1,           S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(2), CFG.teacher, S.fM, null, {horizontal:'left',vertical:'middle'}, S.bT);
+      setCell(row.getCell(3), tongLop,     S.fB,
+        {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}}, S.aCC, S.bT);
+      setCell(row.getCell(4), tongHS,      S.fM, null, S.aCC, S.bT);
+      setCell(row.getCell(5), tongTiet,    S.fB,
+        {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}}, S.aCC, S.bT);
+      setCell(row.getCell(totalCols), null, S.fM, null, S.aCC, S.bT);
+
+      if (maxRows > 1) {
+        var endRow = startRow + maxRows - 1;
+        ws.mergeCells(startRow, 1, endRow, 1);
+        ws.mergeCells(startRow, 2, endRow, 2);
+        ws.mergeCells(startRow, 3, endRow, 3);
+        ws.mergeCells(startRow, 4, endRow, 4);
+        ws.mergeCells(startRow, 5, endRow, 5);
+        ws.mergeCells(startRow, totalCols, endRow, totalCols);
+      }
+    }
+
+    KHOI_LIST.forEach(function(k, ki) {
+      var base  = fixedCols + ki * colsPerKhoi;
+      var monRow = khoiData[k][ri];
+
+      if (monRow) {
+        setCell(row.getCell(base + 1), monRow.kLop   || null, S.fM, null, S.aCC, S.bT);
+        setCell(row.getCell(base + 2), monRow.kNames || null, S.fM, null,
+          {horizontal:'left',vertical:'middle',wrapText:true}, S.bT);
+        setCell(row.getCell(base + 3), monRow.mon    || null, S.fM, null,
+          {horizontal:'left',vertical:'middle',wrapText:true}, S.bT);
+        setCell(row.getCell(base + 4), monRow.kTiet  || null, S.fB,
+          monRow.kTiet > 0
+            ? {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}}
+            : null,
+          S.aCC, S.bT);
+      } else {
+        for (var ci = 1; ci <= colsPerKhoi; ci++) {
+          setCell(row.getCell(base + ci), null, S.fM, null, S.aCC, S.bT);
+        }
+      }
+    });
+  }
+
+  var sumR = startRow + maxRows;
+  ws.getRow(sumR).height = 18;
+  ws.mergeCells(sumR, 1, sumR, 2);
+  setCell(ws.getRow(sumR).getCell(1), 'Tổng số', S.fB, S.bgSm,
+    {horizontal:'right',vertical:'middle'});
+  setCell(ws.getRow(sumR).getCell(3), tongLop,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},
+    S.bgSm, S.aCC, S.bT);
+  setCell(ws.getRow(sumR).getCell(4), tongHS,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},
+    S.bgSm, S.aCC, S.bT);
+  setCell(ws.getRow(sumR).getCell(5), tongTiet,
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},
+    S.bgSm, S.aCC, S.bT);
+  for (var ci2 = fixedCols + 1; ci2 <= totalCols; ci2++) {
+    setCell(ws.getRow(sumR).getCell(ci2), null, S.fHd, S.bgSm, S.aCC, S.bT);
+  }
+
+  var signR = sumR + 2;
+  var now   = new Date();
+  var mid   = Math.floor(totalCols * 0.65);
+  ws.getRow(signR).getCell(mid).value =
+    (CFG.location || '') + ', ngày ' + now.getDate() +
+    ' tháng ' + pad2(now.getMonth() + 1) + ' năm ' + now.getFullYear();
+  ws.getRow(signR).getCell(mid).font      = {name:'Times New Roman',size:10,italic:true};
+  ws.getRow(signR).getCell(mid).alignment = S.aCC;
+  ws.mergeCells(signR, mid, signR, totalCols);
+  ws.getRow(signR + 1).getCell(mid).value     = 'Giáo viên bộ môn';
+  ws.getRow(signR + 1).getCell(mid).font      = S.fB;
+  ws.getRow(signR + 1).getCell(mid).alignment = S.aCC;
+  ws.mergeCells(signR + 1, mid, signR + 1, totalCols);
+  ws.getRow(signR + 4).getCell(mid).value     = CFG.teacher;
+  ws.getRow(signR + 4).getCell(mid).font      = S.fB;
+  ws.getRow(signR + 4).getCell(mid).alignment = S.aCC;
+  ws.mergeCells(signR + 4, mid, signR + 4, totalCols);
 
   var buf = await wb.xlsx.writeBuffer();
-  dlBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
-    'Bieu1a_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx');
-  toast('✅ Đã xuất Biểu 1a', 't-ok');
+  dlBlob(
+    new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'Bieu1a_' + CFG.schoolYear.replace(/ /g,'').replace(/-/g,'_') + '.xlsx'
+  );
+  toast('✅ Đã xuất Biểu 1a (mỗi môn 1 dòng)', 't-ok');
 }
 
 // ──────────────────────────────────────────
@@ -5369,10 +5505,10 @@ function getBieu1Config(mode) {
 
 async function _buildBieu1aSheet(wb, mode) {
   var bCfg = getBieu1Config(mode || 'hk1');
-  var ws = wb.addWorksheet('Biểu 1a');
-  var S = bieuStyles();
-  var KHOI_LIST = [1,2,3,4,5];
-
+  var ws   = wb.addWorksheet('Biểu 1a');
+  var S    = bieuStyles();
+  var KHOI_LIST = [1, 2, 3, 4, 5];
+ 
   ws.pageSetup = {
     paperSize: CFG.pageSize === 'A3' ? 8 : 9,
     orientation: CFG.orientation || 'landscape',
@@ -5383,210 +5519,183 @@ async function _buildBieu1aSheet(wb, mode) {
       header:(CFG.mgHd||0.5)/2.54, footer:(CFG.mgFt||0.5)/2.54
     }
   };
-
-  var fixedCols  = 5;
+ 
+  var fixedCols   = 5;
   var colsPerKhoi = 4;
-  var totalCols  = fixedCols + KHOI_LIST.length * colsPerKhoi + 1; // 5+20+1=26
-
-  // Độ rộng cột
-  ws.getColumn(1).width = 5;
-  ws.getColumn(2).width = 20;
-  ws.getColumn(3).width = 6;
-  ws.getColumn(4).width = 9;
+  var totalCols   = fixedCols + KHOI_LIST.length * colsPerKhoi + 1;
+ 
+  ws.getColumn(1).width = 5;  ws.getColumn(2).width = 20;
+  ws.getColumn(3).width = 6;  ws.getColumn(4).width = 9;
   ws.getColumn(5).width = 9;
   KHOI_LIST.forEach(function(k, ki) {
     var base = fixedCols + ki * colsPerKhoi;
     ws.getColumn(base+1).width = 5;
     ws.getColumn(base+2).width = 16;
-    ws.getColumn(base+3).width = 10;
+    ws.getColumn(base+3).width = 14;
     ws.getColumn(base+4).width = 11;
   });
   ws.getColumn(totalCols).width = 10;
-
-  // ── Dòng 1: Tên trường + nhãn biểu ──
+ 
+  // Tiêu đề
   ws.getRow(1).height = 28;
   ws.mergeCells(1,1,1,4);
   setCell(ws.getRow(1).getCell(1),
     'SỞ GIÁO DỤC VÀ ĐÀO TẠO\nTrường (Trung tâm).....',
     {name:'Times New Roman',size:10,bold:true}, null,
-    {horizontal:'left',vertical:'middle',wrapText:true}
-  );
+    {horizontal:'left',vertical:'middle',wrapText:true});
   ws.getRow(1).getCell(totalCols).value = 'Biểu 1a';
   ws.getRow(1).getCell(totalCols).font  = S.fB;
   ws.getRow(1).getCell(totalCols).alignment = {horizontal:'right',vertical:'middle'};
-
-  // ── Dòng 2: THỐNG KÊ ──
+ 
   ws.getRow(2).height = 22;
-  setCell(ws.getRow(2).getCell(1), 'THỐNG KÊ',
-    {name:'Times New Roman',size:13,bold:true}, null, S.aCC);
+  setCell(ws.getRow(2).getCell(1),'THỐNG KÊ',
+    {name:'Times New Roman',size:13,bold:true},null,S.aCC);
   ws.mergeCells(2,1,2,totalCols);
-
-  // ── Dòng 3: Tiêu đề phụ ──
+ 
   ws.getRow(3).height = 20;
   setCell(ws.getRow(3).getCell(1),
     'SỐ LỚP VÀ SỐ TIẾT DẠY HỌC SINH KHUYẾT TẬT HỌC HOÀ NHẬP NĂM HỌC ......',
-    {name:'Times New Roman',size:12,bold:true}, null, S.aCC);
+    {name:'Times New Roman',size:12,bold:true},null,S.aCC);
   ws.mergeCells(3,1,3,totalCols);
-
-  // ── Dòng 4: Học kỳ ──
+ 
   ws.getRow(4).height = 18;
-  setCell(ws.getRow(4).getCell(1),
-    'Học kỳ ....., năm học ......',
-    {name:'Times New Roman',size:11,italic:true}, null, S.aCC);
+  setCell(ws.getRow(4).getCell(1),'Học kỳ ....., năm học ......',
+    {name:'Times New Roman',size:11,italic:true},null,S.aCC);
   ws.mergeCells(4,1,4,totalCols);
-
-  // ══════════════════════════════════════════
-  // HEADER BẢNG: dòng 5,6,7 = merge; dòng 8 = STT
-  // ══════════════════════════════════════════
-  ws.getRow(5).height = 22;
-  ws.getRow(6).height = 22;
-  ws.getRow(7).height = 38;
-  ws.getRow(8).height = 16;
-
-  // Cột A (1): "Số TT" — merge dòng 5,6,7, dòng 8 ghi "A"
-  setCell(ws.getRow(5).getCell(1), 'Số\nTT', S.fHd, S.bgHd, S.aCC, S.bT);
+ 
+  // Header bảng
+  ws.getRow(5).height = 22; ws.getRow(6).height = 22;
+  ws.getRow(7).height = 38; ws.getRow(8).height = 16;
+ 
+  setCell(ws.getRow(5).getCell(1),'Số\nTT',S.fHd,S.bgHd,S.aCC,S.bT);
   ws.mergeCells(5,1,7,1);
-  setCell(ws.getRow(8).getCell(1), 'A', S.fHd, S.bgH2, S.aCC, S.bT);
-
-  // Cột B (2): "Họ và tên GV..." — merge dòng 5,6,7, dòng 8 ghi "B"
+  setCell(ws.getRow(8).getCell(1),'A',S.fHd,S.bgH2,S.aCC,S.bT);
+ 
   setCell(ws.getRow(5).getCell(2),
     'Họ và tên GV dạy ở lớp có học sinh học hoà nhập',
-    S.fHd, S.bgHd, S.aCC, S.bT);
+    S.fHd,S.bgHd,S.aCC,S.bT);
   ws.mergeCells(5,2,7,2);
-  setCell(ws.getRow(8).getCell(2), 'B', S.fHd, S.bgH2, S.aCC, S.bT);
-
-  // Nhóm "Tổng số" — dòng 5 merge cột 3,4,5
-  setCell(ws.getRow(5).getCell(3), 'Tổng số', S.fHd, S.bgHd, S.aCC, S.bT);
+  setCell(ws.getRow(8).getCell(2),'B',S.fHd,S.bgH2,S.aCC,S.bT);
+ 
+  setCell(ws.getRow(5).getCell(3),'Tổng số',S.fHd,S.bgHd,S.aCC,S.bT);
   ws.mergeCells(5,3,5,5);
-
-  // Cột C (3): "Lớp" — merge dòng 6,7
-  setCell(ws.getRow(6).getCell(3), 'Lớp', S.fHd, S.bgH2, S.aCC, S.bT);
+  setCell(ws.getRow(6).getCell(3),'Lớp',S.fHd,S.bgH2,S.aCC,S.bT);
   ws.mergeCells(6,3,7,3);
-  setCell(ws.getRow(8).getCell(3), '1', S.fHd, S.bgH2, S.aCC, S.bT);
-
-  // Cột D (4): "Số học sinh khuyết tật học hoà nhập" — merge dòng 5(phần tổng số đã merge),6,7
-  // Vì dòng 5 cột 4 đã nằm trong merge 5,3,5,5 => sub ở dòng 6
-  setCell(ws.getRow(6).getCell(4),
-    'Số học sinh khuyết tật học hoà nhập',
-    S.fHd, S.bgH2, S.aCC, S.bT);
+  setCell(ws.getRow(8).getCell(3),'1',S.fHd,S.bgH2,S.aCC,S.bT);
+  setCell(ws.getRow(6).getCell(4),'Số học sinh khuyết tật học hoà nhập',S.fHd,S.bgH2,S.aCC,S.bT);
   ws.mergeCells(6,4,7,4);
-  setCell(ws.getRow(8).getCell(4), '2', S.fHd, S.bgH2, S.aCC, S.bT);
-
-  // Cột E (5): "Số tiết thực dạy/tuần" — merge dòng 6,7
-  setCell(ws.getRow(6).getCell(5),
-    'Số tiết thực dạy/\ntuần',
-    S.fHd, S.bgH2, S.aCC, S.bT);
+  setCell(ws.getRow(8).getCell(4),'2',S.fHd,S.bgH2,S.aCC,S.bT);
+  setCell(ws.getRow(6).getCell(5),'Số tiết thực dạy/\ntuần',S.fHd,S.bgH2,S.aCC,S.bT);
   ws.mergeCells(6,5,7,5);
-  setCell(ws.getRow(8).getCell(5), '3', S.fHd, S.bgH2, S.aCC, S.bT);
-
-  // Nhóm lớn "Số lớp/số tiết..." — dòng 5 merge từ cột 6 đến hết phần khối
+  setCell(ws.getRow(8).getCell(5),'3',S.fHd,S.bgH2,S.aCC,S.bT);
+ 
   setCell(ws.getRow(5).getCell(fixedCols+1),
     'Số lớp/ số tiết thực dạy/tuần đối với học sinh học hoà nhập',
-    S.fHd, S.bgHd, S.aCC, S.bT);
-  ws.mergeCells(5, fixedCols+1, 5, fixedCols + KHOI_LIST.length*colsPerKhoi);
-
-  // Cột Ghi chú — merge dòng 5,6,7
-  setCell(ws.getRow(5).getCell(totalCols), 'Ghi chú', S.fHd, S.bgHd, S.aCC, S.bT);
+    S.fHd,S.bgHd,S.aCC,S.bT);
+  ws.mergeCells(5,fixedCols+1,5,fixedCols+KHOI_LIST.length*colsPerKhoi);
+ 
+  setCell(ws.getRow(5).getCell(totalCols),'Ghi chú',S.fHd,S.bgHd,S.aCC,S.bT);
   ws.mergeCells(5,totalCols,7,totalCols);
-  setCell(ws.getRow(8).getCell(totalCols), '23', S.fHd, S.bgH2, S.aCC, S.bT);
-
-  // Từng khối: dòng 6 = tên khối, dòng 7 = 4 sub-header, dòng 8 = số thứ tự
-  var sttCol = 4; // bắt đầu từ STT số 4 (sau 1,2,3)
-  KHOI_LIST.forEach(function(k, ki) {
-    var base = fixedCols + ki * colsPerKhoi;
-
-    // Dòng 6: tên khối, merge 4 cột
-    setCell(ws.getRow(6).getCell(base+1), 'Lớp ' + k, S.fHd, S.bgHd, S.aCC, S.bT);
-    ws.mergeCells(6, base+1, 6, base+colsPerKhoi);
-
-    // Dòng 7: 4 sub-header
-    var subLabels = [
-      'Số\nlớp',
-      'Liệt kê\ntên lớp',
-      'Tên môn\ndạy',
-      'Tổng số tiết\nthực dạy\ntrong tuần'
-    ];
-    subLabels.forEach(function(v, i) {
-      setCell(ws.getRow(7).getCell(base+1+i), v, S.fHd, S.bgH2, S.aCC, S.bT);
+  setCell(ws.getRow(8).getCell(totalCols),'23',S.fHd,S.bgH2,S.aCC,S.bT);
+ 
+  var sttCol = 3;
+  KHOI_LIST.forEach(function(k,ki){
+    var base=fixedCols+ki*colsPerKhoi;
+    setCell(ws.getRow(6).getCell(base+1),'Lớp '+k,S.fHd,S.bgHd,S.aCC,S.bT);
+    ws.mergeCells(6,base+1,6,base+colsPerKhoi);
+    ['Số\nlớp','Liệt kê\ntên lớp','Tên môn\ndạy','Tổng số tiết\nthực dạy\ntrong tuần'].forEach(function(v,i){
+      setCell(ws.getRow(7).getCell(base+1+i),v,S.fHd,S.bgH2,S.aCC,S.bT);
     });
-
-    // Dòng 8: STT số
-    for (var i = 0; i < colsPerKhoi; i++) {
+    for(var i=0;i<colsPerKhoi;i++){
       sttCol++;
-      setCell(ws.getRow(8).getCell(base+1+i), String(sttCol), S.fHd, S.bgH2, S.aCC, S.bT);
+      setCell(ws.getRow(8).getCell(base+1+i),String(sttCol),S.fHd,S.bgH2,S.aCC,S.bT);
     }
   });
-
-  // ── Dữ liệu dòng 9 ──
-  var ktMap = getKTMapByCls();
-  var allKtCls = allClasses.filter(function(c) {
-    var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
-    return !!ktMap[r];
+ 
+  // Tính dữ liệu
+  var ktMap    = getKTMapByCls();
+  var allKtCls = allClasses.filter(function(c){
+    var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap[r];
   });
   var tongLop  = allKtCls.length;
   var tongHS   = studentList.length;
   var tongTiet = 0;
-  allKtCls.forEach(function(c) { tongTiet += getTongTietClsInMonths(c, bCfg.months); });
-
-  var dataRow = ws.getRow(9);
-  dataRow.height = 18;
-  setCell(dataRow.getCell(1), 1,           S.fM, null, S.aCC, S.bT);
-  setCell(dataRow.getCell(2), CFG.teacher, S.fM, null, {horizontal:'left',vertical:'middle'}, S.bT);
-  setCell(dataRow.getCell(3), tongLop,     S.fB, {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}}, S.aCC, S.bT);
-  setCell(dataRow.getCell(4), tongHS,      S.fM, null, S.aCC, S.bT);
-  setCell(dataRow.getCell(5), tongTiet,    S.fB, {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}}, S.aCC, S.bT);
-
-  KHOI_LIST.forEach(function(k, ki) {
-    var base = fixedCols + ki * colsPerKhoi;
-    var clsKhoi = allClasses.filter(function(c) {
-      var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
-      return r[0] === String(k) && !!ktMap[r];
+  allKtCls.forEach(function(c){ tongTiet+=getTongTietClsInMonths(c,bCfg.months); });
+ 
+  var khoiData = {};
+  KHOI_LIST.forEach(function(k){ khoiData[k]=getKhoiMonRows(k,ktMap,bCfg); });
+  var maxRows = 1;
+  KHOI_LIST.forEach(function(k){ if(khoiData[k].length>maxRows) maxRows=khoiData[k].length; });
+ 
+  var startRow = 9;
+  for(var ri=0; ri<maxRows; ri++){
+    var rowNum=startRow+ri;
+    ws.getRow(rowNum).height=16;
+    var row=ws.getRow(rowNum);
+ 
+    if(ri===0){
+      setCell(row.getCell(1),1,S.fM,null,S.aCC,S.bT);
+      setCell(row.getCell(2),CFG.teacher,S.fM,null,{horizontal:'left',vertical:'middle'},S.bT);
+      setCell(row.getCell(3),tongLop,S.fB,
+        {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}},S.aCC,S.bT);
+      setCell(row.getCell(4),tongHS,S.fM,null,S.aCC,S.bT);
+      setCell(row.getCell(5),tongTiet,S.fB,
+        {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}},S.aCC,S.bT);
+      setCell(row.getCell(totalCols),null,S.fM,null,S.aCC,S.bT);
+      if(maxRows>1){
+        var endRow=startRow+maxRows-1;
+        [1,2,3,4,5,totalCols].forEach(function(c){
+          ws.mergeCells(startRow,c,endRow,c);
+        });
+      }
+    }
+ 
+    KHOI_LIST.forEach(function(k,ki){
+      var base=fixedCols+ki*colsPerKhoi;
+      var monRow=khoiData[k][ri];
+      if(monRow){
+        setCell(row.getCell(base+1),monRow.kLop||null,S.fM,null,S.aCC,S.bT);
+        setCell(row.getCell(base+2),monRow.kNames||null,S.fM,null,
+          {horizontal:'left',vertical:'middle',wrapText:true},S.bT);
+        setCell(row.getCell(base+3),monRow.mon||null,S.fM,null,
+          {horizontal:'left',vertical:'middle',wrapText:true},S.bT);
+        setCell(row.getCell(base+4),monRow.kTiet||null,S.fB,
+          monRow.kTiet>0?{type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}}:null,
+          S.aCC,S.bT);
+      } else {
+        for(var ci=1;ci<=colsPerKhoi;ci++)
+          setCell(row.getCell(base+ci),null,S.fM,null,S.aCC,S.bT);
+      }
     });
-    var kLop  = clsKhoi.length;
-    var kTiet = 0;
-    clsKhoi.forEach(function(c) { kTiet += getTongTietClsInMonths(c, bCfg.months); });
-    var kNames = clsKhoi.map(function(c) { return c.indexOf('||')>=0 ? c.split('||')[0] : c; }).join(', ');
-
-    setCell(dataRow.getCell(base+1), kLop   ||null, S.fM, null, S.aCC, S.bT);
-    setCell(dataRow.getCell(base+2), kNames ||null, S.fM, null, {horizontal:'left',vertical:'middle',wrapText:true}, S.bT);
-    setCell(dataRow.getCell(base+3), CFG.subject||null, S.fM, null, S.aCC, S.bT);
-    setCell(dataRow.getCell(base+4), kTiet  ||null, S.fB,
-      kTiet>0 ? {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}} : null, S.aCC, S.bT);
-  });
-  setCell(dataRow.getCell(totalCols), null, S.fM, null, S.aCC, S.bT);
-
-  // ── Dòng Tổng số ──
-  var sumR = 10;
-  ws.getRow(sumR).height = 18;
-  ws.mergeCells(sumR,1,sumR,2);
-  setCell(ws.getRow(sumR).getCell(1), 'Tổng số', S.fB, S.bgSm, {horizontal:'right',vertical:'middle'});
-  setCell(ws.getRow(sumR).getCell(3), tongLop,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
-  setCell(ws.getRow(sumR).getCell(4), tongHS,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
-  setCell(ws.getRow(sumR).getCell(5), tongTiet,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
-  for (var ci2 = fixedCols+1; ci2 <= totalCols; ci2++) {
-    setCell(ws.getRow(sumR).getCell(ci2), null, S.fHd, S.bgSm, S.aCC, S.bT);
   }
-
-  // ── Ký tên ──
-  var signR = sumR + 2;
-  var now   = new Date();
-  var mid   = Math.floor(totalCols * 0.65);
-  ws.getRow(signR).getCell(mid).value =
-    (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
-  ws.getRow(signR).getCell(mid).font = {name:'Times New Roman',size:10,italic:true};
-  ws.getRow(signR).getCell(mid).alignment = S.aCC;
-  ws.mergeCells(signR, mid, signR, totalCols);
-  ws.getRow(signR+1).getCell(mid).value = 'Giáo viên bộ môn';
-  ws.getRow(signR+1).getCell(mid).font  = S.fB;
-  ws.getRow(signR+1).getCell(mid).alignment = S.aCC;
-  ws.mergeCells(signR+1, mid, signR+1, totalCols);
-  ws.getRow(signR+4).getCell(mid).value = CFG.teacher;
-  ws.getRow(signR+4).getCell(mid).font  = S.fB;
-  ws.getRow(signR+4).getCell(mid).alignment = S.aCC;
-  ws.mergeCells(signR+4, mid, signR+4, totalCols);
+ 
+  // Dòng tổng
+  var sumR=startRow+maxRows;
+  ws.getRow(sumR).height=18;
+  ws.mergeCells(sumR,1,sumR,2);
+  setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,{horizontal:'right',vertical:'middle'});
+  [[3,tongLop],[4,tongHS],[5,tongTiet]].forEach(function(v){
+    setCell(ws.getRow(sumR).getCell(v[0]),v[1],
+      {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  });
+  for(var ci2=fixedCols+1;ci2<=totalCols;ci2++)
+    setCell(ws.getRow(sumR).getCell(ci2),null,S.fHd,S.bgSm,S.aCC,S.bT);
+ 
+  // Ký tên
+  var signR=sumR+2, now=new Date(), mid=Math.floor(totalCols*0.65);
+  ws.getRow(signR).getCell(mid).value=
+    (CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear();
+  ws.getRow(signR).getCell(mid).font={name:'Times New Roman',size:10,italic:true};
+  ws.getRow(signR).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(signR,mid,signR,totalCols);
+  ws.getRow(signR+1).getCell(mid).value='Giáo viên bộ môn';
+  ws.getRow(signR+1).getCell(mid).font=S.fB;
+  ws.getRow(signR+1).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(signR+1,mid,signR+1,totalCols);
+  ws.getRow(signR+4).getCell(mid).value=CFG.teacher;
+  ws.getRow(signR+4).getCell(mid).font=S.fB;
+  ws.getRow(signR+4).getCell(mid).alignment=S.aCC;
+  ws.mergeCells(signR+4,mid,signR+4,totalCols);
 }
 
 async function _buildBieu1bSheet(wb, mode) {
@@ -5687,39 +5796,11 @@ async function _buildBieu1dSheet(wb) {
   var tongCacPC = _p2.tongCacPC;
 
   // Lấy tổng số tiết (ưu tiên nhập tay)
-  var elTongTiet = document.getElementById('b1d-tongtiet');
-  var tongTiet = 0;
-  if (elTongTiet && elTongTiet.value !== '' && parseFloat(elTongTiet.value) > 0) {
-    tongTiet = parseFloat(elTongTiet.value);
-  } else {
-    var ktMap = getKTMapByCls();
-    var ktClsList = allClasses.filter(function(c) {
-      var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
-      return !!ktMap[r];
-    });
-    ktClsList.forEach(function(c) { tongTiet += getTongTietCls(c); });
-  }
-
-  // Lấy tổng lương tháng (ưu tiên nhập tay)
-  var elTongLuong = document.getElementById('b1d-tongluong');
-  var finalTongLuong = _p2.tongLuongThang;
-  if (elTongLuong && elTongLuong.value !== '' && parseFloat(elTongLuong.value) > 0) {
-    finalTongLuong = parseFloat(elTongLuong.value);
-  }
-
-  // Lấy số tiền 1 giờ dạy (ưu tiên nhập tay)
-  var elTien1Gio = document.getElementById('b1d-tien1gio');
+  // ── Lấy toàn bộ từ getLuongParams() — đã ưu tiên nhập tay bên trong hàm đó ──
+  var tongTiet      = _p2.tongTiet;
+  var finalTongLuong= _p2.tongLuongThang;
   var finalTien1Gio = _p2.tien1Gio;
-  if (elTien1Gio && elTien1Gio.value !== '' && parseFloat(elTien1Gio.value) > 0) {
-    finalTien1Gio = parseFloat(elTien1Gio.value);
-  }
-
-  // Lấy phụ cấp (ưu tiên nhập tay)
-  var elPhuCap = document.getElementById('b1d-phucap');
-  var tongTien = finalTien1Gio * mucPC * tongTiet;
-  if (elPhuCap && elPhuCap.value !== '' && parseFloat(elPhuCap.value) > 0) {
-    tongTien = parseFloat(elPhuCap.value);
-  }
+  var tongTien      = _p2.phuCap;
 
   // Cấu trúc cột theo đúng mẫu:
   // 1:STT  2:HọTên  3:ChứcVụ  4:HệSốLương
@@ -5844,9 +5925,13 @@ async function _buildBieu1dSheet(wb) {
   dc(dataRow, 12, pcdang || null);
   dc(dataRow, 13, tongCacPC,  S.fB);
   dc(dataRow, 14, Math.round(finalTongLuong), S.fB);
-  var mucPCTien = Math.round(finalTien1Gio * mucPC);  // Mức phụ cấp = tiền 1 giờ × 20%
+  // Cột 15: Tiền 1 giờ dạy
+  // Cột 16: Mức phụ cấp — hiển thị % (vd: 0.2 hoặc 20%), KHÔNG phải tiền
+  // Cột 18: Phụ cấp ưu đãi = Tiền 1 giờ × Mức % × Số tiết
+  var mucPCTien   = Math.round(finalTien1Gio * _p2.mucPCRate);  // tiền 1 giờ × %PC (dùng ở cột 18)
+  var mucPCHienThi = _p2.mucPCRate;                              // hiển thị ở cột 16: 0.2 = 20%
   dc(dataRow, 15, Math.round(finalTien1Gio));
-  dc(dataRow, 16, mucPCTien);                          // hiển thị tiền, không phải 0.2
+  dc(dataRow, 16, mucPCHienThi);   // cột 16: mức % (0.2), đúng theo mẫu =+07*0.2
   dc(dataRow, 17, tongTiet,   S.fB);
   dc(dataRow, 18, Math.round(mucPCTien * tongTiet),   // PC ưu đãi = mức PC × số tiết
     {name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A6B34'}}
@@ -5934,9 +6019,9 @@ async function _buildBieu1eSheet(wb) {
   autoFitColumns(ws, [5, 28, 22, 16, 10, 16, 18]);
   var totalCols = 7;
 
-  var _pgH_1e = CFG.pageSize === 'A3' ? 297 : 210;
-  var _mgPt_1e = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
-  var _rowH_1e = Math.min(32, Math.max(16, (_pgH_1e / 25.4 * 72 - _mgPt_1e - 200) / 3));
+  var _pgH_1e = CFG.pageSize === 'A3' ? 842 : 595;
+var _mgPt_1e = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
+var _rowH_1e = Math.min(40, Math.max(18, (_pgH_1e - _mgPt_1e - 220) / 4));
   
   ws.pageSetup = {
     paperSize: CFG.pageSize === 'A3' ? 8 : 9,
@@ -6262,8 +6347,9 @@ async function _buildBieu1MainSheet(wb) {
 
   // Dữ liệu
   var dataR = 6;
-  var _pageH = CFG.pageSize === 'A3' ? 419 : 595;
-  var _rowH  = Math.min(22, Math.max(14, (_pageH - (CFG.mgTop+CFG.mgBot)/2.54*72 - 80) / Math.max(1, studentList.length)));
+  var _pageH = CFG.pageSize === 'A3' ? 842 : 595;
+var _fixedRows = 20 + 32 + 40 + 18 + 14 + 18 + 40;
+var _rowH = Math.min(28, Math.max(16, (_pageH - (CFG.mgTop+CFG.mgBot)/2.54*72 - _fixedRows) / Math.max(1, studentList.length + 1)));
 
   studentList.forEach(function(s, i) {
     var row = ws.getRow(dataR + i); row.height = _rowH;
@@ -6333,9 +6419,9 @@ async function _buildBieu1gSheet(wb) {
   var totalCols = 7;
   autoFitColumns(ws, [6, 28, 16, 18, 18, 20, 12]);
 
-  var _pgH_1g = CFG.pageSize === 'A3' ? 297 : 210;
-  var _mgPt_1g = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
-  var _rowH_1g = Math.min(36, Math.max(16, (_pgH_1g / 25.4 * 72 - _mgPt_1g - 220) / 4));
+  var _pgH_1g = CFG.pageSize === 'A3' ? 842 : 595;
+var _mgPt_1g = (CFG.mgTop + CFG.mgBot) / 2.54 * 72;
+var _rowH_1g = Math.min(40, Math.max(18, (_pgH_1g - _mgPt_1g - 220) / 4));
 
   // ── Dòng 1: Tên trường + nhãn biểu ──
   ws.getRow(1).height = 28;
@@ -6507,11 +6593,11 @@ function getLuongParams() {
     return def;
   }
   
-  var luong   = numVal('b1d-luong',   3.99);
-  var kv      = numVal('b1d-kv',      0.5);
-  var uuai    = numVal('b1d-uuai',    1.3965);
-  var luongCS = numVal('b1d-luongcs', 2340000);
-  var mucPC   = numVal('b1d-mucpc',   0.2);
+  var luong   = numVal('b1d-luong',   0);
+  var kv      = numVal('b1d-kv',      0);
+  var uuai    = numVal('b1d-uuai',    0.35);  // mặc định 35% nếu chưa nhập
+  var luongCS = numVal('b1d-luongcs', 0);
+  var mucPC   = numVal('b1d-mucpc',   0.35);  // mặc định 35% nếu chưa nhập
   var chucvu  = numVal('b1d-chucvu',  0);
   var pcdb    = numVal('b1d-pcdb',    0);
   var pcth    = numVal('b1d-pcth',    0);
@@ -6526,35 +6612,54 @@ function getLuongParams() {
   var phuCap         = numVal('b1d-phucap', 0);
   
   // Nếu không có giá trị nhập tay thì tự động tính
-  var tongCacPC = kv + uuai + pcdb + pcth + pctn + pctnng + pcdang;
+  // Công thức chuẩn theo biểu mẫu QĐ:
+  // PC ưu đãi = (hệ số lương + hệ số chức vụ) × % ưu đãi
+  // (nhận cả dạng thập phân 0.35 hoặc nguyên 35)
+  // Chuẩn hoá về dạng thập phân (0.35, không phải 35)
+  var uuaiRate  = uuai  > 1 ? uuai  / 100 : uuai;
+  var mucPCRate = mucPC > 1 ? mucPC / 100 : mucPC;
+  var uuaiHeSo  = (luong + chucvu) * uuaiRate;   // = công thức =(D7+F7)*%ưuđãi
+  var tongCacPC = kv + chucvu + uuaiHeSo + pcdb + pcth + pctn + pctnng + pcdang;
+
+  // Tổng lương/tháng = (Hệ số lương + Cộng phụ cấp) × Lương cơ sở
   var tuDongTongLuong = (luong + tongCacPC) * luongCS;
-  var tuDongTien1Gio = tuDongTongLuong / (luong * 39.8);
-  var tuDongMucPC = tuDongTien1Gio * mucPC;          // tiền 1 giờ × 20%
-  var tuDongTien1GioPC = tuDongMucPC;                // đây chính là "Mức phụ cấp" cột 16
-  
-  var finalTongLuong = tongLuongThang > 0 ? tongLuongThang : tuDongTongLuong;
-  var finalTien1Gio = tien1Gio > 0 ? tien1Gio : tuDongTien1Gio;
-  var finalTongTiet = tongTiet > 0 ? tongTiet : (function() {
+
+  // Tiền 1 giờ dạy = TổngLương × 12 / (17 × 52)  [theo mẫu: =+((N7*12)/(17*37))*(37/52)]
+  // Công thức rút gọn: = TổngLương * 12 / (17 * 52)
+  var tuDongTien1Gio = tuDongTongLuong * 12 / (17 * 52);
+
+  // Mức PC (tiền) = Tiền 1 giờ × % ưu đãi
+  var tuDongTien1GioPC = tuDongTien1Gio * mucPCRate;
+
+  // ── Ưu tiên giá trị nhập tay, fallback về tự tính ──
+  var finalTongLuong = (tongLuongThang > 0) ? tongLuongThang : tuDongTongLuong;
+  var finalTien1Gio  = (tien1Gio > 0)       ? tien1Gio       : tuDongTien1Gio;
+  var finalTien1GioPC = finalTien1Gio * mucPCRate;
+
+  var finalTongTiet = (tongTiet > 0) ? tongTiet : (function() {
     var t = 0;
     var ktMap2 = getKTMapByCls();
     var ktClsList2 = allClasses.filter(function(c) {
-      var r = c.indexOf('||')>=0 ? c.split('||')[0] : c;
+      var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
       return !!ktMap2[r];
     });
     ktClsList2.forEach(function(c) { t += getTongTietCls(c); });
     return t;
   })();
-  var finalPhuCap = phuCap > 0 ? phuCap : (finalTien1Gio * mucPC * finalTongTiet);
-  
-  return { 
-    luong:luong, kv:kv, uuai:uuai, luongCS:luongCS, mucPC:mucPC, chucvu:chucvu,
-    pcdb:pcdb, pcth:pcth, pctn:pctn, pctnng:pctnng, pcdang:pcdang,
-    tongCacPC:tongCacPC, 
-    tongLuongThang:finalTongLuong,
-    tien1Gio:finalTien1Gio, 
-    tien1GioPC:finalTien1Gio * mucPC,
-    tongTiet:finalTongTiet,
-    phuCap:finalPhuCap
+
+  var finalPhuCap = (phuCap > 0) ? phuCap : Math.round(finalTien1GioPC * finalTongTiet);
+
+  return {
+    luong: luong, kv: kv, uuai: uuai, uuaiRate: uuaiRate,
+    luongCS: luongCS, mucPC: mucPC, mucPCRate: mucPCRate,
+    chucvu: chucvu,
+    pcdb: pcdb, pcth: pcth, pctn: pctn, pctnng: pctnng, pcdang: pcdang,
+    tongCacPC:      tongCacPC,
+    tongLuongThang: finalTongLuong,
+    tien1Gio:       finalTien1Gio,
+    tien1GioPC:     finalTien1GioPC,
+    tongTiet:       finalTongTiet,
+    phuCap:         finalPhuCap
   };
 }
 function saveLuongCFG() {
@@ -6562,13 +6667,84 @@ function saveLuongCFG() {
              'b1d-pcdb','b1d-pcth','b1d-pctn','b1d-pctnng','b1d-pcdang'];
   ids.forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) CFG[id] = isNaN(parseFloat(el.value)) ? el.value.trim() : parseFloat(el.value);
+    if (el) CFG[id] = (el.value.trim() === '') ? '' : (isNaN(parseFloat(el.value)) ? el.value.trim() : parseFloat(el.value));
   });
   saveCFG();
-  updateLuongDisplay();
+  autoCalcLuong();  // tự động tính ngay lập tức
   toast('💾 Đã lưu thông số lương', 't-ok');
 }
 
+function autoCalcLuong() {
+  var luong   = parseFloat((document.getElementById('b1d-luong')   ||{value:''}).value) || 0;
+  var kv      = parseFloat((document.getElementById('b1d-kv')      ||{value:''}).value) || 0;
+  var uuai    = parseFloat((document.getElementById('b1d-uuai')    ||{value:''}).value) || 0;
+  var luongCS = parseFloat((document.getElementById('b1d-luongcs') ||{value:''}).value) || 0;
+  var mucPC   = parseFloat((document.getElementById('b1d-mucpc')   ||{value:''}).value) || 0;
+  var chucvu  = parseFloat((document.getElementById('b1d-chucvu')  ||{value:''}).value) || 0;
+  var pctnng  = parseFloat((document.getElementById('b1d-pctnng')  ||{value:''}).value) || 0;
+
+  var elKV    = document.getElementById('b1d-kv');
+  var elUuai  = document.getElementById('b1d-uuai');
+  var elMucPC = document.getElementById('b1d-mucpc');
+  var elPCTNNG= document.getElementById('b1d-pctnng');
+  var elTL    = document.getElementById('b1d-tongluong');
+  var elT1G   = document.getElementById('b1d-tien1gio');
+  var elTT    = document.getElementById('b1d-tongtiet');
+  var elPC    = document.getElementById('b1d-phucap');
+
+  // Nếu xóa hệ số lương hoặc mức lương cơ sở → xóa trắng tất cả
+  if (luong <= 0 || luongCS <= 0) {
+    if (elKV)     elKV.value     = '';
+    if (elUuai)   elUuai.value   = '';
+    if (elMucPC)  elMucPC.value  = '';
+    if (elPCTNNG) elPCTNNG.value = '';
+    if (elTL)     elTL.value     = '';
+    if (elT1G)    elT1G.value    = '';
+    if (elPC)     elPC.value     = '';
+    return;
+  }
+
+  // Tự động điền giá trị mặc định cho các ô chưa nhập
+  if (elKV    && elKV.value    === '') { elKV.value    = 0.5;   kv     = 0.5;   }
+  if (elUuai  && elUuai.value  === '') { elUuai.value  = 0.35;  uuai   = 0.35;  }
+  if (elMucPC && elMucPC.value === '') { elMucPC.value = 0.2;   mucPC  = 0.2;   }
+  if (elPCTNNG&& elPCTNNG.value=== '') { elPCTNNG.value= 0.864; pctnng = 0.864; }
+
+  // Tính theo công thức
+  var uuaiRate  = uuai  > 1 ? uuai  / 100 : uuai;
+  var mucPCRate = mucPC > 1 ? mucPC / 100 : mucPC;
+  var uuaiHeSo  = (luong + chucvu) * uuaiRate;
+  var pcdb      = parseFloat((document.getElementById('b1d-pcdb') ||{value:0}).value) || 0;
+  var pcth      = parseFloat((document.getElementById('b1d-pcth') ||{value:0}).value) || 0;
+  var pctn      = parseFloat((document.getElementById('b1d-pctn') ||{value:0}).value) || 0;
+  var pcdang    = parseFloat((document.getElementById('b1d-pcdang')||{value:0}).value)|| 0;
+  var tongCacPC = kv + chucvu + uuaiHeSo + pcdb + pcth + pctn + pctnng + pcdang;
+  var tongLuong = (luong + tongCacPC) * luongCS;
+  var tien1Gio  = tongLuong * 12 / (17 * 52);
+  var tien1GioPC= tien1Gio * mucPCRate;
+
+  // Tính tổng tiết từ LBG
+  var ktMap2 = getKTMapByCls();
+  var tongTiet = 0;
+  allClasses.filter(function(c){
+    var r=c.indexOf('||')>=0?c.split('||')[0]:c; return !!ktMap2[r];
+  }).forEach(function(c){ tongTiet += getTongTietCls(c); });
+
+  // Luôn tính lại nếu ô chưa bị nhập tay
+  // Đánh dấu ô nào do người dùng nhập tay bằng attribute data-manual
+  if (elTL  && elTL.dataset.manual  !== 'true') elTL.value  = Math.round(tongLuong);
+  if (elT1G && elT1G.dataset.manual !== 'true') elT1G.value = Math.round(tien1Gio);
+  if (elTT  && elTT.dataset.manual  !== 'true') elTT.value  = tongTiet > 0 ? tongTiet : '';
+  if (elPC  && elPC.dataset.manual  !== 'true') elPC.value  = tongTiet > 0 ? Math.round(tien1GioPC * tongTiet) : '';
+}
+function resetManual(id) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.dataset.manual = 'false';
+    el.value = '';
+    autoCalcLuong();
+  }
+}
 function updateLuongDisplay() {
   var _p = getLuongParams();
   var tongTietTuDong = 0;
@@ -6588,14 +6764,24 @@ function updateLuongDisplay() {
   
   // Chỉ cập nhật giá trị tự động nếu ô đó đang trống hoặc có giá trị 0
   // Không ghi đè nếu người dùng đã nhập tay
-  if (elTongLuong && (elTongLuong.value === '' || parseFloat(elTongLuong.value) === 0)) {
-    elTongLuong.value = Math.round(_p.tongLuongThang);
-  }
-  if (elTien1Gio && (elTien1Gio.value === '' || parseFloat(elTien1Gio.value) === 0)) {
-    elTien1Gio.value = Math.round(_p.tien1Gio);
+  // Chỉ tự động điền khi có hệ số lương > 0
+  var luongHienTai = parseFloat((document.getElementById('b1d-luong')||{value:0}).value) || 0;
+  var luongCSHienTai = parseFloat((document.getElementById('b1d-luongcs')||{value:0}).value) || 0;
+  
+  if (luongHienTai > 0 && luongCSHienTai > 0) {
+    if (elTongLuong && (elTongLuong.value === '' || parseFloat(elTongLuong.value) === 0)) {
+      elTongLuong.value = Math.round(_p.tongLuongThang);
+    }
+    if (elTien1Gio && (elTien1Gio.value === '' || parseFloat(elTien1Gio.value) === 0)) {
+      elTien1Gio.value = Math.round(_p.tien1Gio);
+    }
+  } else {
+    // Xoá nếu chưa nhập hệ số lương
+    if (elTongLuong && parseFloat(elTongLuong.value) === 0) elTongLuong.value = '';
+    if (elTien1Gio  && parseFloat(elTien1Gio.value)  === 0) elTien1Gio.value  = '';
   }
   if (elTongTiet && (elTongTiet.value === '' || parseFloat(elTongTiet.value) === 0)) {
-    elTongTiet.value = tongTietTuDong;
+    elTongTiet.value = tongTietTuDong > 0 ? tongTietTuDong : '';
   }
     // Không tự động điền giá trị vào ô phụ cấp (để người dùng tự nhập hoặc để trống)
   // if (elPhuCap && (elPhuCap.value === '' || parseFloat(elPhuCap.value) === 0)) {
@@ -6712,39 +6898,102 @@ async function viewBieu1Main() {
 
 // Hàm tạo HTML cho Biểu 1a
 async function viewBieu1a() {
-    const title = 'Biểu 1a: Thống kê số lớp & số tiết dạy HSKT học hòa nhập';
-    // Logic lấy dữ liệu y hệt như trong exportBieu1a
-    const bCfg = getBieu1Config('hk1');
-    const ktMap = getKTMapByCls();
-    const allKtCls = allClasses.filter(c => !!ktMap[c.indexOf('||')>=0 ? c.split('||')[0] : c]);
-    const tongLop = allKtCls.length;
-    const tongHS = studentList.length;
-    let tongTiet = 0;
-    allKtCls.forEach(c => tongTiet += getTongTietClsInMonths(c, bCfg.months));
-    
-    let html = '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; font-size: 12px;">';
-    html += `<caption style="caption-side: top; margin-bottom: 10px; font-weight: bold;">${title}</caption>`;
-    html += `<thead><tr style="background: var(--navy); color: #fff;"><th rowspan="2">STT</th><th rowspan="2">Họ và tên GV</th><th colspan="3">Tổng số</th>`;
-    [1,2,3,4,5].forEach(k => html += `<th colspan="4">Khối ${k}</th>`);
-    html += `<th rowspan="2">Ghi chú</th></tr>`;
-    html += `<tr style="background: var(--navy); color: #fff;"><th>Lớp</th><th>Số HSKT</th><th>Số tiết</th>`;
-    [1,2,3,4,5].forEach(() => html += `<th>Số lớp</th><th>Liệt kê lớp</th><th>Tên môn</th><th>Số tiết</th>`);
-    html += `</tr></thead><tbody>`;
-    html += `<tr><td>1</td><td>${escapeHtml(CFG.teacher)}</td>
-            <td style="text-align: center;">${tongLop}</td><td style="text-align: center;">${tongHS}</td><td style="text-align: center;">${tongTiet}</td>`;
-    [1,2,3,4,5].forEach(k => {
-        const clsKhoi = getClsByKhoi(k).filter(c => !!ktMap[c.indexOf('||')>=0 ? c.split('||')[0] : c]);
-        let kLop = clsKhoi.length, kTiet = 0;
-        clsKhoi.forEach(c => kTiet += getTongTietClsInMonths(c, bCfg.months));
-        const kNames = clsKhoi.map(c => c.indexOf('||')>=0 ? c.split('||')[0] : c).join(', ');
-        html += `<td style="text-align: center;">${kLop}</td><td>${escapeHtml(kNames)}</td><td style="text-align: center;">${escapeHtml(CFG.subject || '')}</td><td style="text-align: center;">${kTiet}</td>`;
+  var title = 'Biểu 1a: Thống kê số lớp & số tiết dạy HSKT học hòa nhập';
+  var bCfg  = getBieu1Config(tkFilterMode || 'hk1');
+  var ktMap = getKTMapByCls();
+
+  var allKtCls = allClasses.filter(function(c) {
+    var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
+    return !!ktMap[r];
+  });
+  var tongLop  = allKtCls.length;
+  var tongHS   = studentList.length;
+  var tongTiet = 0;
+  allKtCls.forEach(function(c) { tongTiet += getTongTietClsInMonths(c, bCfg.months); });
+
+  var khoiData = {};
+  [1, 2, 3, 4, 5].forEach(function(k) {
+    khoiData[k] = getKhoiMonRows(k, ktMap, bCfg);
+  });
+  var maxRows = 1;
+  [1, 2, 3, 4, 5].forEach(function(k) {
+    if (khoiData[k].length > maxRows) maxRows = khoiData[k].length;
+  });
+
+  var html = '<div style="overflow-x:auto">';
+  html += '<table border="1" cellpadding="4" cellspacing="0" '
+        + 'style="border-collapse:collapse;width:100%;font-size:11px;min-width:1100px">';
+
+  html += '<thead>';
+  html += '<tr style="background:#0d1b3e;color:#fff;text-align:center">';
+  html += '<th rowspan="2">STT</th>';
+  html += '<th rowspan="2" style="min-width:120px">Họ và tên GV</th>';
+  html += '<th colspan="3">Tổng số</th>';
+  [1, 2, 3, 4, 5].forEach(function(k) {
+    html += '<th colspan="4" style="background:#172447">Khối ' + k + '</th>';
+  });
+  html += '<th rowspan="2">Ghi chú</th>';
+  html += '</tr>';
+
+  html += '<tr style="background:#172447;color:#e0b84e;text-align:center">';
+  html += '<th>Lớp</th><th>Số HSKT</th><th>Tổng tiết</th>';
+  [1, 2, 3, 4, 5].forEach(function() {
+    html += '<th>Số lớp</th><th style="min-width:80px">Liệt kê lớp</th>'
+          + '<th style="min-width:90px;color:#ffd54f">Tên môn dạy</th><th>Tổng tiết</th>';
+  });
+  html += '</tr></thead>';
+
+  html += '<tbody>';
+  for (var ri = 0; ri < maxRows; ri++) {
+    html += '<tr style="border-bottom:1px solid #e0e0e0">';
+
+    if (ri === 0) {
+      html += '<td style="text-align:center;vertical-align:middle" rowspan="' + maxRows + '">1</td>';
+      html += '<td style="vertical-align:middle" rowspan="' + maxRows + '">' + esc(CFG.teacher) + '</td>';
+      html += '<td style="text-align:center;font-weight:700;background:#fffbe6;vertical-align:middle" rowspan="' + maxRows + '">' + tongLop + '</td>';
+      html += '<td style="text-align:center;vertical-align:middle" rowspan="' + maxRows + '">' + tongHS + '</td>';
+      html += '<td style="text-align:center;font-weight:700;background:#fffbe6;vertical-align:middle" rowspan="' + maxRows + '">' + tongTiet + '</td>';
+    }
+
+    [1, 2, 3, 4, 5].forEach(function(k) {
+      var monRow = khoiData[k][ri];
+      if (monRow) {
+        html += '<td style="text-align:center">' + (monRow.kLop || '') + '</td>';
+        html += '<td style="font-size:10px">' + esc(monRow.kNames) + '</td>';
+        html += '<td style="font-size:10px;font-weight:600;color:#1a3a6c;background:#f5f8ff">'
+              + esc(monRow.mon) + '</td>';
+        html += '<td style="text-align:center;font-weight:700;background:#fffbe6">'
+              + (monRow.kTiet || '') + '</td>';
+      } else {
+        html += '<td></td><td></td><td></td><td></td>';
+      }
     });
-    html += `<td></td></tr>`;
-    html += `<tr style="background: #f0f0f0;"><td colspan="2"><strong>Tổng số</strong></td><td style="text-align: center;"><strong>${tongLop}</strong></td><td style="text-align: center;"><strong>${tongHS}</strong></td><td style="text-align: center;"><strong>${tongTiet}</strong></td>`;
-    [1,2,3,4,5].forEach(() => html += `<td colspan="4"></td>`);
-    html += `<td></td></tr>`;
-    html += `</tbody></table>`;
-    showBieuContent(title, html);
+
+    if (ri === 0) {
+      html += '<td rowspan="' + maxRows + '"></td>';
+    }
+
+    html += '</tr>';
+  }
+
+  html += '<tr style="background:#e8edf5;font-weight:700">';
+  html += '<td colspan="2" style="text-align:right;padding:5px 8px">Tổng số</td>';
+  html += '<td style="text-align:center">' + tongLop  + '</td>';
+  html += '<td style="text-align:center">' + tongHS   + '</td>';
+  html += '<td style="text-align:center">' + tongTiet + '</td>';
+  [1, 2, 3, 4, 5].forEach(function() {
+    html += '<td colspan="4"></td>';
+  });
+  html += '<td></td></tr>';
+  html += '</tbody></table></div>';
+
+  html += '<div style="margin-top:10px;padding:8px 12px;background:#e3f2fd;border-radius:6px;'
+        + 'font-size:11px;color:#1565a8">'
+        + '💡 Mỗi dòng trong cùng 1 khối = 1 môn dạy riêng biệt. '
+        + 'Cột "Số lớp", "Liệt kê lớp", "Tổng tiết" đã được tách theo từng môn.'
+        + '</div>';
+
+  showBieuContent(title, html);
 }
 
 // Hàm tạo HTML cho Biểu 1b
@@ -6828,82 +7077,100 @@ async function viewBieu1c() {
 
 // Hàm view cho Biểu 1d, 1e, 1g (tạm thời thông báo đang phát triển)
 async function viewBieu1d() {
-    const title = 'Biểu 1d: Dự toán kinh phí chi trả chế độ dạy học sinh khuyết tật học hòa nhập';
-    
-    var _pv = getLuongParams();
-    const luong=_pv.luong, kv=_pv.kv, uuai=_pv.uuai, luongCS=_pv.luongCS;
-    const chucvu=_pv.chucvu, mucPC=_pv.mucPC;
-    const pcdb=_pv.pcdb, pcth=_pv.pcth, pctn=_pv.pctn, pctnng=_pv.pctnng, pcdang=_pv.pcdang;
-    const tongCacPC=_pv.tongCacPC;
-    const tongLuongThang=_pv.tongLuongThang;
-    const tienMotGiay=_pv.tien1Gio;
-    const muc1GiayPC=_pv.tien1GioPC;
-    
-    const tongTiet = _pv.tongTiet;          // lấy từ ô nhập tay hoặc tự tính đúng
-const tongTien = _pv.phuCap;            // lấy từ ô nhập tay hoặc tự tính đúng
-    
-    let html = `
-        <div style="font-family: 'Times New Roman'; overflow-x: auto;">
-            <p style="text-align: right; font-style: italic; margin-bottom: 20px;">Đơn vị tính: đồng</p>
-            <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-size: 13px;">
-                <thead>
-                    <tr style="background: #0d1b3e; color: #fff; text-align: center;">
-                        <th rowspan="3" style="vertical-align: middle;">Số TT</th>
-                        <th rowspan="3" style="vertical-align: middle;">Họ và tên GV</th>
-                        <th rowspan="3" style="vertical-align: middle;">Chức vụ</th>
-                        <th rowspan="3" style="vertical-align: middle;">Hệ số lương<br>hiện hưởng</th>
-                        <th colspan="9" style="text-align: center;">Hệ số phụ cấp</th>
-                        <th rowspan="3" style="vertical-align: middle;">Tổng tiền lương/tháng</th>
-                        <th rowspan="3" style="vertical-align: middle;">Số tiền 1 giờ dạy</th>
-                        <th rowspan="3" style="vertical-align: middle;">Mức phụ cấp</th>
-                        <th rowspan="3" style="vertical-align: middle;">Tổng số tiết<br>thực dạy</th>
-                        <th rowspan="3" style="vertical-align: middle;">Phụ cấp ưu đãi<br>giảng dạy HSKT</th>
-                        <th rowspan="3" style="vertical-align: middle;">Ghi chú</th>
-                    </tr>
-                    <tr style="background: #0d1b3e; color: #fff; text-align: center;">
-                        <th>Khu vực</th><th>Chức vụ</th><th>PC ưu đãi</th><th>PC đặc biệt</th>
-                        <th>PC thu hút</th><th>PC trách nhiệm</th><th>PC TNNG</th><th>PC Đảng</th><th>Cộng phụ cấp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td>${escapeHtml(CFG.teacher)}</td>
-                        <td style="text-align: center;">${escapeHtml(chucvu)}</td>
-                        <td style="text-align: center;">${luong}</td>
-                        <td style="text-align: center;">${kv}</td>
-                        <td style="text-align: center;">0</td>
-                        <td style="text-align: center;">${uuai}</td>
-                        <td style="text-align: center;">0</td>
-                        <td style="text-align: center;">0</td>
-                        <td style="text-align: center;">0</td>         
-                        <td style="text-align: center;">${pctnng}</td>
-                        <td style="text-align: center;">0</td>
-                        <td style="text-align: center; font-weight: bold;">${tongCacPC.toFixed(2)}</td>
-                        <td style="text-align: center; font-weight: bold;">${Math.round(tongLuongThang).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center;">${Math.round(tienMotGiay).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center;">${Math.round(muc1GiayPC).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center; font-weight: bold;">${tongTiet.toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center; font-weight: bold; color: #1a6b3c;">${Math.round(tongTien).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center;"></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr style="background: #e8edf5;">
-                        <td colspan="3" style="text-align: right; font-weight: bold;">Tổng số</td>
-                        <td colspan="10"></td>
-                        <td style="text-align: center; font-weight: bold;">${Math.round(tongLuongThang).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center;"></td>
-                        <td style="text-align: center;"></td>
-                        <td style="text-align: center; font-weight: bold;">${tongTiet.toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center; font-weight: bold;">${Math.round(tongTien).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center;"></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    `;
-    showBieuContent(title, html);
+  const title = 'Biểu 1d: Dự toán kinh phí chi trả chế độ dạy học sinh khuyết tật học hòa nhập';
+  
+  // Lấy bộ tham số từ hệ thống
+  var _pv = getLuongParams();
+  
+  // 1. Lấy giá trị thực tế từ các ô nhập liệu (Thiết lập)
+  const getVal = (id) => {
+    const el = document.getElementById(id);
+    return (el && el.value !== "") ? parseFloat(el.value) : 0;
+  };
+
+  const hasInput = (id) => {
+    const el = document.getElementById(id);
+    return el && el.value !== "";
+  };
+
+  // 2. Thu thập thông số thiết lập quan trọng
+  const luong = getVal('b1d-luong');
+  const kv = getVal('b1d-kv');
+  const uuai = getVal('b1d-uuai');
+  const chucvu = getVal('b1d-chucvu');
+  const mucPCThucNhan = getVal('b1d-mucpc') || 0.2; // Mức % PC ưu đãi thực nhận (vd: 0.2)
+  const tongTiet = getVal('b1d-tongtiet'); // Số tiết thực dạy (vd: 73)
+  
+  // 3. Tính toán lại "Phụ cấp ưu đãi giảng dạy HSKT" theo công thức: 
+  // Tiền 1 giờ * Mức % thực nhận * Số tiết thực dạy
+  const tien1Gio = _pv.tien1Gio; 
+  const phuCapHSKT = Math.round(tien1Gio * mucPCThucNhan * tongTiet);
+
+  // Kiểm tra điều kiện hiển thị
+  const hasLuong = hasInput('b1d-luong');
+  const hasTiet = hasInput('b1d-tongtiet');
+
+  let html = `
+    <div style="font-family: 'Times New Roman'; overflow-x: auto;">
+      <p style="text-align: right; font-style: italic; margin-bottom: 20px;">Đơn vị tính: đồng</p>
+      <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-size: 13px;">
+        <thead>
+          <tr style="background: #0d1b3e; color: #fff; text-align: center;">
+            <th rowspan="3">Số TT</th>
+            <th rowspan="3">Họ và tên GV</th>
+            <th rowspan="3">Chức vụ</th>
+            <th rowspan="3">Hệ số lương<br>hiện hưởng</th>
+            <th colspan="9">Hệ số phụ cấp</th>
+            <th rowspan="3">Tổng tiền lương/tháng</th>
+            <th rowspan="3">Số tiền 1 giờ dạy</th>
+            <th rowspan="3">Mức phụ cấp</th>
+            <th rowspan="3">Tổng số tiết<br>thực dạy</th>
+            <th rowspan="3">Phụ cấp ưu đãi<br>giảng dạy HSKT</th>
+            <th rowspan="3">Ghi chú</th>
+          </tr>
+          <tr style="background: #0d1b3e; color: #fff;">
+            <th>Khu vực</th><th>Chức vụ</th><th>PC ưu đãi</th><th>PC đặc biệt</th>
+            <th>PC thu hút</th><th>PC trách nhiệm</th><th>PC TNNG</th><th>PC Đảng</th><th>Cộng phụ cấp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center;">1</td>
+            <td>${escapeHtml(CFG.teacher)}</td>
+            <td style="text-align: center;">${hasInput('b1d-chucvu') ? chucvu : ""}</td>
+            <td style="text-align: center;">${hasLuong ? luong : ""}</td>
+            <td style="text-align: center;">${hasInput('b1d-kv') ? kv : ""}</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">${hasInput('b1d-uuai') ? uuai : ""}</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">${_pv.pctnng > 0 ? _pv.pctnng : ""}</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center; font-weight: bold;">${hasLuong ? (kv + chucvu + uuai + _pv.pctnng).toFixed(2) : ""}</td>
+            <td style="text-align: center; font-weight: bold;">${hasLuong ? Math.round(_pv.tongLuongThang).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center;">${hasLuong ? Math.round(tien1Gio).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center;">${hasLuong ? Math.round(tien1Gio * mucPCThucNhan).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center; font-weight: bold;">${hasTiet ? tongTiet.toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center; font-weight: bold; color: #1a6b3c;">${(hasLuong && hasTiet) ? phuCapHSKT.toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center;"></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background: #e8edf5;">
+            <td colspan="3" style="text-align: right; font-weight: bold;">Tổng số</td>
+            <td colspan="10"></td>
+            <td style="text-align: center; font-weight: bold;">${hasLuong ? Math.round(_pv.tongLuongThang).toLocaleString('vi-VN') : ""}</td>
+            <td></td><td></td>
+            <td style="text-align: center; font-weight: bold;">${hasTiet ? tongTiet.toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center; font-weight: bold;">${(hasLuong && hasTiet) ? phuCapHSKT.toLocaleString('vi-VN') : ""}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+  showBieuContent(title, html);
 }
 async function viewBieu1e() {
     const title = 'Biểu 1e: Danh sách viên chức đề nghị hưởng chế độ phụ cấp ưu đãi dạy học sinh khuyết tật học hòa nhập';
@@ -7018,31 +7285,51 @@ async function viewBieu1g() {
     }
     
     let html = `
-        <div style="font-family: 'Times New Roman'; overflow-x: auto;">
-            <p style="text-align: right; font-style: italic;">Đơn vị tính: đồng</p>
-            <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-size: 13px;">
-                <thead>
-                    <tr style="background: #0d1b3e; color: #fff; text-align: center;">
-                        <th>Số TT</th>
-                        <th>Tên đơn vị</th>
-                        <th>Tổng số lớp có<br>HS học hoà nhập</th>
-                        <th>Tổng số GV dạy<br>HS khuyết tật</th>
-                        <th>Tổng số tiết GV<br>thực dạy ở lớp<br>có HSKT</th>
-                        <th>Tổng kinh phí chi<br>trả PC ưu đãi<br>giảng dạy HSKT</th>
-                        <th>Ghi chú</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td>${escapeHtml(CFG.school)}</td>
-                        <td style="text-align: center; font-weight: bold; background: #fffbe6;">${tongLop}</td>
-                        <td style="text-align: center;">1</td>
-                        <td style="text-align: center; font-weight: bold; background: #fffbe6;">${Number(tongTiet).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center; font-weight: bold; color: #1a6b3c; background: #fffbe6;">${Number(tongTien).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: center;"></td>
-                    </tr>
-                </tbody>
+    <div style="font-family: 'Times New Roman'; overflow-x: auto;">
+      <p style="text-align: right; font-style: italic; margin-bottom: 20px;">Đơn vị tính: đồng</p>
+      <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-size: 13px;">
+        <thead>
+          <tr style="background: #0d1b3e; color: #fff; text-align: center;">
+            <th rowspan="3">Số TT</th>
+            <th rowspan="3">Họ và tên GV</th>
+            <th rowspan="3">Chức vụ</th>
+            <th rowspan="3">Hệ số lương<br>hiện hưởng</th>
+            <th colspan="9">Hệ số phụ cấp</th>
+            <th rowspan="3">Tổng tiền lương/tháng</th>
+            <th rowspan="3">Số tiền 1 giờ dạy</th>
+            <th rowspan="3">Mức phụ cấp</th>
+            <th rowspan="3">Tổng số tiết<br>thực dạy</th>
+            <th rowspan="3">Phụ cấp ưu đãi<br>giảng dạy HSKT</th>
+            <th rowspan="3">Ghi chú</th>
+          </tr>
+          <tr style="background: #0d1b3e; color: #fff;">
+            <th>Khu vực</th><th>Chức vụ</th><th>PC ưu đãi</th><th>PC đặc biệt</th>
+            <th>PC thu hút</th><th>PC trách nhiệm</th><th>PC TNNG</th><th>PC Đảng</th><th>Cộng phụ cấp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center;">1</td>
+            <td>${escapeHtml(CFG.teacher)}</td>
+            <td style="text-align: center;">${chucvu || ""}</td>
+            <td style="text-align: center;">${luong > 0 ? luong : ""}</td>
+            <td style="text-align: center;">${kv > 0 ? kv : ""}</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">${uuai > 0 ? uuai : ""}</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center;">${pctnng > 0 ? pctnng : ""}</td>
+            <td style="text-align: center;">0</td>
+            <td style="text-align: center; font-weight: bold;">${tongCacPC > 0 ? tongCacPC.toFixed(2) : ""}</td>
+            <td style="text-align: center; font-weight: bold;">${tongLuongThang > 0 ? Math.round(tongLuongThang).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center;">${tienMotGiay > 0 ? Math.round(tienMotGiay).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center;">${muc1GiayPC > 0 ? Math.round(muc1GiayPC).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center; font-weight: bold;">${tongTiet > 0 ? tongTiet.toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center; font-weight: bold; color: #1a6b3c;">${tongTien > 0 ? Math.round(tongTien).toLocaleString('vi-VN') : ""}</td>
+            <td style="text-align: center;"></td>
+          </tr>
+        </tbody>
                 <tfoot>
                     <tr style="background: #e8edf5;">
                         <td colspan="2" style="text-align: right; font-weight: bold;">Tổng số</td>
@@ -7481,6 +7768,104 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Enter') doAuth();
   });
 });
+// ══ LIVE PREVIEW: Tự động cập nhật biểu khi thay đổi thông số ══
+
+// Map biểu đang hiển thị → hàm view tương ứng
+var _BIEU_VIEW_MAP = {
+  'Biểu 1d': function() { viewBieu1d(); },
+  'Biểu 1e': function() { viewBieu1e(); },
+  'Biểu 1g': function() { viewBieu1g(); },
+  'Biểu 1a': function() { viewBieu1a(); },
+  'Biểu 1b': function() { viewBieu1b(); },
+  'Biểu 1c': function() { viewBieu1c(); },
+  'Biểu 1':  function() { viewBieu1Main(); },
+};
+
+// Đọc tên biểu đang hiển thị từ tiêu đề container
+function _getActiveBieuName() {
+  var containers = [
+    document.getElementById('bieuPreviewContainer'),
+    document.getElementById('bbPreviewContainer')
+  ];
+  for (var i = 0; i < containers.length; i++) {
+    var c = containers[i];
+    if (!c || c.style.display === 'none' || !c.innerHTML.trim()) continue;
+    var titleEl = c.querySelector('div[style*="background"]');
+    if (titleEl) {
+      var txt = titleEl.textContent || '';
+      var keys = Object.keys(_BIEU_VIEW_MAP);
+      for (var j = 0; j < keys.length; j++) {
+        if (txt.indexOf(keys[j]) >= 0) return keys[j];
+      }
+    }
+  }
+  return null;
+}
+
+// Debounce timer cho live refresh
+var _liveRefreshTimer = null;
+
+function _scheduleLiveRefresh() {
+  clearTimeout(_liveRefreshTimer);
+  _liveRefreshTimer = setTimeout(function() {
+    var activeBieu = _getActiveBieuName();
+    if (activeBieu && _BIEU_VIEW_MAP[activeBieu]) {
+      _BIEU_VIEW_MAP[activeBieu]();
+    }
+  }, 600); // đợi 0.6s sau khi gõ xong
+}
+
+// Gắn listener vào tất cả input lương sau khi DOM sẵn sàng
+function _attachLuongListeners() {
+  var luongIds = [
+    'b1d-luong','b1d-kv','b1d-uuai','b1d-luongcs',
+    'b1d-chucvu','b1d-mucpc','b1d-pcdb','b1d-pcth',
+    'b1d-pctn','b1d-pctnng','b1d-pcdang',
+    'b1d-tongluong','b1d-tien1gio','b1d-tongtiet','b1d-phucap'
+  ];
+  luongIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.dataset.liveListenerAttached) return;
+    el.dataset.liveListenerAttached = 'true';
+    el.addEventListener('input', _scheduleLiveRefresh);
+    el.addEventListener('change', _scheduleLiveRefresh);
+  });
+}
+
+// Patch hàm saveLuongCFG để kích hoạt refresh sau khi lưu
+var _origSaveLuongCFG = saveLuongCFG;
+saveLuongCFG = function() {
+  _origSaveLuongCFG();
+  _scheduleLiveRefresh();
+};
+
+// Patch hàm showBieuContent để ghi nhớ biểu đang mở
+var _origShowBieuContent = showBieuContent;
+showBieuContent = function(title, contentHtml, shouldScroll) {
+  _origShowBieuContent(title, contentHtml, shouldScroll);
+};
+
+// Khởi động sau khi trang load xong
+(function() {
+  var _initTimer = setInterval(function() {
+    var el = document.getElementById('b1d-luong');
+    if (el) {
+      clearInterval(_initTimer);
+      _attachLuongListeners();
+    }
+  }, 500);
+})();
+
+// Patch showPage để gắn lại listener khi chuyển sang tab Biểu 1
+var _origShowPage = showPage;
+showPage = function(id, btn) {
+  _origShowPage(id, btn);
+  if (id === 'bieu1') {
+    setTimeout(_attachLuongListeners, 200);
+  }
+};
+
 </script>
 
 </body>
