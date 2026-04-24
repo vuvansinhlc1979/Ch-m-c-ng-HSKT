@@ -2949,20 +2949,21 @@ for (var ci = CD1; ci <= CDN; ci++) ws.getColumn(ci).width = _dayColW;
   var fM = {name:'Times New Roman',size:10};
   var fB = {name:'Times New Roman',size:10,bold:true};
   var fT = {name:'Times New Roman',size:12,bold:true};
-  var _htc = CFG.colorHeaderText ? CFG.colorHeaderText.replace('#','FF') : 'FFFFFFFF';
-  if (_htc.length === 8 && _htc.indexOf('FF') !== 0) _htc = 'FF' + _htc.slice(0,6);
-  else if (_htc.length === 6) _htc = 'FF' + _htc;
-  var hF = {name:'Times New Roman',size:9,bold:true,color:{argb:_htc}};
+  var hF = {name:'Times New Roman',size:9,bold:true};
   var bT = {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
   var bML = {top:{style:'thin'},left:{style:'medium'},bottom:{style:'thin'},right:{style:'thin'}};
   var bMB = {top:{style:'thin'},left:{style:'medium'},bottom:{style:'medium'},right:{style:'thin'}};
 
-  function fPat(argb) { return {type:'pattern',pattern:'solid',fgColor:{argb:argb}}; }
-  var fHD = fPat('FF2E4A7A'), fH2 = fPat('FF3D5C94');
-  var fSU = fPat('FFFFF8E6'), fSA = fPat('FFF3F0FF');
-  var fON = fPat('FFE8F5E9'), fED = fPat('FFFFD180');
-  var fKT = fPat('FFFFF0F0');
-  var fSM = fPat('FFE8EDF5'), fTL = fPat('FFFFFCE6');
+  function fPat(argb) { return {type:'pattern',pattern:'none'}; }
+  var fHD = {type:'pattern',pattern:'none'};
+  var fH2 = {type:'pattern',pattern:'none'};
+  var fSU = {type:'pattern',pattern:'none'};
+  var fSA = {type:'pattern',pattern:'none'};
+  var fON = {type:'pattern',pattern:'none'};
+  var fED = {type:'pattern',pattern:'none'};
+  var fKT = {type:'pattern',pattern:'none'};
+  var fSM = {type:'pattern',pattern:'none'};
+  var fTL = {type:'pattern',pattern:'none'};
   var aCC = {horizontal:'center',vertical:'middle',wrapText:true};
   var aLC = {horizontal:'left',vertical:'middle',wrapText:true};
 
@@ -3000,8 +3001,8 @@ for (var ci = CD1; ci <= CDN; ci++) ws.getColumn(ci).width = _dayColW;
   dn.forEach(function(dd, i) {
     var c = CD1 + i, wd = dw[i];
     var isSun = wd === 'CN', isSat = wd === 'T7';
-    var numColor = isSun ? 'FF7A5C00' : (isSat ? 'FF5A3F99' : 'FFFFFFFF');
-    var wdColor  = isSun ? 'FF7A5C00' : (isSat ? 'FF5A3F99' : 'FFD0DCF0');
+    var numColor = 'FF000000';
+    var wdColor  = 'FF000000';
     var bg = isSun ? fSU : (isSat ? fSA : fHD);
     var bg2= isSun ? fSU : (isSat ? fSA : fH2);
     S(ws.getRow(7).getCell(c), dd, {name:'Times New Roman',size:8,bold:true,color:{argb:numColor}}, bg, aCC, bT);
@@ -3027,7 +3028,7 @@ var _dataRowH2 = Math.min(40, Math.max(16, _availH2 / Math.max(1, dispCls.length
     var xlsCls = xlsParts ? xlsParts[0] : cls;
     var xlsMon = xlsParts ? xlsParts[1] : CFG.subject;
     S(row.getCell(CN), CFG.teacher, fM, clsFill, aLC, bT);
-    S(row.getCell(CC), xlsCls, {name:'Times New Roman',size:10,bold:true,color:{argb:isKT?'FFAA2020':'FF1A2744'}}, clsFill, aCC, bT);
+    S(row.getCell(CC), xlsCls, {name:'Times New Roman',size:10,bold:true}, null, aCC, bT);
     S(row.getCell(CM), xlsMon, fM, clsFill, aCC, bT);
     var rTot = 0;
     dn.forEach(function(dd, i) {
@@ -3042,8 +3043,8 @@ var _dataRowH2 = Math.min(40, Math.max(16, _availH2 / Math.max(1, dispCls.length
       else if (isSat) fi = fSA;
       else fi = clsFill || {type:'pattern',pattern:'none'};
       var fo;
-      if (cnt > 0) fo = {name:'Times New Roman',size:9,bold:true,color:{argb:'FF1A6B34'}};
-      else fo = {name:'Times New Roman',size:8,color:{argb:isSun?'FFB8860B':(isSat?'FF7B5EAA':'FF999999')}};
+      if (cnt > 0) fo = {name:'Times New Roman',size:9,bold:true};
+      else fo = {name:'Times New Roman',size:8};
       S(row.getCell(c), cnt || null, fo, fi, aCC, bT);
     });
     S(row.getCell(CT), rTot||null, rTot?{name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A2744'}}:fM, fTL, aCC, bML);
@@ -3052,9 +3053,9 @@ var _dataRowH2 = Math.min(40, Math.max(16, _availH2 / Math.max(1, dispCls.length
   });
 
   var sRow = ws.getRow(exR); sRow.height = _dataRowH2;
-  S(sRow.getCell(CS),'Cộng',fB,fSM,{horizontal:'right',vertical:'middle'});
+  S(sRow.getCell(CS),'Cộng',fB,null,{horizontal:'right',vertical:'middle'});
   ws.mergeCells(exR,CS,exR,CM);
-  [CS,CN,CC,CM].forEach(function(c){sRow.getCell(c).fill=fSM;sRow.getCell(c).border=bT;});
+  [CS,CN,CC,CM].forEach(function(c){sRow.getCell(c).border=bT;});
   var grand = 0;
   dTot.forEach(function(v){grand+=v;});
   dn.forEach(function(dd,i) {
@@ -4278,7 +4279,7 @@ var _dataRowH = Math.min(40, Math.max(16, _availH / Math.max(1, dispCls.length +
     }
     ws.mergeCells(sumRowIdx, 1, sumRowIdx, 4);
     sc(1,'Tổng số', fHd, aRC);
-    sc(5, totalLessons, {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}});
+    sc(5, totalLessons, {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}});
     sc(6, null, fHd); sc(7, null, fHd);
     months.forEach(function(x, i) {
       var v = colTotals[mk(x.m,x.y)];
@@ -4286,7 +4287,7 @@ var _dataRowH = Math.min(40, Math.max(16, _availH / Math.max(1, dispCls.length +
       sc(col,   dispCls.length, fHd);
       sc(col+1, null, fHd);
       sc(col+2, null, fHd);
-      sc(col+3, v||null, {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}});
+      sc(col+3, v||null, {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}});
     });
     sc(lastCol, null, fHd);
 
@@ -4638,12 +4639,12 @@ function bieuStyles() {
     fT:   {name:'Times New Roman',size:13,bold:true},
     fB:   {name:'Times New Roman',size:10,bold:true},
     fM:   {name:'Times New Roman',size:10},
-    fHd:  {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}},
-    fRed: {name:'Times New Roman',size:10,bold:true,color:{argb:'FFCC0000'}},
-    bgHd: {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}},
-    bgH2: {type:'pattern',pattern:'solid',fgColor:{argb:'FF172447'}},
-    bgSm: {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}},
-    bgYe: {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFCE6'}},
+    fHd:  {name:'Times New Roman',size:9,bold:true},
+    fRed: {name:'Times New Roman',size:10,bold:true},
+    bgHd: {type:'pattern',pattern:'none'},
+    bgH2: {type:'pattern',pattern:'none'},
+    bgSm: {type:'pattern',pattern:'none'},
+    bgYe: {type:'pattern',pattern:'none'},
     bT:   {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}},
     bM:   {top:{style:'medium'},left:{style:'medium'},bottom:{style:'medium'},right:{style:'medium'}},
     aCC:  {horizontal:'center',vertical:'middle',wrapText:true},
@@ -4941,13 +4942,13 @@ ws.getColumn(totalCols).width = Math.max(8, _noteWidth * _scale);
   setCell(ws.getRow(sumR).getCell(1), 'Tổng số', S.fB, S.bgSm,
     {horizontal:'right',vertical:'middle'});
   setCell(ws.getRow(sumR).getCell(3), tongLop,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},
     S.bgSm, S.aCC, S.bT);
   setCell(ws.getRow(sumR).getCell(4), tongHS,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},
     S.bgSm, S.aCC, S.bT);
   setCell(ws.getRow(sumR).getCell(5), tongTiet,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},
     S.bgSm, S.aCC, S.bT);
   for (var ci2 = fixedCols + 1; ci2 <= totalCols; ci2++) {
     setCell(ws.getRow(sumR).getCell(ci2), null, S.fHd, S.bgSm, S.aCC, S.bT);
@@ -5011,6 +5012,7 @@ colWidths.push(8, 10);
 autoFitColumns(ws, colWidths);
 
   // Header
+  ws.getRow(1).height = 32; // <--- THÊM DÒNG NÀY ĐỂ TĂNG ĐỘ CAO HÀNG 1
   ws.mergeCells(1,1,1,5); ws.mergeCells(1,totalCols,1,totalCols);
   setCell(ws.getRow(1).getCell(1),
     'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + CFG.school.toUpperCase(),
@@ -5111,10 +5113,10 @@ autoFitColumns(ws, colWidths);
   ws.mergeCells(sumR,1,sumR,3);
   colTotals.forEach(function(v,i){
     setCell(sumRow.getCell(mStartCol+i), v||null,
-      {name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+      {name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
   });
   setCell(sumRow.getCell(totalCols-1), grandTotal,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
   setCell(sumRow.getCell(totalCols), null, S.fHd, S.bgSm, S.aCC, S.bT);
 
   // Ký tên
@@ -5244,13 +5246,13 @@ async function exportBieu1c() {
   mCol = 4;
   BIEU1_MONTHS.forEach(function(x, mi) {
     setCell(ws.getRow(sumR).getCell(mCol), ktCls.length,
-      {name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+      {name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
     setCell(ws.getRow(sumR).getCell(mCol+1), colTotTiet[mi]||null,
-      {name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+      {name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
     mCol += 2;
   });
   setCell(ws.getRow(sumR).getCell(totalCols-1), grandTot,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(sumR).getCell(totalCols), null, S.fHd, S.bgSm, S.aCC, S.bT);
 
   // Sign
@@ -5373,10 +5375,10 @@ async function exportBieu1d() {
   ws.mergeCells(8,1,8,3);
   for(var ci=4;ci<=totalCols;ci++) setCell(ws.getRow(8).getCell(ci),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(8).getCell(17), tongTiet,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT
   );
   setCell(ws.getRow(8).getCell(18), Math.round(mucPCTien * tongTiet),
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
 
   // Sign
   var sRow=10; var now=new Date(); var mid=Math.floor(totalCols*0.6);
@@ -5495,10 +5497,10 @@ async function exportBieu1e() {
   setCell(ws.getRow(9).getCell(2),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(9).getCell(3),null,S.fHd,S.bgSm,S.aCC,S.bT);
   ws.mergeCells(9,1,9,3);
-  setCell(ws.getRow(9).getCell(4),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
-  setCell(ws.getRow(9).getCell(5),mucPC,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
-  setCell(ws.getRow(9).getCell(6),Math.round(tien1GioPC),{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
-  setCell(ws.getRow(9).getCell(7),tongTien,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(4),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(5),mucPC,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(6),Math.round(tien1GioPC),{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(7),tongTien,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
 
   var sRow=11; var mid=4;
   ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear();
@@ -5790,7 +5792,7 @@ ws.getColumn(totalCols).width = Math.max(8, _noteWidth * _scale);
   ws.mergeCells(sumR,1,sumR,2);
   [[3,tongLop],[4,tongHS],[5,tongTiet]].forEach(function(v){
     setCell(ws.getRow(sumR).getCell(v[0]),v[1],
-      {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+      {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
   });
   for(var ci2=fixedCols+1;ci2<=totalCols;ci2++)
     setCell(ws.getRow(sumR).getCell(ci2),null,S.fHd,S.bgSm,S.aCC,S.bT);
@@ -5857,7 +5859,7 @@ ws.pageSetup = {
   setCell(ws.getRow(sumR).getCell(1),'Tổng số tiết',S.fB,S.bgSm,{horizontal:'right',vertical:'middle'},S.bT);
   setCell(ws.getRow(sumR).getCell(2),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(sumR).getCell(3),null,S.fHd,S.bgSm,S.aCC,S.bT);
-  ws.mergeCells(sumR,1,sumR,3); colTotals.forEach(function(v,i){ setCell(ws.getRow(sumR).getCell(mStartCol+i),v||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  ws.mergeCells(sumR,1,sumR,3); colTotals.forEach(function(v,i){ setCell(ws.getRow(sumR).getCell(mStartCol+i),v||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
   var signR=sumR+2,now=new Date(),mid=Math.floor(totalCols*0.6);
   ws.getRow(signR).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(signR).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(signR).getCell(mid).alignment=S.aCC; ws.mergeCells(signR,mid,signR,totalCols);
   ws.getRow(signR+1).getCell(mid).value='Giáo viên bộ môn'; ws.getRow(signR+1).getCell(mid).font=S.fB; ws.getRow(signR+1).getCell(mid).alignment=S.aCC; ws.mergeCells(signR+1,mid,signR+1,totalCols);
@@ -5875,6 +5877,7 @@ ws.pageSetup = {
   fitToPage: true, fitToWidth: 1, fitToHeight: 0,
   margins: { left:(CFG.mgLeft||1)/2.54, right:(CFG.mgRight||0.5)/2.54, top:(CFG.mgTop||1)/2.54, bottom:(CFG.mgBot||1)/2.54, header:(CFG.mgHd||0.5)/2.54, footer:(CFG.mgFt||0.5)/2.54 }
 };
+ws.getRow(1).height = 32; // <--- THÊM DÒNG NÀY ĐỂ TĂNG ĐỘ CAO HÀNG 1
   ws.mergeCells(1,1,1,5); ws.getRow(1).getCell(totalCols).value='Biểu 1c';
   setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true});
   ws.getRow(1).getCell(totalCols).font=S.fB; ws.getRow(1).getCell(totalCols).alignment={horizontal:'right',vertical:'middle'};
@@ -5894,7 +5897,7 @@ ws.pageSetup = {
   setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,{horizontal:'right',vertical:'middle'},S.bT);
   setCell(ws.getRow(sumR).getCell(2),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(sumR).getCell(3),null,S.fHd,S.bgSm,S.aCC,S.bT);
-  ws.mergeCells(sumR,1,sumR,3); mCol=4; bCfg.months.forEach(function(x,mi){ setCell(ws.getRow(sumR).getCell(mCol),ktCls.length,{name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(mCol+1),colTotTiet[mi]||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); mCol+=2; }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTot,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  ws.mergeCells(sumR,1,sumR,3); mCol=4; bCfg.months.forEach(function(x,mi){ setCell(ws.getRow(sumR).getCell(mCol),ktCls.length,{name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(mCol+1),colTotTiet[mi]||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); mCol+=2; }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTot,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
   var sRow=sumR+2,now=new Date(),mid=Math.floor(totalCols*0.6);
   ws.getRow(sRow).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(sRow).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(sRow).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow,mid,sRow,totalCols);
   ws.getRow(sRow+1).getCell(mid).value='Giáo viên bộ môn'; ws.getRow(sRow+1).getCell(mid).font=S.fB; ws.getRow(sRow+1).getCell(mid).alignment=S.aCC; ws.mergeCells(sRow+1,mid,sRow+1,totalCols);
@@ -6073,10 +6076,10 @@ async function _buildBieu1dSheet(wb) {
     setCell(ws.getRow(sumR).getCell(ci), null, S.fHd, S.bgSm, S.aCC, S.bT);
   }
   setCell(ws.getRow(sumR).getCell(17), tongTiet,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT
   );
   setCell(ws.getRow(sumR).getCell(18), Math.round(tongTien),
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT
   );
 
   // --- Ký tên ---
@@ -6196,10 +6199,10 @@ var _rowH_1e = Math.min(40, Math.max(18, (_pgH_1e - _mgPt_1e - 220) / 4));
   setCell(ws.getRow(9).getCell(2),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(9).getCell(3),null,S.fHd,S.bgSm,S.aCC,S.bT);
   ws.mergeCells(9,1,9,3);
-  setCell(ws.getRow(9).getCell(4),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
-  setCell(ws.getRow(9).getCell(5),mucPC,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
-  setCell(ws.getRow(9).getCell(6),Math.round(finalTien1Gio1e),{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
-  setCell(ws.getRow(9).getCell(7),tongTien,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(4),tongTiet,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(5),mucPC,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(6),Math.round(finalTien1Gio1e),{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
+  setCell(ws.getRow(9).getCell(7),tongTien,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
   
   var sRow = 11, mid = 4;
   ws.getRow(sRow).getCell(mid).value = (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
@@ -6248,14 +6251,14 @@ async function _buildBieuBienBanSheet(wb) {
   ['Số\nTT','Họ và tên GV dạy ở lớp có học sinh học hoà nhập','Trình độ\nchuyên môn','Chức vụ','Môn dạy','Lớp có học sinh\nkhuyết tật','Tên học sinh\nkhuyết tật','Số tiết\nthực dạy','Tổng số\ntiết dạy','Giáo viên dạy trực tiếp ký xác nhận\n(Ký ghi rõ họ tên)','Tổ trưởng chuyên môn ký xác nhận\n(Ký ghi rõ họ tên)'].forEach(function(v,i){ setCell(ws.getRow(4).getCell(1+i),v,S.fHd,S.bgHd,S.aCC,S.bT); ws.mergeCells(4,1+i,5,1+i); });
   ws.getRow(6).height=14; ['A','B','1','2','3','4','5','6','7','8','9'].forEach(function(v,i){ setCell(ws.getRow(6).getCell(1+i),v,S.fHd,S.bgH2,S.aCC,S.bT); });
   var ktMap2=getKTMapByCls(); var dataR=7; var stt=1; var grandTotal=0;
-  allClasses.forEach(function(cls){ var realCls=cls.indexOf('||')>=0?cls.split('||')[0]:cls; var xlsMon=cls.indexOf('||')>=0?cls.split('||')[1]:(CFG.subject||''); var hsInCls=ktMap2[realCls]||[]; var tiet=getTongTietCls(cls); if(tiet===0&&!hsInCls.length) return;
-    if(hsInCls.length===0){ var row=ws.getRow(dataR); row.height=16; setCell(row.getCell(1),stt++,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),CFG.teacher,S.fB,null,S.aLC,S.bT); setCell(row.getCell(3),trinhDo,S.fM,null,S.aCC,S.bT); setCell(row.getCell(4),chucvu,S.fM,null,S.aCC,S.bT); setCell(row.getCell(5),xlsMon,S.fM,null,S.aCC,S.bT); setCell(row.getCell(6),realCls,S.fB,null,S.aCC,S.bT); setCell(row.getCell(7),null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(8),tiet||null,S.fM,tiet>0?S.bgYe:null,S.aCC,S.bT); setCell(row.getCell(9),tiet||null,S.fB,S.bgYe,S.aCC,S.bT); setCell(row.getCell(10),null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(11),totruong||null,S.fM,null,S.aCC,S.bT); grandTotal+=tiet; dataR++;
+  allClasses.forEach(function(cls){ var realCls=cls.indexOf('||')>=0?cls.split('||')[0]:cls; var xlsMon=cls.indexOf('||')>=0?cls.split('||')[1]:(CFG.subject||''); var hsInCls=ktMap2[realCls]||[]; var tiet=getTongTietCls(cls); if(!hsInCls.length||tiet===0) return;
+    if(false){
     } else { hsInCls.forEach(function(hs,hi){ var row=ws.getRow(dataR); row.height=16; setCell(row.getCell(1),hi===0?stt:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(2),hi===0?CFG.teacher:null,S.fB,null,S.aLC,S.bT); setCell(row.getCell(3),hi===0?trinhDo:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(4),hi===0?chucvu:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(5),hi===0?xlsMon:null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(6),hi===0?realCls:null,S.fB,null,S.aCC,S.bT); setCell(row.getCell(7),hs.name||null,S.fM,null,S.aLC,S.bT); setCell(row.getCell(8),hi===0?tiet:null,S.fM,hi===0&&tiet>0?S.bgYe:null,S.aCC,S.bT); setCell(row.getCell(9),hi===0?tiet:null,S.fB,hi===0?S.bgYe:null,S.aCC,S.bT); setCell(row.getCell(10),null,S.fM,null,S.aCC,S.bT); setCell(row.getCell(11),hi===0?(totruong||null):null,S.fM,null,S.aCC,S.bT); dataR++; }); stt++; grandTotal+=tiet; }
   });
   var sumR=dataR;
   setCell(ws.getRow(sumR).getCell(1),'Tổng số',S.fB,S.bgSm,{horizontal:'right',vertical:'middle'},S.bT);
   for(var _bi2=2;_bi2<=8;_bi2++) setCell(ws.getRow(sumR).getCell(_bi2),null,S.fHd,S.bgSm,S.aCC,S.bT);
-  ws.mergeCells(sumR,1,sumR,8); setCell(ws.getRow(sumR).getCell(9),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(10),null,S.fHd,S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(11),null,S.fHd,S.bgSm,S.aCC,S.bT);
+  ws.mergeCells(sumR,1,sumR,8); setCell(ws.getRow(sumR).getCell(9),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(10),null,S.fHd,S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(11),null,S.fHd,S.bgSm,S.aCC,S.bT);
 }
 
 // ──────────────────────────────────────────
@@ -6323,24 +6326,11 @@ async function exportBieuBienBan() {
     var xlsMon  = cls.indexOf('||')>=0 ? cls.split('||')[1] : (CFG.subject||'');
     var hsInCls = ktMap2[realCls] || [];
     var tiet    = getTongTietCls(cls);
-    if (tiet === 0 && !hsInCls.length) return; // Bỏ qua lớp trống
+    // Chỉ xuất lớp có HSKT VÀ có tiết dạy
+    if (!hsInCls.length || tiet === 0) return;
 
-    if (hsInCls.length === 0) {
-      // Không có HS KT trong danh sách — vẫn xuất dòng lớp
-      var row = ws.getRow(dataR); row.height = 16;
-      setCell(row.getCell(1),  stt++,      S.fM, null, S.aCC, S.bT);
-      setCell(row.getCell(2),  CFG.teacher,S.fB, null, S.aLC, S.bT);
-      setCell(row.getCell(3),  trinhDo,    S.fM, null, S.aCC, S.bT);
-      setCell(row.getCell(4),  chucvu,     S.fM, null, S.aCC, S.bT);
-      setCell(row.getCell(5),  xlsMon,     S.fM, null, S.aCC, S.bT);
-      setCell(row.getCell(6),  realCls,    S.fB, null, S.aCC, S.bT);
-      setCell(row.getCell(7),  null,       S.fM, null, S.aCC, S.bT);
-      setCell(row.getCell(8),  tiet||null, S.fM, tiet>0?S.bgYe:null, S.aCC, S.bT);
-      setCell(row.getCell(9),  tiet||null, S.fB, S.bgYe, S.aCC, S.bT);
-      setCell(row.getCell(10), null,       S.fM, null, S.aCC, S.bT);
-      setCell(row.getCell(11), totruong||null,S.fM, null, S.aCC, S.bT);
-      grandTotal += tiet;
-      dataR++;
+    if (false) {
+      // Khối này không dùng nữa — chỉ giữ cấu trúc else bên dưới
     } else {
       // Xuất 1 dòng / HS KT trong lớp
       hsInCls.forEach(function(hs, hi) {
@@ -6369,7 +6359,7 @@ async function exportBieuBienBan() {
   for(var _bi=2;_bi<=8;_bi++) setCell(ws.getRow(sumR).getCell(_bi),null,S.fHd,S.bgSm,S.aCC,S.bT);
   ws.mergeCells(sumR,1,sumR,8);
   setCell(ws.getRow(sumR).getCell(9),grandTotal,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}},S.bgSm,S.aCC,S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(sumR).getCell(10),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(sumR).getCell(11),null,S.fHd,S.bgSm,S.aCC,S.bT);
 
@@ -6670,13 +6660,13 @@ var _rowH_1g = Math.min(40, Math.max(18, (_pgH_1g - _mgPt_1g - 220) / 4));
   setCell(ws.getRow(10).getCell(2),null,S.fHd,S.bgSm,S.aCC,S.bT);
   ws.mergeCells(10,1,10,2);
   setCell(ws.getRow(10).getCell(3), tongLop,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT);
   setCell(ws.getRow(10).getCell(4), 1,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT);
   setCell(ws.getRow(10).getCell(5), tongTiet,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT);
   setCell(ws.getRow(10).getCell(6), tongTien,
-    {name:'Times New Roman',size:10,bold:true,color:{argb:'FFC8973A'}}, S.bgSm, S.aCC, S.bT);
+    {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}}, S.bgSm, S.aCC, S.bT);
   setCell(ws.getRow(10).getCell(7), null, S.fHd, S.bgSm, S.aCC, S.bT);
 
   // ── Ký tên ──
@@ -7604,24 +7594,11 @@ async function viewBieuBienBan() {
         const hsInCls = ktMap[realCls] || [];
         const tiet    = getTongTietCls(cls);
         
-        if (tiet === 0 && hsInCls.length === 0) return;
-        
-        if (hsInCls.length === 0) {
-            rows.push({
-                stt: stt++,
-                gv: CFG.teacher,
-                trinhDo: trinhDo,
-                chucvu: chucvu,
-                mon: xlsMon,
-                lop: realCls,
-                hsName: '',
-                soTiet: tiet,
-                tongTiet: tiet,
-                gvKy: '',
-                ttKy: totruong,
-                isFirstOfClass: true
-            });
-            grandTotal += tiet;
+        // Chỉ thống kê lớp có HSKT VÀ có tiết dạy
+        if (!hsInCls.length || tiet === 0) return;
+
+        if (false) {
+            // Khối này không dùng nữa
         } else {
             hsInCls.forEach(function(hs, idx) {
                 rows.push({
@@ -7795,10 +7772,12 @@ async function _buildBieu1MainSheet(wb) {
   var _rowH = Math.min(22, Math.max(12, (_pgH / 25.4 * 72 - _mgPt - 220) / Math.max(1, studentList.length + 1)));
   
   ws.mergeCells(1,1,1,6);
-  setCell(ws.getRow(1).getCell(1),'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n'+CFG.school.toUpperCase(),{name:'Times New Roman',size:10,bold:true},null,{horizontal:'left',vertical:'middle',wrapText:true});
+  // Đã chỉnh vertical: 'bottom' và height: 40 để hiển thị đủ 2 dòng chữ
+  setCell(ws.getRow(1).getCell(1), 'SỞ GIÁO DỤC VÀ ĐÀO TẠO\n' + (typeof CFG !== 'undefined' ? CFG.school : '').toUpperCase(), {name:'Times New Roman',size:10,bold:true}, null, {horizontal:'left',vertical:'bottom',wrapText:true});
   ws.getRow(1).getCell(totalCols).value = 'Biểu 1';
   ws.getRow(1).getCell(totalCols).font = {name:'Times New Roman',size:10,bold:true};
-  ws.getRow(1).getCell(totalCols).alignment = {horizontal:'right',vertical:'middle'};
+  ws.getRow(1).getCell(totalCols).alignment = {horizontal:'right',vertical:'bottom'};
+  ws.getRow(1).height = 40;
   
   ws.getRow(2).height = 32;
   setCell(ws.getRow(2).getCell(1),'DANH SÁCH HỌC SINH KHUYẾT TẬT HỌC HÒA NHẬP\nHỌC KỲ I, NĂM HỌC ' + CFG.schoolYear,{name:'Times New Roman',size:12,bold:true},null,{horizontal:'center',vertical:'middle',wrapText:true});
@@ -7810,19 +7789,22 @@ async function _buildBieu1MainSheet(wb) {
   hdrs.forEach(function(h) {
     var cs = h.cs || 1;
     var c = ws.getRow(3).getCell(col);
-    setCell(c, h.v, {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}}, {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}}, {horizontal:'center',vertical:'middle',wrapText:true}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
+    // ĐÃ SỬA: bgHd THÀNH MÀU TRẮNG/XÁM
+    setCell(c, h.v, {name:'Times New Roman',size:9,bold:true,color:{argb:'FF1A2744'}}, {type:'pattern',pattern:'solid',fgColor:{argb:'FFF4F5F8'}}, {horizontal:'center',vertical:'middle',wrapText:true}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
     if (h.rs > 1 || cs > 1) ws.mergeCells(3, col, 3+h.rs-1, col+cs-1);
     col += cs;
   });
   
   ws.getRow(4).height = 18;
   [[3,'Nam'],[4,'Nữ'],[8,'Số'],[9,'Thời gian cấp']].forEach(function(v) {
-    setCell(ws.getRow(4).getCell(v[0]), v[1], {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}}, {type:'pattern',pattern:'solid',fgColor:{argb:'FF172447'}}, {horizontal:'center',vertical:'middle'}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
+    // ĐÃ SỬA: bgH2 THÀNH MÀU TRẮNG/XÁM NHẠT HƠN
+    setCell(ws.getRow(4).getCell(v[0]), v[1], {name:'Times New Roman',size:9,bold:true,color:{argb:'FF1A2744'}}, {type:'pattern',pattern:'solid',fgColor:{argb:'FFEAEDF3'}}, {horizontal:'center',vertical:'middle'}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
   });
   
   ws.getRow(5).height = 14;
   ['A','B','1','2','3','4','5','6','7','8'].forEach(function(v,i){
-    setCell(ws.getRow(5).getCell(1+i), v, {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}}, {type:'pattern',pattern:'solid',fgColor:{argb:'FF172447'}}, {horizontal:'center',vertical:'middle'}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
+    // ĐÃ SỬA: bgH2 THÀNH MÀU TRẮNG/XÁM
+    setCell(ws.getRow(5).getCell(1+i), v, {name:'Times New Roman',size:9,bold:true,color:{argb:'FF1A2744'}}, {type:'pattern',pattern:'solid',fgColor:{argb:'FFEAEDF3'}}, {horizontal:'center',vertical:'middle'}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
   });
   
   studentList.forEach(function(s, i) {
@@ -7845,9 +7827,6 @@ async function _buildBieu1MainSheet(wb) {
     setCell(row.getCell(10), s.ghiChu||'', {name:'Times New Roman',size:10}, null, {horizontal:'left',vertical:'middle',wrapText:true}, {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}});
   });
   
-  var sumR = 6 + studentList.length;
-  ws.mergeCells(sumR,1,sumR,2);
-  setCell(ws.getRow(sumR).getCell(1), 'Tổng số: ' + studentList.length + ' học sinh', {name:'Times New Roman',size:10,bold:true}, {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}}, {horizontal:'left',vertical:'middle'});
 }
 </script>
 </main>
