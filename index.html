@@ -1187,24 +1187,31 @@ tr.row-kt td.td-cls{color:var(--red)}
       <div class="dlg-title">Xuất Excel thống kê</div>
     </div>
     <div class="dlg-body">
-      <p style="margin-bottom:12px">Chọn phạm vi lớp cần xuất:</p>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn btn-primary" onclick="doExportThongKe('all')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
-          <span style="font-size:16px">📋</span>
-          <div style="text-align:left">
-            <div style="font-size:12px;font-weight:700">Tất cả các lớp</div>
-            <div style="font-size:10px;opacity:.7;font-weight:400">Xuất toàn bộ lớp có tiết dạy trong kỳ</div>
-          </div>
-        </button>
-        <button class="btn btn-danger" onclick="doExportThongKe('kt')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
-          <span style="font-size:16px">🔴</span>
-          <div style="text-align:left">
-            <div style="font-size:12px;font-weight:700">Chỉ lớp có HS khuyết tật</div>
-            <div style="font-size:10px;opacity:.7;font-weight:400">Xuất những lớp có HS KT trong danh sách</div>
-          </div>
-        </button>
+  <p style="margin-bottom:12px">Chọn kỳ học cần xuất:</p>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <button class="btn btn-primary" onclick="doExportThongKeHK('hk1')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
+      <span style="font-size:16px">📘</span>
+      <div style="text-align:left">
+        <div style="font-size:12px;font-weight:700">Học kỳ 1</div>
+        <div style="font-size:10px;opacity:.7;font-weight:400">Xuất thống kê tiết dạy Học kỳ 1</div>
       </div>
-    </div>
+    </button>
+    <button class="btn btn-primary" onclick="doExportThongKeHK('hk2')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
+      <span style="font-size:16px">📗</span>
+      <div style="text-align:left">
+        <div style="font-size:12px;font-weight:700">Học kỳ 2</div>
+        <div style="font-size:10px;opacity:.7;font-weight:400">Xuất thống kê tiết dạy Học kỳ 2</div>
+      </div>
+    </button>
+    <button class="btn btn-gold" onclick="doExportThongKeHK('year')" style="justify-content:flex-start;gap:10px;padding:10px 14px">
+      <span style="font-size:16px">📙</span>
+      <div style="text-align:left">
+        <div style="font-size:12px;font-weight:700">Cả năm</div>
+        <div style="font-size:10px;opacity:.7;font-weight:400">Xuất thống kê tiết dạy cả năm học</div>
+      </div>
+    </button>
+  </div>
+</div>
     <div class="dlg-ft">
       <button class="btn btn-outline btn-sm" onclick="document.getElementById('tkExportDlg').classList.remove('open')">Huỷ</button>
     </div>
@@ -1330,7 +1337,7 @@ fitPage:true, repeatRow:true,
   fn1:'bang_cham_cong_T{M}_{Y}', fn2:'bang_cham_cong_namhoc_{Y1}_{Y2}',
   promptSave:false, maxDayLessons:5, onlyKTCls:false,
 hk1Start:'05/09/2025', hk1End:'10/01/2026',
-hk2Start:'20/01/2026', hk2End:'31/05/2026',
+hk2Start:'12/01/2026', hk2End:'31/05/2026',
 'b1d-luong':'',
 'b1d-kv':'',
 'b1d-uuai':'',
@@ -2786,18 +2793,33 @@ function gotoMonth(key) {
 // ══ EXPORT ════════════════════════════
 function openExportDialog(mode) {
   if (mode === 'all') {
-    openConfirm('📦','Chọn phạm vi xuất',
-      'Bạn muốn xuất tháng này như thế nào?<br><br>' +
-      '<button class="btn btn-primary" style="width:100%;margin-bottom:8px;justify-content:flex-start;gap:10px;padding:10px 14px" onclick="closeConfirm();_doOpenExport(\'all\',\'all\')">' +
-      '<span style="font-size:16px">📋</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Tất cả các lớp</div><div style="font-size:10px;opacity:.7">Xuất toàn bộ lớp có tiết dạy</div></div></button>' +
-      '<button class="btn btn-danger" style="width:100%;justify-content:flex-start;gap:10px;padding:10px 14px" onclick="closeConfirm();_doOpenExport(\'all\',\'kt\')">' +
-      '<span style="font-size:16px">🔴</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Chỉ lớp có HS khuyết tật</div><div style="font-size:10px;opacity:.7">Xuất những lớp có HS KT</div></div></button>',
+    openConfirm('📦','Chọn học kỳ cần xuất',
+      'Chọn học kỳ để xuất file chấm công:<br><br>' +
+
+      '<button class="btn btn-primary" style="width:100%;margin-bottom:8px;justify-content:flex-start;gap:10px;padding:10px 14px;background:var(--navy)" onclick="closeConfirm();_setHKAndExport(\'hk1\')">' +
+      '<span style="font-size:16px">📘</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Học kỳ I</div><div style="font-size:10px;opacity:.7">Chỉ xuất các tháng trong HKI</div></div></button>' +
+
+      '<button class="btn btn-primary" style="width:100%;margin-bottom:8px;justify-content:flex-start;gap:10px;padding:10px 14px;background:#1a7a4a" onclick="closeConfirm();_setHKAndExport(\'hk2\')">' +
+      '<span style="font-size:16px">📗</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Học kỳ II</div><div style="font-size:10px;opacity:.7">Chỉ xuất các tháng trong HKII</div></div></button>' +
+
+      '<button class="btn btn-primary" style="width:100%;justify-content:flex-start;gap:10px;padding:10px 14px;background:#7b2d8b" onclick="closeConfirm();_setHKAndExport(\'all\')">' +
+      '<span style="font-size:16px">📚</span><div style="text-align:left"><div style="font-size:12px;font-weight:700">Cả năm học</div><div style="font-size:10px;opacity:.7">Xuất toàn bộ các tháng cả năm</div></div></button>',
+
       'Huỷ','btn-outline', null
     );
     G('dlgOkBtn').style.display='none';
     return;
   }
   _doOpenExport(mode, 'all');
+}
+
+// Hàm mới: set học kỳ rồi mở dialog xuất
+function _setHKAndExport(hkMode) {
+  var prevMode = tkFilterMode;
+  tkFilterMode = hkMode;
+  _doOpenExport('all', 'all');
+  // Ghi chú: tkFilterMode đã được set, doExport() sẽ tự đọc khi xuất
+  // Khôi phục sau khi dialog đóng không cần thiết vì người dùng chủ động chọn HK
 }
 
 function _doOpenExport(mode, clsFilter) {
@@ -4166,9 +4188,12 @@ html += '<th rowspan="2" style="background:var(--navy);color:#fff;padding:6px 3p
   cont.innerHTML = html;
 }
 
-function doExportThongKe(clsMode) {
+function doExportThongKeHK(hkMode) {
   document.getElementById('tkExportDlg').classList.remove('open');
-  exportThongKe(clsMode);
+  var oldMode = tkFilterMode;
+  tkFilterMode = hkMode;
+  exportThongKe('all');
+  tkFilterMode = oldMode;
 }
 
 async function exportThongKe(clsMode) {
@@ -4209,13 +4234,13 @@ async function exportThongKe(clsMode) {
     var fT  = {name:'Times New Roman',size:13,bold:true};
     var fB  = {name:'Times New Roman',size:10,bold:true};
     var fM  = {name:'Times New Roman',size:10};
-    var fHd = {name:'Times New Roman',size:9,bold:true,color:{argb:'FFFFFFFF'}};
+    var fHd = {name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}};
     var fRed= {name:'Times New Roman',size:10,bold:true,color:{argb:'FFAA2020'}};
     var fBl = {name:'Times New Roman',size:10,bold:true,color:{argb:'FF1A2744'}};
-    var bgHd= {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}};
-    var bgH2= {type:'pattern',pattern:'solid',fgColor:{argb:'FF172447'}};
-    var bgSm= {type:'pattern',pattern:'solid',fgColor:{argb:'FF0D1B3E'}};
-    var bgKT= {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF0F0'}};
+    var bgHd= {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+    var bgH2= {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+    var bgSm= {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+    var bgKT= {type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
     var bT  = {top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
     var aCC = {horizontal:'center',vertical:'middle',wrapText:true};
     var aLC = {horizontal:'left',  vertical:'middle',wrapText:true};
