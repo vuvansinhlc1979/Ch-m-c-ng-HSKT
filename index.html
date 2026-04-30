@@ -3052,17 +3052,17 @@ async function xacNhanGuiBaoCao() {
     thangTiet[key] = 0;
   });
 
-  const dsLopCoHSKT = [...new Set((studentList || []).map(s => s.cls || s.lop))];
-
+  // Tính tiết từng lớp
   (allClasses || []).forEach(cls => {
+    // Chỉ tính lớp có HSKT
     const clsName = cls.split('||')[0].trim();
-    if (!dsLopCoHSKT.includes(clsName)) return; // Bỏ qua lớp không có HSKT
+    const hsOfCls = (studentList || []).filter(s => (s.cls || s.lop) === clsName);
+    if (hsOfCls.length === 0) return;
 
     const tiet = getTongTietClsInMonths(cls, months, hkRange);
     if (tiet > 0) {
       tongLop++;
       tongTiet += tiet;
-      const hsOfCls = (studentList || []).filter(s => (s.cls || s.lop) === clsName);
       tongHS += hsOfCls.length;
     }
     // Tính theo từng tháng
