@@ -21,7 +21,6 @@
 }
 </style> 
 <head>
- <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src *; img-src * data: blob:; frame-src *;"> 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hệ Thống Chấm Công – Trường TH Số 2 Gia Phú</title>
@@ -579,7 +578,7 @@ tr.row-kt td.td-cls{color:var(--red)}
     <button class="btn btn-sm btn-outline" id="tkBtnHK2" onclick="setTKFilter('hk2')" style="border-color:rgba(255,255,255,.25);color:#fff">📗 HK II</button>
     <button class="btn btn-sm btn-outline" id="tkBtnAll" onclick="setTKFilter('all')" style="border-color:rgba(255,255,255,.25);color:#fff">📙 Cả năm</button>
     <button class="btn btn-sm btn-gold" onclick="document.getElementById('tkExportDlg').classList.add('open')">📊 Xuất TK</button>
-    <button class="btn btn-sm btn-success" onclick="showModalGuiBaoCao()" title="Gửi báo cáo lên hệ thống">📤 Gửi báo cáo</button>
+    <button class="btn btn-sm btn-success" onclick="guiBaoCao()" title="Gửi báo cáo lên hệ thống">📤 Gửi báo cáo</button>
   </div>
 
 </div>
@@ -1265,7 +1264,7 @@ tr.row-kt td.td-cls{color:var(--red)}
 // ═══════════════════════════════════════
 
 var APP_VER = '4.0';
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbydiRMrZFIMXYcVpYTinAgeLdInL7caZCAdp2EVAjTu3Jp3iRs2Cn6cKe5d3tUwTl2eyg/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycby_AfGOGC-JCAUX4dIbAdeF-7b62V8XKxT6KN4ePqoDGRimT5Z1h-8SZgfd6I3UustsUg/exec';
 var SK = { l:'bcc_l', e:'bcc_e', n:'bcc_n', c:'bcc_c', s:'bcc_s', m:'bcc_m', cfg:'bcc_cfg', ts:'bcc_ts' };
 
 // ── IndexedDB wrapper (thay thế localStorage) ──
@@ -2968,178 +2967,54 @@ function dlBlob(blob, fname) {
   toast('💾 Đã tải: ' + fname, 't-ok');
 }
 // ══ GỬI BÁO CÁO LÊN GOOGLE SHEETS ══════
-// ══ MODAL CHỌN HK TRƯỚC KHI GỬI ══════
-function showModalGuiBaoCao() {
-  // Tạo modal nếu chưa có
-  if (!document.getElementById('modal-chon-hk')) {
-    var modal = document.createElement('div');
-    modal.id = 'modal-chon-hk';
-    modal.style.cssText = `
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.5); z-index:9999;
-      display:flex; align-items:center; justify-content:center;
-    `;
-    modal.innerHTML = `
-      <div style="background:#fff; border-radius:12px; padding:28px 32px; 
-                  min-width:320px; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-        <h3 style="margin:0 0 16px; color:#0D1B3E; font-size:18px;">
-          📤 Gửi báo cáo lên hệ thống
-        </h3>
-        <p style="margin:0 0 16px; color:#555; font-size:14px;">
-          Chọn học kỳ cần gửi báo cáo:
-        </p>
-        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-          <label style="display:flex; align-items:center; gap:10px; cursor:pointer; 
-                        padding:10px; border:2px solid #e0e0e0; border-radius:8px;">
-            <input type="radio" name="chon-hk" value="hk1" checked>
-            <span>📚 <b>Học kỳ I</b> (Tháng 9 → Tháng 1)</span>
-          </label>
-          <label style="display:flex; align-items:center; gap:10px; cursor:pointer;
-                        padding:10px; border:2px solid #e0e0e0; border-radius:8px;">
-            <input type="radio" name="chon-hk" value="hk2">
-            <span>📚 <b>Học kỳ II</b> (Tháng 2 → Tháng 5)</span>
-          </label>
-          <label style="display:flex; align-items:center; gap:10px; cursor:pointer;
-                        padding:10px; border:2px solid #e0e0e0; border-radius:8px;">
-            <input type="radio" name="chon-hk" value="canam">
-            <span>📚 <b>Cả năm</b></span>
-          </label>
-        </div>
-        <div style="display:flex; gap:10px; justify-content:flex-end;">
-          <button onclick="document.getElementById('modal-chon-hk').style.display='none'"
-            style="padding:8px 20px; border:1px solid #ccc; border-radius:6px; 
-                   background:#fff; cursor:pointer; font-size:14px;">
-            ❌ Hủy
-          </button>
-          <button onclick="xacNhanGuiBaoCao()"
-            style="padding:8px 20px; border:none; border-radius:6px;
-                   background:#198754; color:#fff; cursor:pointer; 
-                   font-size:14px; font-weight:bold;">
-            ✅ Xác nhận gửi
-          </button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-  // Tự động chọn HK đang xem
-  var hkHienTai = tkFilterMode || 'hk1';
-  var radio = document.querySelector('input[name="chon-hk"][value="' + hkHienTai + '"]');
-  if (radio) radio.checked = true;
+async function guiBaoCao() {
+  var hkMode = tkFilterMode || 'hk1';
+  var bCfg   = getBieu1Config(hkMode);
 
-  document.getElementById('modal-chon-hk').style.display = 'flex';
-}
-
-async function xacNhanGuiBaoCao() {
-  // Đóng modal
-  document.getElementById('modal-chon-hk').style.display = 'none';
-
-  // Lấy HK được chọn
-  const hkMode = document.querySelector('input[name="chon-hk"]:checked').value;
-
-  // ── BUILD PAYLOAD ──────────────────────────────────────────
-  const cfg = getBieu1Config(hkMode);
-  const months = cfg.months;
-  const hkRange = cfg.hkRange;
-
-  // Tổng hợp theo lớp
-  let tongLop = 0, tongHS = 0, tongTiet = 0;
-  const thangTiet = {};
-
-  // Khởi tạo thangTiet theo HK
-  months.forEach(m => {
-    const key = 't' + m.m + '_' + m.y;
-    thangTiet[key] = 0;
+  var ktMap = getKTMapByCls();
+  var allKtCls = allClasses.filter(function(c) {
+    var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
+    return !!ktMap[r];
   });
 
-  // Tính tiết từng lớp
-  (allClasses || []).forEach(cls => {
-    const tiet = getTongTietClsInMonths(cls, months, hkRange);
-    if (tiet > 0) {
-      tongLop++;
-      tongTiet += tiet;
-      // Đếm HS của lớp này
-      const hsOfCls = (studentList || []).filter(s => s.lop === cls);
-      tongHS += hsOfCls.length;
-    }
-    // Tính theo từng tháng
-    months.forEach(m => {
-      const key = 't' + m.m + '_' + m.y;
-      const t = getMonthLessonsInRange(cls, m.m, m.y, hkRange.start, hkRange.end);
-      thangTiet[key] = (thangTiet[key] || 0) + t;
-    });
+  var tongLop  = allKtCls.length;
+  var tongHS   = studentList.length;
+  var tongTiet = 0;
+  allKtCls.forEach(function(c) {
+    tongTiet += getTongTietClsInMonths(c, bCfg.months, bCfg.hkRange);
   });
 
-  // Lương & phụ cấp từ CFG
-  const luong     = Number(CFG.luong     || 0);
-  const luongCS   = Number(CFG.luongCS   || 0);
-  const kv        = Number(CFG.kv        || 0);
-  const uuai      = Number(CFG.uuai      || 0);
-  const mucPC     = Number(CFG.mucPC     || 0);
-  const chucvu    = Number(CFG.chucvu    || 0);
-  const pctnng    = Number(CFG.pctnng    || 0);
-  const tongLuong = Number(CFG.tongLuong || 0);
-  const tien1Gio  = Number(CFG.tien1Gio  || 0);
-  const phuCap    = Number(CFG.phuCap    || 0);
-
-  // Biểu 1g
-  const b1g_tongLop  = tongLop;
-  const b1g_tongGV   = 1;
-  const b1g_tongTiet = tongTiet;
-  const b1g_tongKP   = phuCap;
-
-  const payload = {
-    hkMode,
-    teacher    : CFG.teacher    || '',
-    school     : CFG.school     || '',
-    code       : CFG.code       || '',
-    schoolYear : CFG.schoolYear || '',
-    tongLop, tongHS, tongTiet,
-    thangTiet,
-    luong, luongCS, kv, uuai, mucPC, chucvu, pctnng,
-    tongLuong, tien1Gio, phuCap,
-    b1g_tongLop, b1g_tongGV, b1g_tongTiet, b1g_tongKP
+  var payload = {
+    hkMode:       hkMode,
+    teacher:      CFG.teacher    || '',
+    school:       CFG.school     || '',
+    code:         CFG.code       || '',
+    schoolYear:   CFG.schoolYear || '',
+    tongLop:      tongLop,
+    tongHS:       tongHS,
+    tongTiet:     tongTiet,
+    b1a_tongLop:  tongLop,
+    b1a_tongHS:   tongHS,
+    b1a_tongTiet: tongTiet,
+    b1b_tongTiet: tongTiet,
+    b1b_tongTuan: Math.round(tongTiet / Math.max(1, bCfg.months.length * 4)),
+    b1c_tongTiet: tongTiet,
+    ghiChu:       ''
   };
 
-  // ── KIỂM TRA ĐỘ DÀI URL ───────────────────────────────────
-  const payloadStr = encodeURIComponent(JSON.stringify(payload));
-  const fullUrl    = GAS_URL + '?payload=' + payloadStr;
-
-  console.log('📏 Độ dài URL:', fullUrl.length, 'ký tự');
-  if (fullUrl.length > 8000) {
-    alert('⚠️ Payload quá dài (' + fullUrl.length + ' ký tự)!\nVui lòng liên hệ kỹ thuật để rút gọn.');
-    return;
-  }
-
-  // ── GỬI LÊN GAS ────────────────────────────────────────────
-  // Hiện loading
-  const btn = document.querySelector('[onclick*="showModalGuiBaoCao"]');
-  const oldText = btn ? btn.innerHTML : '';
-  if (btn) btn.innerHTML = '⏳ Đang gửi...';
-
   try {
-    const res  = await fetch(fullUrl, { method: 'GET' });
-    const json = await res.json();
-
-    if (json.status === 'OK') {
-      alert('✅ Gửi báo cáo thành công!\n' +
-            'HK: ' + hkMode.toUpperCase() +
-            '\nTổng tiết: ' + tongTiet +
-            '\nFile: ' + (json.fileName || 'Đã ghi vào Sheets'));
-    } else {
-      alert('❌ GAS trả lỗi: ' + (json.error || JSON.stringify(json)));
-    }
-  } catch (err) {
-    alert('❌ Không gửi được!\nLỗi: ' + err.message +
-          '\n\nKiểm tra:\n1. GAS đã deploy chưa?\n2. URL trong GAS_URL có đúng không?');
-    console.error('Lỗi gửi báo cáo:', err);
-  } finally {
-    if (btn) btn.innerHTML = oldText;
+    toast('📤 Đang gửi báo cáo...', 't-info');
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast('✅ Đã gửi báo cáo thành công!', 't-ok');
+  } catch(err) {
+    toast('❌ Không gửi được: ' + err.message, 't-err');
   }
 }
-
-// Giữ hàm cũ để không bị lỗi nếu có chỗ nào còn gọi
-function guiBaoCao() { showModalGuiBaoCao(); }
 // ══ BUILD EXCEL SHEET ══════════════════
 function buildSheet(wb, key, ktFilter, hkMode) {
   var parts = key.split('_');
@@ -8319,10 +8194,9 @@ function setActiveBieuBtn(activeId) {
 }  
 // ══ AUTH — Phân quyền qua Gmail ══════════════════════
 // ⚠️ Thay URL bên dưới bằng URL Apps Script mới sau khi deploy
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbydiRMrZFIMXYcVpYTinAgeLdInL7caZCAdp2EVAjTu3Jp3iRs2Cn6cKe5d3tUwTl2eyg/exec';
+var _API = 'https://script.google.com/macros/s/AKfycbw9RRBJjD7Q9AZ_nIEd25CIL8jvx_szQUTJDNsT5dej3SDbn9jsCIfSz9tsi8xwKGhE7w/exec';
 
 // Danh sách email dự phòng (dùng khi Apps Script không phản hồi)
-var _API = GAS_URL;
 var _LOCAL_WHITELIST = [
   'vuvansinh1c1979@gmail.com',
   'nguachien7979@gmail.com',
@@ -8382,7 +8256,7 @@ function doAuth() {
     _cleanupAuth();
     console.warn('[Auth] Timeout sau 8s, thử whitelist nội bộ...');
     _tryLocalAuth(email, msg, btn);
-  }, 0);
+  }, 8000);
 
   document.body.appendChild(script);
 }
