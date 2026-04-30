@@ -21,6 +21,7 @@
 }
 </style> 
 <head>
+ <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src *; img-src * data: blob:; frame-src *;"> 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hệ Thống Chấm Công – Trường TH Số 2 Gia Phú</title>
@@ -524,40 +525,63 @@ tr.row-kt td.td-cls{color:var(--red)}
 </header>
 
 <!-- GLOBAL TOOLBAR -->
-<div id="globalBar" style="position:fixed;left:var(--sb-w);right:0;top:var(--tb-h);z-index:190;background:#172447;border-bottom:1px solid rgba(255,255,255,.1);padding:6px 14px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(13,27,62,.15)">
-  <button class="btn btn-sm btn-outline" id="gEditBtn" onclick="toggleEdit()" style="border-color:rgba(255,255,255,.25);color:#fff">✏️ Chỉnh sửa</button>
-  <button class="btn btn-sm btn-outline" id="gUndo" onclick="doUndo()" title="Hoàn tác (Ctrl+Z)" style="border-color:rgba(255,255,255,.25);color:#fff;opacity:.4" disabled>↩ Undo</button>
-  <button class="btn btn-sm btn-outline" id="gRedo" onclick="doRedo()" title="Làm lại (Ctrl+Y)" style="border-color:rgba(255,255,255,.25);color:#fff;opacity:.4" disabled>↪ Redo</button>
-  <button class="btn btn-sm btn-outline" id="gHideWk" onclick="toggleHideWeekend()" style="border-color:rgba(255,255,255,.25);color:#fff" title="Ẩn T7/CN">📅 Ẩn T7/CN</button>
-  <button class="btn btn-sm btn-success" id="gAddCls" onclick="addClassPrompt()">➕ Thêm lớp</button>
-  <button class="btn btn-sm btn-danger" id="gDelCls" onclick="askDeleteClass()">🗑️ Xoá lớp</button>
-  <button class="btn btn-sm btn-danger" id="gClearEdit" onclick="askClearEdits()" style="display:none">🗑️ Xoá sửa</button>
-  <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
-  <button class="btn btn-sm btn-success" onclick="manualSave()">💾 Lưu</button>
-  <button class="btn btn-sm btn-primary" id="gPrint" onclick="doPrint()" style="background:rgba(255,255,255,.12);border:none;color:#fff">🖨️ In</button>
-  <button class="btn btn-sm btn-gold" onclick="openExportDialog('month')">📊 Xuất tháng</button>
-  <button class="btn btn-sm btn-outline" onclick="exportPDF()" style="border-color:rgba(255,255,255,.25);color:#fff" title="Xuất PDF tháng hiện tại">📄 Xuất PDF</button>
-  <button class="btn btn-sm btn-gold" onclick="exportToTemplate()" title="Điền dữ liệu vào file mẫu gốc (.xlsx theo QĐ)">📋 Xuất file mẫu QĐ</button>
-  <button class="btn btn-sm btn-danger" onclick="openExportDialog('all')" style="background:rgba(255,255,255,.12);border:none;color:#fff">📦 Xuất tất cả</button>
-  <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
-  <button class="btn btn-sm btn-outline" id="tkBtnHK1" onclick="setTKFilter('hk1')" style="border-color:rgba(255,255,255,.25);color:#fff">📘 HK I</button>
-  <button class="btn btn-sm btn-outline" id="tkBtnHK2" onclick="setTKFilter('hk2')" style="border-color:rgba(255,255,255,.25);color:#fff">📗 HK II</button>
-  <button class="btn btn-sm btn-outline" id="tkBtnAll" onclick="setTKFilter('all')" style="border-color:rgba(255,255,255,.25);color:#fff">📙 Cả năm</button>
-  <button class="btn btn-sm btn-gold" onclick="document.getElementById('tkExportDlg').classList.add('open')">📊 Xuất TK</button>
-  <button class="btn btn-sm btn-gold" onclick="showPage('bieubienban',document.getElementById('navBB'))">📝 Biên Bản</button>
-  <!-- Các nút xem biểu (đã chuyển từ tab Biểu 1) -->
-<button id="btnV1"  class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1');viewBieu1Main()">👁️ Xem Biểu 1</button>
-<button id="btnV1a" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1a');viewBieu1a()">👁️ Xem Biểu 1a</button>
-<button id="btnV1b" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1b');viewBieu1b()">👁️ Xem Biểu 1b</button>
-<button id="btnV1c" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1c');viewBieu1c()">👁️ Xem Biểu 1c</button>
-<button id="btnV1d" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1d');viewBieu1d()">👁️ Xem Biểu 1d</button>
-<button id="btnV1e" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1e');viewBieu1e()">👁️ Xem Biểu 1e</button>
-<button id="btnV1g" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1g');viewBieu1g()">👁️ Xem Biểu 1g</button>
-<button class="btn btn-sm btn-success" onclick="exportAllBieu1()">📊 Xuất tất cả</button>
-  <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
-  <div style="flex:1"></div>
-  <button class="btn btn-sm btn-gold" id="gBtnAll" onclick="setGlobalFilter('all')">📋 Tất cả lớp</button>
-  <button class="btn btn-sm btn-outline" id="gBtnKT" onclick="setGlobalFilter('kt')" style="border-color:var(--red);color:var(--red)">🔴 Chỉ lớp KT</button>
+<div id="globalBar" style="position:fixed;left:var(--sb-w);right:0;top:var(--tb-h);z-index:190;background:#172447;border-bottom:1px solid rgba(255,255,255,.1);padding:4px 14px;display:flex;flex-direction:column;gap:3px;box-shadow:0 2px 8px rgba(13,27,62,.15)">
+
+  <!-- HÀNG 1: Chỉnh sửa + Lưu + Xuất file chấm công -->
+  <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+    <!-- Nhóm chỉnh sửa -->
+    <button class="btn btn-sm btn-outline" id="gEditBtn" onclick="toggleEdit()" style="border-color:rgba(255,255,255,.25);color:#fff">✏️ Chỉnh sửa</button>
+    <button class="btn btn-sm btn-outline" id="gUndo" onclick="doUndo()" title="Hoàn tác (Ctrl+Z)" style="border-color:rgba(255,255,255,.25);color:#fff;opacity:.4" disabled>↩ Undo</button>
+    <button class="btn btn-sm btn-outline" id="gRedo" onclick="doRedo()" title="Làm lại (Ctrl+Y)" style="border-color:rgba(255,255,255,.25);color:#fff;opacity:.4" disabled>↪ Redo</button>
+    <button class="btn btn-sm btn-outline" id="gHideWk" onclick="toggleHideWeekend()" style="border-color:rgba(255,255,255,.25);color:#fff" title="Ẩn T7/CN">📅 Ẩn T7/CN</button>
+    <button class="btn btn-sm btn-success" id="gAddCls" onclick="addClassPrompt()">➕ Thêm lớp</button>
+    <button class="btn btn-sm btn-danger" id="gDelCls" onclick="askDeleteClass()">🗑️ Xoá lớp</button>
+    <button class="btn btn-sm btn-danger" id="gClearEdit" onclick="askClearEdits()" style="display:none">🗑️ Xoá sửa</button>
+
+    <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
+
+    <!-- Nhóm lưu + in -->
+    <button class="btn btn-sm btn-success" onclick="manualSave()">💾 Lưu</button>
+    <button class="btn btn-sm btn-primary" id="gPrint" onclick="doPrint()" style="background:rgba(255,255,255,.12);border:none;color:#fff">🖨️ In</button>
+
+    <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
+
+    <!-- Nhóm xuất file chấm công -->
+    <button class="btn btn-sm btn-gold" onclick="openExportDialog('month')">📊 Xuất tháng</button>
+    <button class="btn btn-sm btn-outline" onclick="exportPDF()" style="border-color:rgba(255,255,255,.25);color:#fff" title="Xuất PDF tháng hiện tại">📄 Xuất PDF</button>
+    <button class="btn btn-sm btn-gold" onclick="exportToTemplate()" title="Điền dữ liệu vào file mẫu gốc (.xlsx theo QĐ)">📋 Xuất file mẫu QĐ</button>
+    <button class="btn btn-sm btn-danger" onclick="openExportDialog('all')" style="background:rgba(255,255,255,.12);border:none;color:#fff">📦 Xuất tất cả</button>
+
+    <div style="flex:1"></div>
+
+    <!-- Nhóm lọc lớp (góc phải) -->
+    <button class="btn btn-sm btn-gold" id="gBtnAll" onclick="setGlobalFilter('all')">📋 Tất cả lớp</button>
+    <button class="btn btn-sm btn-outline" id="gBtnKT" onclick="setGlobalFilter('kt')" style="border-color:var(--red);color:var(--red)">🔴 Chỉ lớp KT</button>
+  </div>
+
+  <!-- HÀNG 2: Xem biểu + Xuất biểu + HK filter -->
+  <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+    <!-- Nhóm xem biểu -->
+    <button id="btnV1"  class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1');viewBieu1Main()">👁️ Biểu 1</button>
+    <button id="btnV1a" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1a');viewBieu1a()">👁️ Biểu 1a</button>
+    <button id="btnV1b" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1b');viewBieu1b()">👁️ Biểu 1b</button>
+    <button id="btnV1c" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1c');viewBieu1c()">👁️ Biểu 1c</button>
+    <button id="btnV1d" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1d');viewBieu1d()">👁️ Biểu 1d</button>
+    <button id="btnV1e" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1e');viewBieu1e()">👁️ Biểu 1e</button>
+    <button id="btnV1g" class="btn btn-sm btn-bieu" onclick="setActiveBieuBtn('btnV1g');viewBieu1g()">👁️ Biểu 1g</button>
+    <button class="btn btn-sm btn-gold" onclick="showPage('bieubienban',document.getElementById('navBB'))">📝 Biên Bản</button>
+    <button class="btn btn-sm btn-success" onclick="exportAllBieu1()">📊 Xuất tất cả biểu</button>
+
+    <div style="width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 3px"></div>
+
+    <!-- Nhóm lọc HK -->
+    <button class="btn btn-sm btn-outline" id="tkBtnHK1" onclick="setTKFilter('hk1')" style="border-color:rgba(255,255,255,.25);color:#fff">📘 HK I</button>
+    <button class="btn btn-sm btn-outline" id="tkBtnHK2" onclick="setTKFilter('hk2')" style="border-color:rgba(255,255,255,.25);color:#fff">📗 HK II</button>
+    <button class="btn btn-sm btn-outline" id="tkBtnAll" onclick="setTKFilter('all')" style="border-color:rgba(255,255,255,.25);color:#fff">📙 Cả năm</button>
+    <button class="btn btn-sm btn-gold" onclick="document.getElementById('tkExportDlg').classList.add('open')">📊 Xuất TK</button>
+    <button class="btn btn-sm btn-success" onclick="showModalGuiBaoCao()" title="Gửi báo cáo lên hệ thống">📤 Gửi báo cáo</button>
+  </div>
+
 </div>
 
 <!-- MAIN CONTENT -->
@@ -1241,6 +1265,7 @@ tr.row-kt td.td-cls{color:var(--red)}
 // ═══════════════════════════════════════
 
 var APP_VER = '4.0';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbx5DT0yB5dogwrw8XiFFcNCML0ztSLzNIZNBAZHlTL20VnDfbKW2u5l7bMGnrYUvHxU/exec';
 var SK = { l:'bcc_l', e:'bcc_e', n:'bcc_n', c:'bcc_c', s:'bcc_s', m:'bcc_m', cfg:'bcc_cfg', ts:'bcc_ts' };
 
 // ── IndexedDB wrapper (thay thế localStorage) ──
@@ -2815,11 +2840,15 @@ function openExportDialog(mode) {
 
 // Hàm mới: set học kỳ rồi mở dialog xuất
 function _setHKAndExport(hkMode) {
-  var prevMode = tkFilterMode;
   tkFilterMode = hkMode;
-  _doOpenExport('all', 'all');
-  // Ghi chú: tkFilterMode đã được set, doExport() sẽ tự đọc khi xuất
-  // Khôi phục sau khi dialog đóng không cần thiết vì người dùng chủ động chọn HK
+  // Xuất thẳng không qua dialog tên file
+  var suffix = hkMode === 'hk1' ? 'HKI' : hkMode === 'hk2' ? 'HKII' : 'CaNam';
+  var yr = (CFG.schoolYear || '2025_2026').replace(/ /g,'').replace(/-/g,'_');
+  exportMode = 'all';
+  _exportClsFilter = 'all';
+  // Tạo tên file tự động theo HK
+  G('sdFilename').value = 'bang_cham_cong_' + suffix + '_' + yr;
+  doExport();
 }
 
 function _doOpenExport(mode, clsFilter) {
@@ -2938,7 +2967,167 @@ function dlBlob(blob, fname) {
   }, 200);
   toast('💾 Đã tải: ' + fname, 't-ok');
 }
+// ══ GỬI BÁO CÁO LÊN GOOGLE SHEETS ══════
+// ══ MODAL CHỌN HK TRƯỚC KHI GỬI ══════
+function showModalGuiBaoCao() {
+  // Tạo modal nếu chưa có
+  if (!document.getElementById('modal-chon-hk')) {
+    var modal = document.createElement('div');
+    modal.id = 'modal-chon-hk';
+    modal.style.cssText = `
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+    `;
+    modal.innerHTML = `
+      <div style="background:#fff; border-radius:12px; padding:28px 32px; 
+                  min-width:320px; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 16px; color:#0D1B3E; font-size:18px;">
+          📤 Gửi báo cáo lên hệ thống
+        </h3>
+        <p style="margin:0 0 16px; color:#555; font-size:14px;">
+          Chọn học kỳ cần gửi báo cáo:
+        </p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+          <label style="display:flex; align-items:center; gap:10px; cursor:pointer; 
+                        padding:10px; border:2px solid #e0e0e0; border-radius:8px;">
+            <input type="radio" name="chon-hk" value="hk1" checked>
+            <span>📚 <b>Học kỳ I</b> (Tháng 9 → Tháng 1)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:10px; cursor:pointer;
+                        padding:10px; border:2px solid #e0e0e0; border-radius:8px;">
+            <input type="radio" name="chon-hk" value="hk2">
+            <span>📚 <b>Học kỳ II</b> (Tháng 2 → Tháng 5)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:10px; cursor:pointer;
+                        padding:10px; border:2px solid #e0e0e0; border-radius:8px;">
+            <input type="radio" name="chon-hk" value="canam">
+            <span>📚 <b>Cả năm</b></span>
+          </label>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button onclick="document.getElementById('modal-chon-hk').style.display='none'"
+            style="padding:8px 20px; border:1px solid #ccc; border-radius:6px; 
+                   background:#fff; cursor:pointer; font-size:14px;">
+            ❌ Hủy
+          </button>
+          <button onclick="xacNhanGuiBaoCao()"
+            style="padding:8px 20px; border:none; border-radius:6px;
+                   background:#198754; color:#fff; cursor:pointer; 
+                   font-size:14px; font-weight:bold;">
+            ✅ Xác nhận gửi
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  // Tự động chọn HK đang xem
+  var hkHienTai = tkFilterMode || 'hk1';
+  var radio = document.querySelector('input[name="chon-hk"][value="' + hkHienTai + '"]');
+  if (radio) radio.checked = true;
 
+  document.getElementById('modal-chon-hk').style.display = 'flex';
+}
+
+async function xacNhanGuiBaoCao() {
+  // Đóng modal
+  document.getElementById('modal-chon-hk').style.display = 'none';
+
+  // Lấy HK đã chọn - CHỈ KHAI BÁO 1 LẦN
+  var hkMode = document.querySelector('input[name="chon-hk"]:checked').value;
+  var bCfg   = getBieu1Config(hkMode);
+
+  // DEBUG - mở F12 Console để xem
+  console.log('hkMode:', hkMode);
+  console.log('Months:', JSON.stringify(bCfg.months));
+
+  var ktMap = getKTMapByCls();
+  var allKtCls = allClasses.filter(function(c) {
+    var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
+    return !!ktMap[r];
+  });
+
+  var tongLop  = allKtCls.length;
+  var tongHS   = studentList.length;
+  var tongTiet = 0;
+  allKtCls.forEach(function(c) {
+    tongTiet += getTongTietClsInMonths(c, bCfg.months, bCfg.hkRange);
+  });
+
+  var _luong     = parseFloat((document.getElementById('b1d-luong')    ||{value:0}).value)||0;
+  var _luongCS   = parseFloat((document.getElementById('b1d-luongcs')  ||{value:0}).value)||0;
+  var _kv        = parseFloat((document.getElementById('b1d-kv')       ||{value:0}).value)||0;
+  var _uuai      = parseFloat((document.getElementById('b1d-uuai')     ||{value:0}).value)||0;
+  var _mucPC     = parseFloat((document.getElementById('b1d-mucpc')    ||{value:0}).value)||0;
+  var _chucvu    = parseFloat((document.getElementById('b1d-chucvu')   ||{value:0}).value)||0;
+  var _pctnng    = parseFloat((document.getElementById('b1d-pctnng')   ||{value:0}).value)||0;
+  var _tongLuong = parseFloat((document.getElementById('b1d-tongluong')||{value:0}).value)||0;
+  var _tien1Gio  = parseFloat((document.getElementById('b1d-tien1gio') ||{value:0}).value)||0;
+  var _phuCap    = parseFloat((document.getElementById('b1d-phucap')   ||{value:0}).value)||0;
+
+  var thangTiet = {};
+  bCfg.months.forEach(function(x) {
+    var t = 0;
+    allKtCls.forEach(function(c) {
+      t += getMonthLessonsInRange(c, x.m, x.y, bCfg.hkRange.start, bCfg.hkRange.end);
+    });
+    thangTiet['t' + x.m + '_' + x.y] = t;
+  });
+
+  var payload = {
+    hkMode:       hkMode,
+    teacher:      CFG.teacher    || '',
+    school:       CFG.school     || '',
+    code:         CFG.code       || '',
+    schoolYear:   CFG.schoolYear || '',
+    monDay:       CFG.monDay     || CFG.subject || '',
+    tongLop:      tongLop,
+    tongHS:       tongHS,
+    tongTiet:     tongTiet,
+    b1a_tongLop:  tongLop,
+    b1a_tongHS:   tongHS,
+    b1a_tongTiet: tongTiet,
+    thangTiet:    thangTiet,
+    b1b_tongTiet: tongTiet,
+    b1c_tongTiet: tongTiet,
+    luong:        _luong,
+    luongCS:      _luongCS,
+    kv:           _kv,
+    uuai:         _uuai,
+    mucPC:        _mucPC,
+    chucvu:       _chucvu,
+    pctnng:       _pctnng,
+    tongLuong:    _tongLuong,
+    tien1Gio:     _tien1Gio,
+    phuCap:       _phuCap,
+    b1g_tongLop:  tongLop,
+    b1g_tongGV:   1,
+    b1g_tongTiet: tongTiet,
+    b1g_tongKP:   _phuCap,
+    ghiChu:       ''
+  };
+
+  try {
+    toast('📤 Đang gửi báo cáo ' + 
+      (hkMode==='hk1'?'Học kỳ I':hkMode==='hk2'?'Học kỳ II':'Cả năm') + '...', 't-info');
+    var encoded = encodeURIComponent(JSON.stringify(payload));
+var iframe = document.createElement('iframe');
+iframe.style.display = 'none';
+iframe.src = GAS_URL + '?p=' + encoded;
+document.body.appendChild(iframe);
+await new Promise(function(resolve){ setTimeout(resolve, 4000); });
+document.body.removeChild(iframe);
+    toast('✅ Đã gửi báo cáo ' +
+      (hkMode==='hk1'?'Học kỳ I':hkMode==='hk2'?'Học kỳ II':'Cả năm') +
+      ' thành công!', 't-ok');
+  } catch(err) {
+    toast('❌ Không gửi được: ' + err.message, 't-err');
+  }
+}
+
+// Giữ hàm cũ để không bị lỗi nếu có chỗ nào còn gọi
+function guiBaoCao() { showModalGuiBaoCao(); }
 // ══ BUILD EXCEL SHEET ══════════════════
 function buildSheet(wb, key, ktFilter, hkMode) {
   var parts = key.split('_');
@@ -3140,17 +3329,17 @@ if (cnt > 0 && _hkStart && _hkEnd) {
   exR += 2;
 
   var dateStr = (CFG.location||'Gia Phú') + ', ngày ' + days + ' tháng ' + pad2(m) + ' năm ' + y;
-  var midC = Math.round(CD1 + days * 0.55);
-  S(ws.getRow(exR).getCell(midC), dateStr, {name:'Times New Roman',size:10,italic:true}, null, aCC);
-  ws.mergeCells(exR, midC, exR, NC); exR++;
-  var s1=1, s2=Math.round(NC*0.38), s3=Math.round(NC*0.76);
-  [[s1,s1+4,'Người chấm công'],[s2,s2+5,'PHT, Phụ trách chuyên môn'],[s3,NC,'Hiệu trưởng']].forEach(function(fc){
-    S(ws.getRow(exR).getCell(fc[0]),fc[2],fB,null,aCC); ws.mergeCells(exR,fc[0],exR,Math.min(fc[1],NC));
-  });
-  exR++; ws.getRow(exR).height=30; exR++;
-  [[s1,s1+4,CFG.teacher],[s2,s2+5,CFG.pht],[s3,NC,CFG.principal]].forEach(function(fc){
-    S(ws.getRow(exR).getCell(fc[0]),fc[2],fB,null,aCC); ws.mergeCells(exR,fc[0],exR,Math.min(fc[1],NC));
-  });
+var s1=1, s2=Math.round(NC*0.38), s3=Math.round(NC*0.76);
+// Dùng s3 (vị trí "Hiệu trưởng") làm chuẩn cho dòng ngày tháng
+S(ws.getRow(exR).getCell(s3), dateStr, {name:'Times New Roman',size:10,italic:true}, null, aCC);
+ws.mergeCells(exR, s3, exR, NC); exR++;
+[[s1,s1+4,'Người chấm công'],[s2,s2+8,'PHT, Phụ trách chuyên môn'],[s3,NC,'Hiệu trưởng']].forEach(function(fc){
+  S(ws.getRow(exR).getCell(fc[0]),fc[2],fB,null,aCC); ws.mergeCells(exR,fc[0],exR,Math.min(fc[1],NC));
+});
+exR++; ws.getRow(exR).height=30; exR++;
+[[s1,s1+4,CFG.teacher],[s2,s2+8,CFG.pht],[s3,NC,CFG.principal]].forEach(function(fc){
+  S(ws.getRow(exR).getCell(fc[0]),fc[2],fB,null,aCC); ws.mergeCells(exR,fc[0],exR,Math.min(fc[1],NC));
+});
 }
 
 // ══ EXPORT PDF ════════════════════════
@@ -4402,7 +4591,7 @@ var _dataRowH = Math.min(40, Math.max(16, _availH / Math.max(1, dispCls.length +
       c.alignment = al||aCC;
     }
     ws.mergeCells(sumRowIdx, 1, sumRowIdx, 4);
-    sc(1,'Tổng số', fHd, aRC);
+sc(1,'Tổng số', fHd, aCC);
     sc(5, totalLessons, {name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}});
     sc(6, null, fHd); sc(7, null, fHd);
     months.forEach(function(x, i) {
@@ -6134,7 +6323,7 @@ ws.pageSetup = {
   setCell(ws.getRow(sumR).getCell(2),null,S.fHd,S.bgSm,S.aCC,S.bT);
   setCell(ws.getRow(sumR).getCell(3),null,S.fHd,S.bgSm,S.aCC,S.bT);
   ws.mergeCells(sumR,1,sumR,3); colTotals.forEach(function(v,i){ setCell(ws.getRow(sumR).getCell(mStartCol+i),v||null,{name:'Times New Roman',size:9,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); }); setCell(ws.getRow(sumR).getCell(totalCols-1),grandTotal,{name:'Times New Roman',size:10,bold:true,color:{argb:'FF000000'}},S.bgSm,S.aCC,S.bT); setCell(ws.getRow(sumR).getCell(totalCols),null,S.fHd,S.bgSm,S.aCC,S.bT);
-  var signR=sumR+2,now=new Date(),mid=Math.floor(totalCols*0.6);
+  var signR=sumR+2,now=new Date(),mid=Math.floor(totalCols*0.7);
   ws.getRow(signR).getCell(mid).value=(CFG.location||'')+', ngày '+now.getDate()+' tháng '+pad2(now.getMonth()+1)+' năm '+now.getFullYear(); ws.getRow(signR).getCell(mid).font={name:'Times New Roman',size:10,italic:true}; ws.getRow(signR).getCell(mid).alignment=S.aCC; ws.mergeCells(signR,mid,signR,totalCols);
   ws.getRow(signR+1).getCell(mid).value='Giáo viên bộ môn'; ws.getRow(signR+1).getCell(mid).font=S.fB; ws.getRow(signR+1).getCell(mid).alignment=S.aCC; ws.mergeCells(signR+1,mid,signR+1,totalCols);
   ws.getRow(signR+4).getCell(mid).value=CFG.teacher; ws.getRow(signR+4).getCell(mid).font=S.fB; ws.getRow(signR+4).getCell(mid).alignment=S.aCC; ws.mergeCells(signR+4,mid,signR+4,totalCols);
@@ -6402,7 +6591,7 @@ async function _buildBieu1dSheet(wb) {
   // --- Ký tên ---
   var sRow = sumR + 2;
   var now  = new Date();
-  var mid  = Math.floor(totalCols * 0.6);
+  var mid  = Math.floor(totalCols * 0.7);
   ws.getRow(sRow).getCell(mid).value =
     (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
   ws.getRow(sRow).getCell(mid).font = {name:'Times New Roman',size:10,italic:true};
@@ -6805,16 +6994,13 @@ var _rowH = Math.min(28, Math.max(16, (_pageH - (CFG.mgTop+CFG.mgBot)/2.54*72 - 
     setCell(row.getCell(10), s.ghiChu||'',S.fM, null, {horizontal:'left',vertical:'middle',wrapText:true}, S.bT);
   });
 
-  // Dòng tổng
-  var sumR = dataR + studentList.length;
-  ws.mergeCells(sumR,1,sumR,2);
-  setCell(ws.getRow(sumR).getCell(1), 'Tổng số: ' + studentList.length + ' học sinh', S.fB, S.bgSm, {horizontal:'left',vertical:'middle'});
-  for (var c=3; c<=totalCols; c++) setCell(ws.getRow(sumR).getCell(c), null, S.fHd, S.bgSm, S.aCC, S.bT);
+ // Dòng tổng
+var sumR = dataR + studentList.length;
 
   // Ký tên
-  var signR = sumR + 2;
+  var signR = sumR + 1;
   var now = new Date();
-  var mid  = Math.floor(totalCols * 0.6);
+  var mid  = Math.floor(totalCols * 0.7);
   ws.getRow(signR).getCell(mid).value = (CFG.location||'') + ', ngày ' + now.getDate() + ' tháng ' + pad2(now.getMonth()+1) + ' năm ' + now.getFullYear();
   ws.getRow(signR).getCell(mid).font = {name:'Times New Roman',size:10,italic:true};
   ws.getRow(signR).getCell(mid).alignment = S.aCC;
@@ -8121,7 +8307,7 @@ function setActiveBieuBtn(activeId) {
 }  
 // ══ AUTH — Phân quyền qua Gmail ══════════════════════
 // ⚠️ Thay URL bên dưới bằng URL Apps Script mới sau khi deploy
-var _API = 'https://script.google.com/macros/s/AKfycbw9RRBJjD7Q9AZ_nIEd25CIL8jvx_szQUTJDNsT5dej3SDbn9jsCIfSz9tsi8xwKGhE7w/exec';
+var _API = 'https://script.google.com/macros/s/AKfycbx5DT0yB5dogwrw8XiFFcNCMLOztSLzNIZNBAZHlTL20VnDfbKW2u5I7bMGnrYUvHxU/exec';
 
 // Danh sách email dự phòng (dùng khi Apps Script không phản hồi)
 var _LOCAL_WHITELIST = [
@@ -8805,7 +8991,7 @@ async function _buildBieu1dSheet(wb, capHocParam) {
  
   // Ký tên
   var sRow = sumR + 2, now = new Date();
-  var mid  = Math.floor(totalCols * 0.6);
+  var mid  = Math.floor(totalCols * 0.7);
   var pad  = function(n) { return n < 10 ? '0'+n : ''+n; };
   var loc  = typeof CFG !== 'undefined' ? CFG.location : '';
   ws.getRow(sRow).getCell(mid).value = (loc||'') + ', ngày ' + now.getDate() + ' tháng ' + pad(now.getMonth()+1) + ' năm ' + now.getFullYear();
