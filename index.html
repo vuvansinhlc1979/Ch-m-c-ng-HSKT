@@ -3052,14 +3052,17 @@ async function xacNhanGuiBaoCao() {
     thangTiet[key] = 0;
   });
 
-  // Tính tiết từng lớp
+  const dsLopCoHSKT = [...new Set((studentList || []).map(s => s.cls || s.lop))];
+
   (allClasses || []).forEach(cls => {
+    const clsName = cls.split('||')[0].trim();
+    if (!dsLopCoHSKT.includes(clsName)) return; // Bỏ qua lớp không có HSKT
+
     const tiet = getTongTietClsInMonths(cls, months, hkRange);
     if (tiet > 0) {
       tongLop++;
       tongTiet += tiet;
-      // Đếm HS của lớp này
-      const hsOfCls = (studentList || []).filter(s => s.lop === cls);
+      const hsOfCls = (studentList || []).filter(s => (s.cls || s.lop) === clsName);
       tongHS += hsOfCls.length;
     }
     // Tính theo từng tháng
@@ -3088,6 +3091,16 @@ async function xacNhanGuiBaoCao() {
   const b1g_tongTiet = tongTiet;
   const b1g_tongKP   = phuCap;
 
+  // Tính tiết theo từng lớp
+  const thangTietTheoLop = {};
+  (allClasses || []).forEach(cls => {
+    const clsName = cls.split('||')[0].trim();
+    const hsOfCls = (studentList || []).filter(s => (s.cls || s.lop) === clsName);
+    if (hsOfCls.length > 0) {
+      thangTietTheoLop[clsName] = getTongTietClsInMonths(cls, months, hkRange);
+    }
+  });
+
   const payload = {
     hkMode,
     teacher    : CFG.teacher    || '',
@@ -3096,20 +3109,14 @@ async function xacNhanGuiBaoCao() {
     schoolYear : CFG.schoolYear || '',
     tongLop, tongHS, tongTiet,
     thangTiet,
+    thangTietTheoLop,
+    allClasses : allClasses || [],
+    studentList: studentList || [],
     luong, luongCS, kv, uuai, mucPC, chucvu, pctnng,
     tongLuong, tien1Gio, phuCap,
     b1g_tongLop, b1g_tongGV, b1g_tongTiet, b1g_tongKP
   };
 
-  // ── KIỂM TRA ĐỘ DÀI URL ───────────────────────────────────
-  const payloadStr = encodeURIComponent(JSON.stringify(payload));
-  const fullUrl    = GAS_URL + '?payload=' + payloadStr;
-
-  console.log('📏 Độ dài URL:', fullUrl.length, 'ký tự');
-  if (fullUrl.length > 8000) {
-    alert('⚠️ Payload quá dài (' + fullUrl.length + ' ký tự)!\nVui lòng liên hệ kỹ thuật để rút gọn.');
-    return;
-  }
 
   // ── GỬI LÊN GAS ────────────────────────────────────────────
   // Hiện loading
@@ -3118,7 +3125,11 @@ async function xacNhanGuiBaoCao() {
   if (btn) btn.innerHTML = '⏳ Đang gửi...';
 
   try {
-    const res  = await fetch(fullUrl, { method: 'GET', redirect: 'follow' });
+    const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  });
     const text = await res.text();
     const json = JSON.parse(text);
 
