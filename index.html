@@ -3112,12 +3112,11 @@ async function xacNhanGuiBaoCao() {
     toast('📤 Đang gửi báo cáo ' + 
       (hkMode==='hk1'?'Học kỳ I':hkMode==='hk2'?'Học kỳ II':'Cả năm') + '...', 't-info');
     var encoded = encodeURIComponent(JSON.stringify(payload));
-var iframe = document.createElement('iframe');
-iframe.style.display = 'none';
-iframe.src = GAS_URL + '?p=' + encoded;
-document.body.appendChild(iframe);
-await new Promise(function(resolve){ setTimeout(resolve, 4000); });
-document.body.removeChild(iframe);
+    await fetch(GAS_URL + '?p=' + encoded, {
+      method: 'GET',
+      mode: 'no-cors'
+    });
+    await new Promise(function(resolve){ setTimeout(resolve, 3000); });
     toast('✅ Đã gửi báo cáo ' +
       (hkMode==='hk1'?'Học kỳ I':hkMode==='hk2'?'Học kỳ II':'Cả năm') +
       ' thành công!', 't-ok');
