@@ -1265,7 +1265,7 @@ tr.row-kt td.td-cls{color:var(--red)}
 // ═══════════════════════════════════════
 
 var APP_VER = '4.0';
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbx5DT0yB5dogwrw8XiFFcNCML0ztSLzNIZNBAZHlTL20VnDfbKW2u5l7bMGnrYUvHxU/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbydiRMrZFIMXYcVpYTinAgeLdInL7caZCAdp2EVAjTu3Jp3iRs2Cn6cKe5d3tUwTl2eyg/exec';
 var SK = { l:'bcc_l', e:'bcc_e', n:'bcc_n', c:'bcc_c', s:'bcc_s', m:'bcc_m', cfg:'bcc_cfg', ts:'bcc_ts' };
 
 // ── IndexedDB wrapper (thay thế localStorage) ──
@@ -8322,6 +8322,7 @@ function setActiveBieuBtn(activeId) {
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbydiRMrZFIMXYcVpYTinAgeLdInL7caZCAdp2EVAjTu3Jp3iRs2Cn6cKe5d3tUwTl2eyg/exec';
 
 // Danh sách email dự phòng (dùng khi Apps Script không phản hồi)
+var _API = GAS_URL;
 var _LOCAL_WHITELIST = [
   'vuvansinh1c1979@gmail.com',
   'nguachien7979@gmail.com',
@@ -8381,7 +8382,7 @@ function doAuth() {
     _cleanupAuth();
     console.warn('[Auth] Timeout sau 8s, thử whitelist nội bộ...');
     _tryLocalAuth(email, msg, btn);
-  }, 8000);
+  }, 0);
 
   document.body.appendChild(script);
 }
