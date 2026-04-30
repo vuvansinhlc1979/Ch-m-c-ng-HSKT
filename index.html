@@ -3034,94 +3034,107 @@ async function xacNhanGuiBaoCao() {
   // Đóng modal
   document.getElementById('modal-chon-hk').style.display = 'none';
 
-  // Lấy HK đã chọn - CHỈ KHAI BÁO 1 LẦN
-  var hkMode = document.querySelector('input[name="chon-hk"]:checked').value;
-  var bCfg   = getBieu1Config(hkMode);
+  // Lấy HK được chọn
+  const hkMode = document.querySelector('input[name="chon-hk"]:checked').value;
 
-  // DEBUG - mở F12 Console để xem
-  console.log('hkMode:', hkMode);
-  console.log('Months:', JSON.stringify(bCfg.months));
+  // ── BUILD PAYLOAD ──────────────────────────────────────────
+  const cfg = getBieu1Config(hkMode);
+  const months = cfg.months;
+  const hkRange = cfg.hkRange;
 
-  var ktMap = getKTMapByCls();
-  var allKtCls = allClasses.filter(function(c) {
-    var r = c.indexOf('||') >= 0 ? c.split('||')[0] : c;
-    return !!ktMap[r];
+  // Tổng hợp theo lớp
+  let tongLop = 0, tongHS = 0, tongTiet = 0;
+  const thangTiet = {};
+
+  // Khởi tạo thangTiet theo HK
+  months.forEach(m => {
+    const key = 't' + m.m + '_' + m.y;
+    thangTiet[key] = 0;
   });
 
-  var tongLop  = allKtCls.length;
-  var tongHS   = studentList.length;
-  var tongTiet = 0;
-  allKtCls.forEach(function(c) {
-    tongTiet += getTongTietClsInMonths(c, bCfg.months, bCfg.hkRange);
-  });
-
-  var _luong     = parseFloat((document.getElementById('b1d-luong')    ||{value:0}).value)||0;
-  var _luongCS   = parseFloat((document.getElementById('b1d-luongcs')  ||{value:0}).value)||0;
-  var _kv        = parseFloat((document.getElementById('b1d-kv')       ||{value:0}).value)||0;
-  var _uuai      = parseFloat((document.getElementById('b1d-uuai')     ||{value:0}).value)||0;
-  var _mucPC     = parseFloat((document.getElementById('b1d-mucpc')    ||{value:0}).value)||0;
-  var _chucvu    = parseFloat((document.getElementById('b1d-chucvu')   ||{value:0}).value)||0;
-  var _pctnng    = parseFloat((document.getElementById('b1d-pctnng')   ||{value:0}).value)||0;
-  var _tongLuong = parseFloat((document.getElementById('b1d-tongluong')||{value:0}).value)||0;
-  var _tien1Gio  = parseFloat((document.getElementById('b1d-tien1gio') ||{value:0}).value)||0;
-  var _phuCap    = parseFloat((document.getElementById('b1d-phucap')   ||{value:0}).value)||0;
-
-  var thangTiet = {};
-  bCfg.months.forEach(function(x) {
-    var t = 0;
-    allKtCls.forEach(function(c) {
-      t += getMonthLessonsInRange(c, x.m, x.y, bCfg.hkRange.start, bCfg.hkRange.end);
+  // Tính tiết từng lớp
+  (allClasses || []).forEach(cls => {
+    const tiet = getTongTietClsInMonths(cls, months, hkRange);
+    if (tiet > 0) {
+      tongLop++;
+      tongTiet += tiet;
+      // Đếm HS của lớp này
+      const hsOfCls = (studentList || []).filter(s => s.lop === cls);
+      tongHS += hsOfCls.length;
+    }
+    // Tính theo từng tháng
+    months.forEach(m => {
+      const key = 't' + m.m + '_' + m.y;
+      const t = getMonthLessonsInRange(cls, m.m, m.y, hkRange.start, hkRange.end);
+      thangTiet[key] = (thangTiet[key] || 0) + t;
     });
-    thangTiet['t' + x.m + '_' + x.y] = t;
   });
 
-  var payload = {
-    hkMode:       hkMode,
-    teacher:      CFG.teacher    || '',
-    school:       CFG.school     || '',
-    code:         CFG.code       || '',
-    schoolYear:   CFG.schoolYear || '',
-    monDay:       CFG.monDay     || CFG.subject || '',
-    tongLop:      tongLop,
-    tongHS:       tongHS,
-    tongTiet:     tongTiet,
-    b1a_tongLop:  tongLop,
-    b1a_tongHS:   tongHS,
-    b1a_tongTiet: tongTiet,
-    thangTiet:    thangTiet,
-    b1b_tongTiet: tongTiet,
-    b1c_tongTiet: tongTiet,
-    luong:        _luong,
-    luongCS:      _luongCS,
-    kv:           _kv,
-    uuai:         _uuai,
-    mucPC:        _mucPC,
-    chucvu:       _chucvu,
-    pctnng:       _pctnng,
-    tongLuong:    _tongLuong,
-    tien1Gio:     _tien1Gio,
-    phuCap:       _phuCap,
-    b1g_tongLop:  tongLop,
-    b1g_tongGV:   1,
-    b1g_tongTiet: tongTiet,
-    b1g_tongKP:   _phuCap,
-    ghiChu:       ''
+  // Lương & phụ cấp từ CFG
+  const luong     = Number(CFG.luong     || 0);
+  const luongCS   = Number(CFG.luongCS   || 0);
+  const kv        = Number(CFG.kv        || 0);
+  const uuai      = Number(CFG.uuai      || 0);
+  const mucPC     = Number(CFG.mucPC     || 0);
+  const chucvu    = Number(CFG.chucvu    || 0);
+  const pctnng    = Number(CFG.pctnng    || 0);
+  const tongLuong = Number(CFG.tongLuong || 0);
+  const tien1Gio  = Number(CFG.tien1Gio  || 0);
+  const phuCap    = Number(CFG.phuCap    || 0);
+
+  // Biểu 1g
+  const b1g_tongLop  = tongLop;
+  const b1g_tongGV   = 1;
+  const b1g_tongTiet = tongTiet;
+  const b1g_tongKP   = phuCap;
+
+  const payload = {
+    hkMode,
+    teacher    : CFG.teacher    || '',
+    school     : CFG.school     || '',
+    code       : CFG.code       || '',
+    schoolYear : CFG.schoolYear || '',
+    tongLop, tongHS, tongTiet,
+    thangTiet,
+    luong, luongCS, kv, uuai, mucPC, chucvu, pctnng,
+    tongLuong, tien1Gio, phuCap,
+    b1g_tongLop, b1g_tongGV, b1g_tongTiet, b1g_tongKP
   };
 
+  // ── KIỂM TRA ĐỘ DÀI URL ───────────────────────────────────
+  const payloadStr = encodeURIComponent(JSON.stringify(payload));
+  const fullUrl    = GAS_URL + '?payload=' + payloadStr;
+
+  console.log('📏 Độ dài URL:', fullUrl.length, 'ký tự');
+  if (fullUrl.length > 8000) {
+    alert('⚠️ Payload quá dài (' + fullUrl.length + ' ký tự)!\nVui lòng liên hệ kỹ thuật để rút gọn.');
+    return;
+  }
+
+  // ── GỬI LÊN GAS ────────────────────────────────────────────
+  // Hiện loading
+  const btn = document.querySelector('[onclick*="showModalGuiBaoCao"]');
+  const oldText = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '⏳ Đang gửi...';
+
   try {
-    toast('📤 Đang gửi báo cáo ' + 
-      (hkMode==='hk1'?'Học kỳ I':hkMode==='hk2'?'Học kỳ II':'Cả năm') + '...', 't-info');
-    var encoded = encodeURIComponent(JSON.stringify(payload));
-    await fetch(GAS_URL + '?p=' + encoded, {
-      method: 'GET',
-      mode: 'no-cors'
-    });
-    await new Promise(function(resolve){ setTimeout(resolve, 3000); });
-    toast('✅ Đã gửi báo cáo ' +
-      (hkMode==='hk1'?'Học kỳ I':hkMode==='hk2'?'Học kỳ II':'Cả năm') +
-      ' thành công!', 't-ok');
-  } catch(err) {
-    toast('❌ Không gửi được: ' + err.message, 't-err');
+    const res  = await fetch(fullUrl, { method: 'GET' });
+    const json = await res.json();
+
+    if (json.status === 'OK') {
+      alert('✅ Gửi báo cáo thành công!\n' +
+            'HK: ' + hkMode.toUpperCase() +
+            '\nTổng tiết: ' + tongTiet +
+            '\nFile: ' + (json.fileName || 'Đã ghi vào Sheets'));
+    } else {
+      alert('❌ GAS trả lỗi: ' + (json.error || JSON.stringify(json)));
+    }
+  } catch (err) {
+    alert('❌ Không gửi được!\nLỗi: ' + err.message +
+          '\n\nKiểm tra:\n1. GAS đã deploy chưa?\n2. URL trong GAS_URL có đúng không?');
+    console.error('Lỗi gửi báo cáo:', err);
+  } finally {
+    if (btn) btn.innerHTML = oldText;
   }
 }
 
