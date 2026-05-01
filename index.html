@@ -3074,7 +3074,7 @@ async function xacNhanGuiBaoCao() {
 
     // Chỉ đếm lớp 1 lần
     if (!dsLopDaDem.has(clsName)) {
-      if (tiet > 0) tongLop++;
+      tongLop++;
       dsLopDaDem.add(clsName);
       const hsOfCls = (studentList || []).filter(s => (s.cls || s.lop) === clsName);
       tongHS += hsOfCls.length;
