@@ -21,7 +21,7 @@
 }
 </style> 
 <head>
- <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src *; img-src * data: blob:; frame-src *;"> 
+ <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src *; script-src * 'unsafe-inline' 'unsafe-eval'; frame-src *; img-src * data:;">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hệ Thống Chấm Công – Trường TH Số 2 Gia Phú</title>
