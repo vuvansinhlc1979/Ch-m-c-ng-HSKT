@@ -3088,16 +3088,17 @@ async function xacNhanGuiBaoCao() {
   });
 
   // Lương & phụ cấp từ CFG
-  const luong     = Number(CFG.luong     || 0);
-  const luongCS   = Number(CFG.luongCS   || 0);
-  const kv        = Number(CFG.kv        || 0);
-  const uuai      = Number(CFG.uuai      || 0);
-  const mucPC     = Number(CFG.mucPC     || 0);
-  const chucvu    = Number(CFG.chucvu    || 0);
-  const pctnng    = Number(CFG.pctnng    || 0);
-  const tongLuong = Number(CFG.tongLuong || 0);
-  const tien1Gio  = Number(CFG.tien1Gio  || 0);
-  const phuCap    = Number(CFG.phuCap    || 0);
+  function _gv(id) { return parseFloat((document.getElementById(id)||{value:0}).value)||0; }
+  const luong     = _gv('b1d-luong');
+  const luongCS   = _gv('b1d-luongcs');
+  const kv        = _gv('b1d-kv');
+  const uuai      = _gv('b1d-uuai');
+  const mucPC     = _gv('b1d-mucpc');
+  const chucvu    = _gv('b1d-chucvu');
+  const pctnng    = _gv('b1d-pctnng');
+  const tongLuong = _gv('b1d-tongluong');
+  const tien1Gio  = _gv('b1d-tien1gio');
+  const phuCap    = _gv('b1d-phucap');
 
   // Biểu 1g
   const b1g_tongLop  = tongLop;
