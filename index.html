@@ -8404,25 +8404,12 @@ function doAuth() {
     return;
   }
 
-  btn.disabled = true;
+  btn.disabled    = true;
   btn.textContent = '⏳ Đang kiểm tra...';
   msg.style.color = 'rgba(255,255,255,.55)';
   msg.textContent = 'Đang xác thực...';
 
-  // GỌI APPS SCRIPT THẬT SỰ
-  fetch(_API + '?action=checkEmail&email=' + encodeURIComponent(email))
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.allowed) {
-        _grantAccess();
-      } else {
-        _denyAccess(email, msg, btn);
-      }
-    })
-    .catch(function() {
-      // Fallback về whitelist cục bộ nếu mạng lỗi
-      _tryLocalAuth(email, msg, btn);
-    });
+  _tryLocalAuth(email, msg, btn);
 }
 
 // Kiểm tra whitelist cục bộ (fallback)
